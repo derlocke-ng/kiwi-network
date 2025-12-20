@@ -1,0 +1,43 @@
+site_name: Kiwi Network
+site_description: Self-hosted, privacy-first infrastructure for individuals, SMBs, and public offices.
+site_url: https://docs.kiwi-network.eu
+repo_url: https://github.com/derlocke-ng/kiwi-network
+repo_name: kiwi-network
+
+site_dir: build/docs
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.top
+    - content.code.copy
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Overview: getting-started/index.md
+      - Network Model: getting-started/network-model.md
+  - Architecture:
+      - Overview: architecture/index.md
+      - kiwi-master: architecture/kiwi-master.md
+      - kiwi-node: architecture/kiwi-node.md
+      - kiwi-workstation: architecture/kiwi-workstation.md
+  - Federation: federation/index.md
+  - Compliance: compliance/index.md
+  - Roadmap: roadmap.md
+  - Contributing: contributing.md

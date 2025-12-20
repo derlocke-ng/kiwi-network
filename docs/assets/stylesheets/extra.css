@@ -1,0 +1,56 @@
+/*
+  Kiwi Network docs theme
+  Matches kiwi-blog defaults:
+  - content hue: 100
+  - header hue: 210
+*/
+
+:root {
+  --kiwi-content-hue: 100;
+  --kiwi-header-hue: 210;
+}
+
+/* Light */
+[data-md-color-scheme="default"] {
+  --md-default-fg-color: hsl(var(--kiwi-content-hue), 50%, 18%);
+  --md-default-fg-color--light: hsl(var(--kiwi-content-hue), 30%, 30%);
+  --md-default-bg-color: hsl(var(--kiwi-content-hue), 30%, 96%);
+  --md-default-bg-color--light: hsl(var(--kiwi-content-hue), 25%, 92%);
+
+  --md-primary-fg-color: hsl(var(--kiwi-header-hue), 25%, 25%);
+  --md-primary-fg-color--light: hsl(var(--kiwi-header-hue), 35%, 35%);
+  --md-primary-fg-color--dark: hsl(var(--kiwi-header-hue), 20%, 20%);
+  --md-primary-bg-color: hsl(var(--kiwi-header-hue), 15%, 88%);
+
+  --md-accent-fg-color: hsl(var(--kiwi-content-hue), 45%, 45%);
+  --md-accent-fg-color--transparent: hsla(var(--kiwi-content-hue), 45%, 45%, 0.12);
+
+  --md-typeset-a-color: hsl(var(--kiwi-content-hue), 60%, 38%);
+}
+
+/* Dark */
+[data-md-color-scheme="slate"] {
+  --md-default-fg-color: hsl(var(--kiwi-content-hue), 30%, 90%);
+  --md-default-fg-color--light: hsl(var(--kiwi-content-hue), 20%, 75%);
+  --md-default-bg-color: hsl(var(--kiwi-content-hue), 25%, 10%);
+  --md-default-bg-color--light: hsl(var(--kiwi-content-hue), 20%, 14%);
+
+  --md-primary-fg-color: hsl(var(--kiwi-header-hue), 25%, 18%);
+  --md-primary-fg-color--light: hsl(var(--kiwi-header-hue), 30%, 22%);
+  --md-primary-fg-color--dark: hsl(var(--kiwi-header-hue), 20%, 14%);
+  --md-primary-bg-color: hsl(var(--kiwi-header-hue), 15%, 92%);
+
+  --md-accent-fg-color: hsl(var(--kiwi-content-hue), 55%, 65%);
+  --md-accent-fg-color--transparent: hsla(var(--kiwi-content-hue), 55%, 65%, 0.12);
+
+  --md-typeset-a-color: hsl(var(--kiwi-content-hue), 60%, 70%);
+}
+
+/* Small alignment with kiwi-blog look */
+.md-header {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+}
+
+.md-typeset code {
+  border-radius: 0.25rem;
+}

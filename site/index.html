@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kiwi Network</title>
+  <meta name="description" content="Self-hosted, privacy-first infrastructure for individuals, SMBs, and public offices." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥝</text></svg>">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <a href="./">🥝 Kiwi Network</a>
+      <span class="tag">private infrastructure, made easy</span>
+    </div>
+
+    <nav class="nav">
+      <a href="https://docs.kiwi-network.eu">Docs</a>
+      <a href="https://github.com/derlocke-ng/kiwi-network">GitHub</a>
+      <button id="themeToggle" class="toggle" type="button">🌙 Dark</button>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <h1>Own your infrastructure.</h1>
+      <p>
+        Kiwi Network helps private individuals, SMBs, and public offices run a modern open-source
+        infrastructure with a minimal attack surface: one WireGuard entry point, everything else behind the VPN.
+      </p>
+
+      <div class="grid">
+        <div class="box">
+          <h2>kiwi-master</h2>
+          <p>Public entry point: WireGuard + network services.</p>
+          <ul>
+            <li>wg-easy (WireGuard server)</li>
+            <li>gluetun (upstream VPN/double-hop)</li>
+            <li>pihole (DNS)</li>
+            <li>optional Tor proxy</li>
+          </ul>
+        </div>
+        <div class="box">
+          <h2>kiwi-node</h2>
+          <p>Private services: reachable over VPN and/or locally.</p>
+          <ul>
+            <li>Nextcloud (AIO)</li>
+            <li>Vaultwarden</li>
+            <li>Reverse proxy (NGINX)</li>
+            <li>Docker services</li>
+          </ul>
+        </div>
+        <div class="box">
+          <h2>kiwi-workstation</h2>
+          <p>Daily driver OS for users/operators.</p>
+          <ul>
+            <li>Fedora Silverblue / Bluefin DX</li>
+            <li>easy onboarding</li>
+            <li>safe defaults</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="cta">
+        <a class="button primary" href="https://docs.kiwi-network.eu">Read the docs</a>
+        <a class="button secondary" href="https://github.com/derlocke-ng/kiwi-network">View on GitHub</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Federation (planned)</h2>
+      <p>
+        Connect multiple Kiwi Networks (e.g. Company A and B) to collaborate securely.
+        The goal: easier Nextcloud federation and controlled sharing, without exposing internal services publicly.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Docs</h2>
+      <p>
+        Documentation lives in MkDocs (Material) with dark mode and kiwi-blog default colors.
+      </p>
+      <pre><code>mkdocs serve</code></pre>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div>
+      <span>© 2025 Kiwi Network</span>
+      <span class="sep">—</span>
+      <a href="https://docs.kiwi-network.eu">docs.kiwi-network.eu</a>
+      <span class="sep">·</span>
+      <a href="https://kiwi-network.eu">kiwi-network.eu</a>
+    </div>
+  </footer>
+
+  <script src="theme.js"></script>
+</body>
+</html>

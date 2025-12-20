@@ -1,0 +1,70 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install MkDocs Material
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install mkdocs-material
+
+      - name: Build docs
+        run: |
+          mkdocs build --site-url https://kiwi-network.eu/docs/
+
+      - name: Assemble Pages output
+        run: |
+          rm -rf build/public
+          mkdir -p build/public/docs
+
+          # Homepage (root)
+          cp -a site/. build/public/
+
+          # Docs under /docs
+          cp -a build/docs/. build/public/docs/
+
+          # Custom domain for the Pages site
+          cp -a CNAME build/public/CNAME
+
+          # Disable Jekyll processing
+          touch build/public/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
