@@ -1,126 +1,350 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kiwi Network</title>
-  <meta name="description" content="Self-hosted, privacy-first infrastructure for individuals, SMBs, and public offices." />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kiwi Network — Private Infrastructure, Made Easy</title>
+  <meta name="description" content="Self-hosted, privacy-first infrastructure for individuals, SMBs, and public offices. One WireGuard entry point, everything else behind the VPN.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥝</text></svg>">
-  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="appbar" role="banner">
-    <div class="appbar__left">
-      <button class="iconbtn js-drawer-open" type="button" aria-label="Open menu" aria-controls="drawer" aria-expanded="false">
-        <span class="iconbtn__bars" aria-hidden="true"></span>
+  <!-- App Bar -->
+  <header class="appbar">
+    <div class="appbar__inner">
+      <a href="./" class="appbar__brand">
+        <span class="appbar__logo">🥝</span>
+        <span class="appbar__title">Kiwi Network</span>
+      </a>
+      <nav class="appbar__nav">
+        <a href="#features" class="nav__link">Features</a>
+        <a href="#architecture" class="nav__link">Architecture</a>
+        <a href="#federation" class="nav__link">Federation</a>
+        <a href="https://kiwi-network.eu/docs/" class="nav__link">Docs</a>
+        <a href="https://github.com/derlocke-ng/kiwi-network" class="nav__link nav__link--icon" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        </a>
+      </nav>
+      <button class="appbar__toggle js-theme-toggle" type="button" aria-label="Toggle theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
       </button>
-
-      <div class="brand">
-        <a class="brand__link" href="./">🥝 Kiwi Network</a>
-        <span class="tag">private infrastructure, made easy</span>
-      </div>
-    </div>
-
-    <nav class="tabs" aria-label="Primary">
-      <a class="tab" href="https://kiwi-network.eu/docs/">Docs</a>
-      <a class="tab" href="https://github.com/derlocke-ng/kiwi-network">GitHub</a>
-    </nav>
-
-    <div class="appbar__right">
-      <button class="toggle js-theme-toggle" type="button">🌙 Dark</button>
+      <button class="appbar__menu js-menu-toggle" type="button" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </header>
 
-  <div class="scrim js-drawer-close" hidden></div>
-
-  <aside id="drawer" class="drawer" aria-label="Menu" aria-hidden="true">
+  <!-- Mobile Drawer -->
+  <div class="drawer-scrim js-drawer-close" hidden></div>
+  <aside class="drawer" id="drawer" aria-hidden="true">
     <div class="drawer__header">
-      <div class="drawer__title">🥝 Kiwi Network</div>
-      <button class="iconbtn js-drawer-close" type="button" aria-label="Close menu">
-        <span class="iconbtn__x" aria-hidden="true"></span>
-      </button>
+      <span class="drawer__title">🥝 Kiwi Network</span>
+      <button class="drawer__close js-drawer-close" aria-label="Close menu">✕</button>
     </div>
-
     <nav class="drawer__nav">
-      <a class="drawer__link" href="https://kiwi-network.eu/docs/">Docs</a>
-      <a class="drawer__link" href="https://github.com/derlocke-ng/kiwi-network">GitHub</a>
-      <button class="drawer__link drawer__button js-theme-toggle" type="button">🌙 Dark</button>
+      <a href="#features" class="drawer__link js-drawer-close">Features</a>
+      <a href="#architecture" class="drawer__link js-drawer-close">Architecture</a>
+      <a href="#federation" class="drawer__link js-drawer-close">Federation</a>
+      <a href="https://kiwi-network.eu/docs/" class="drawer__link">Docs</a>
+      <a href="https://github.com/derlocke-ng/kiwi-network" class="drawer__link">GitHub</a>
     </nav>
   </aside>
 
-  <main class="wrap">
-    <section class="card">
-      <h1>Own your infrastructure.</h1>
-      <p>
-        Kiwi Network helps private individuals, SMBs, and public offices run a modern open-source
-        infrastructure with a minimal attack surface: one WireGuard entry point, everything else behind the VPN.
-      </p>
-
-      <div class="grid">
-        <div class="box">
-          <h2>kiwi-master</h2>
-          <p>Public entry point: WireGuard + network services.</p>
-          <ul>
-            <li>wg-easy (WireGuard server)</li>
-            <li>gluetun (upstream VPN/double-hop)</li>
-            <li>pihole (DNS)</li>
-            <li>optional Tor proxy</li>
-          </ul>
-        </div>
-        <div class="box">
-          <h2>kiwi-node</h2>
-          <p>Private services: reachable over VPN and/or locally.</p>
-          <ul>
-            <li>Nextcloud (AIO)</li>
-            <li>Vaultwarden</li>
-            <li>Reverse proxy (NGINX)</li>
-            <li>Docker services</li>
-          </ul>
-        </div>
-        <div class="box">
-          <h2>kiwi-workstation</h2>
-          <p>Daily driver OS for users/operators.</p>
-          <ul>
-            <li>Fedora Silverblue / Bluefin DX</li>
-            <li>easy onboarding</li>
-            <li>safe defaults</li>
-          </ul>
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero__content">
+        <h1 class="hero__title">Own your infrastructure.</h1>
+        <p class="hero__subtitle">
+          Kiwi Network is a privacy-first, self-hosted setup for individuals, SMBs, and public offices — built on open-source and Linux.
+        </p>
+        <p class="hero__highlight">
+          <strong>One WireGuard entry point.</strong> Everything else behind the VPN.
+        </p>
+        <div class="hero__actions">
+          <a href="https://kiwi-network.eu/docs/" class="btn btn--primary">Read the Docs</a>
+          <a href="https://github.com/derlocke-ng/kiwi-network" class="btn btn--outline">View on GitHub</a>
         </div>
       </div>
-
-      <div class="cta">
-        <a class="button primary" href="https://docs.kiwi-network.eu">Read the docs</a>
-        <a class="button secondary" href="https://github.com/derlocke-ng/kiwi-network">View on GitHub</a>
+      <div class="hero__visual">
+        <!-- Network Overview Diagram -->
+        <div class="diagram diagram--hero">
+          <div class="diagram__cloud">
+            <span class="diagram__label">Public Internet</span>
+            <svg class="diagram__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
+          </div>
+          <div class="diagram__arrow diagram__arrow--down">
+            <span>WireGuard (UDP)</span>
+          </div>
+          <div class="diagram__box diagram__box--master">
+            <strong>kiwi-master</strong>
+            <small>Entry Point</small>
+          </div>
+          <div class="diagram__arrow diagram__arrow--down">
+            <span>VPN Tunnel</span>
+          </div>
+          <div class="diagram__row">
+            <div class="diagram__box diagram__box--node">
+              <strong>kiwi-node</strong>
+              <small>Services</small>
+            </div>
+            <div class="diagram__box diagram__box--ws">
+              <strong>kiwi-workstation</strong>
+              <small>Desktop</small>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="card">
-      <h2>Federation (planned)</h2>
-      <p>
-        Connect multiple Kiwi Networks (e.g. Company A and B) to collaborate securely.
-        The goal: easier Nextcloud federation and controlled sharing, without exposing internal services publicly.
-      </p>
+    <!-- Features Section -->
+    <section class="features" id="features">
+      <div class="container">
+        <h2 class="section__title">What you get</h2>
+        <p class="section__subtitle">A minimal attack surface with maximum flexibility.</p>
+        <div class="features__grid">
+          <div class="feature-card">
+            <div class="feature-card__icon feature-card__icon--master">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+            </div>
+            <h3>kiwi-master</h3>
+            <p>The hardened public entry point. Only WireGuard is exposed to the Internet.</p>
+            <ul class="feature-card__list">
+              <li>wg-easy (WireGuard server)</li>
+              <li>gluetun (upstream VPN / double-hop)</li>
+              <li>pihole (DNS filtering)</li>
+              <li>Optional Tor proxy</li>
+            </ul>
+          </div>
+          <div class="feature-card">
+            <div class="feature-card__icon feature-card__icon--node">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h18V4H4c-1.1 0-2 .9-2 2v11H0v3h14v-3H4V6zm19 2h-6c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h6c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1zm-1 9h-4v-7h4v7z"/></svg>
+            </div>
+            <h3>kiwi-node</h3>
+            <p>Private services reachable only via VPN or LAN. Never publicly exposed.</p>
+            <ul class="feature-card__list">
+              <li>Nextcloud (AIO)</li>
+              <li>Vaultwarden</li>
+              <li>Reverse proxy (NGINX)</li>
+              <li>Docker services</li>
+            </ul>
+          </div>
+          <div class="feature-card">
+            <div class="feature-card__icon feature-card__icon--ws">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H3V4h18v10z"/></svg>
+            </div>
+            <h3>kiwi-workstation</h3>
+            <p>Daily driver OS for users and operators. Easy onboarding, safe defaults.</p>
+            <ul class="feature-card__list">
+              <li>Fedora Silverblue / Bluefin DX</li>
+              <li>Immutable base</li>
+              <li>VPN-first workflows</li>
+              <li>Simple updates & rollback</li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section class="card">
-      <h2>Docs</h2>
-      <p>
-        Documentation lives in MkDocs (Material) with dark mode and kiwi-blog default colors.
-      </p>
-      <pre><code>mkdocs serve</code></pre>
+    <!-- Architecture Diagram Section -->
+    <section class="architecture" id="architecture">
+      <div class="container">
+        <h2 class="section__title">Network Architecture</h2>
+        <p class="section__subtitle">How traffic flows through a Kiwi Network deployment.</p>
+        <div class="arch-diagram">
+          <div class="arch-diagram__container">
+            <!-- Internet Layer -->
+            <div class="arch-layer arch-layer--internet">
+              <div class="arch-layer__label">Internet</div>
+              <div class="arch-layer__content">
+                <div class="arch-node arch-node--user">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                  <span>Remote User</span>
+                </div>
+                <div class="arch-node arch-node--attacker">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                  <span>Blocked Traffic</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Arrows -->
+            <div class="arch-arrows">
+              <div class="arch-arrow arch-arrow--allowed">
+                <span>WireGuard UDP ✓</span>
+              </div>
+              <div class="arch-arrow arch-arrow--blocked">
+                <span>HTTP/HTTPS ✗</span>
+              </div>
+            </div>
+
+            <!-- Master Layer -->
+            <div class="arch-layer arch-layer--master">
+              <div class="arch-layer__label">kiwi-master (VPS/Cloud)</div>
+              <div class="arch-layer__content">
+                <div class="arch-service">
+                  <span class="arch-service__name">wg-easy</span>
+                  <span class="arch-service__port">:51820/udp</span>
+                </div>
+                <div class="arch-service">
+                  <span class="arch-service__name">pihole</span>
+                  <span class="arch-service__port">DNS</span>
+                </div>
+                <div class="arch-service">
+                  <span class="arch-service__name">gluetun</span>
+                  <span class="arch-service__port">upstream</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- VPN Tunnel -->
+            <div class="arch-tunnel">
+              <div class="arch-tunnel__line"></div>
+              <span class="arch-tunnel__label">Encrypted VPN Tunnel (10.x.x.x)</span>
+            </div>
+
+            <!-- Node Layer -->
+            <div class="arch-layer arch-layer--node">
+              <div class="arch-layer__label">kiwi-node (Home/Office)</div>
+              <div class="arch-layer__content">
+                <div class="arch-service">
+                  <span class="arch-service__name">Nextcloud</span>
+                </div>
+                <div class="arch-service">
+                  <span class="arch-service__name">Vaultwarden</span>
+                </div>
+                <div class="arch-service">
+                  <span class="arch-service__name">NGINX</span>
+                </div>
+                <div class="arch-service">
+                  <span class="arch-service__name">+ more</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Workstation -->
+            <div class="arch-layer arch-layer--ws">
+              <div class="arch-layer__label">kiwi-workstation</div>
+              <div class="arch-layer__content">
+                <div class="arch-device">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H3V4h18v10z"/></svg>
+                  <span>Desktop</span>
+                </div>
+                <div class="arch-device">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/></svg>
+                  <span>Laptop</span>
+                </div>
+                <div class="arch-device">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><path d="M15.5 1h-8A2.5 2.5 0 005 3.5v17A2.5 2.5 0 007.5 23h8a2.5 2.5 0 002.5-2.5v-17A2.5 2.5 0 0015.5 1zm-4 21c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5-4H7V4h9v14z"/></svg>
+                  <span>Mobile</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Legend -->
+          <div class="arch-legend">
+            <div class="arch-legend__item">
+              <span class="arch-legend__dot arch-legend__dot--green"></span>
+              <span>Allowed (WireGuard only)</span>
+            </div>
+            <div class="arch-legend__item">
+              <span class="arch-legend__dot arch-legend__dot--red"></span>
+              <span>Blocked (everything else)</span>
+            </div>
+            <div class="arch-legend__item">
+              <span class="arch-legend__dot arch-legend__dot--blue"></span>
+              <span>Internal VPN traffic</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Federation Section -->
+    <section class="federation" id="federation">
+      <div class="container">
+        <h2 class="section__title">Federation (Planned)</h2>
+        <p class="section__subtitle">Connect multiple Kiwi Networks for secure collaboration.</p>
+        <div class="fed-diagram">
+          <div class="fed-network fed-network--a">
+            <div class="fed-network__label">Company A</div>
+            <div class="fed-network__box">
+              <div class="fed-network__master">master</div>
+              <div class="fed-network__nodes">
+                <span>node</span>
+                <span>node</span>
+              </div>
+            </div>
+          </div>
+          <div class="fed-link">
+            <div class="fed-link__line"></div>
+            <span class="fed-link__label">VPN Link + Federation</span>
+          </div>
+          <div class="fed-network fed-network--b">
+            <div class="fed-network__label">Company B</div>
+            <div class="fed-network__box">
+              <div class="fed-network__master">master</div>
+              <div class="fed-network__nodes">
+                <span>node</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="fed-features">
+          <div class="fed-feature">
+            <strong>Nextcloud Federation</strong>
+            <p>Share files and calendars across organizations without exposing services publicly.</p>
+          </div>
+          <div class="fed-feature">
+            <strong>Controlled Access</strong>
+            <p>Define exactly which services and users can communicate between networks.</p>
+          </div>
+          <div class="fed-feature">
+            <strong>End-to-End Privacy</strong>
+            <p>All inter-network traffic travels through encrypted VPN tunnels.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+      <div class="container">
+        <h2>Ready to get started?</h2>
+        <p>Check out the documentation or explore the source code on GitHub.</p>
+        <div class="cta-section__actions">
+          <a href="https://kiwi-network.eu/docs/" class="btn btn--primary btn--large">Read the Docs</a>
+          <a href="https://github.com/derlocke-ng/kiwi-network" class="btn btn--outline btn--large">View on GitHub</a>
+        </div>
+      </div>
     </section>
   </main>
 
+  <!-- Footer -->
   <footer class="footer">
-    <div>
-      <span>© 2025 Kiwi Network</span>
-      <span class="sep">—</span>
-      <a href="https://docs.kiwi-network.eu">docs.kiwi-network.eu</a>
-      <span class="sep">·</span>
-      <a href="https://kiwi-network.eu">kiwi-network.eu</a>
+    <div class="container">
+      <div class="footer__content">
+        <div class="footer__brand">
+          <span>🥝 Kiwi Network</span>
+          <p>Private infrastructure, made easy.</p>
+        </div>
+        <div class="footer__links">
+          <a href="https://kiwi-network.eu/docs/">Documentation</a>
+          <a href="https://github.com/derlocke-ng/kiwi-network">GitHub</a>
+          <a href="https://github.com/derlocke-ng/kiwi-network/blob/main/LICENSE">License (AGPL-3.0)</a>
+        </div>
+      </div>
+      <div class="footer__copy">
+        © 2025 Kiwi Network · Made with open source
+      </div>
     </div>
   </footer>
 
-  <script src="theme.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>
