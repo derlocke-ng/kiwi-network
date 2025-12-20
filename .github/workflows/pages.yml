@@ -32,6 +32,10 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install mkdocs-material
 
+      - name: Build homepage
+        run: |
+          mkdocs build -f mkdocs-home.yml
+
       - name: Build docs
         run: |
           mkdocs build
@@ -42,7 +46,7 @@ jobs:
           mkdir -p build/public/docs
 
           # Homepage (root)
-          cp -a site/. build/public/
+          cp -a build/home/. build/public/
 
           # Docs under /docs
           cp -a build/docs/. build/public/docs/
