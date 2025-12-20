@@ -32,8 +32,9 @@
 [data-md-color-scheme="slate"] {
   --md-default-fg-color: hsl(var(--kiwi-content-hue), 30%, 90%);
   --md-default-fg-color--light: hsl(var(--kiwi-content-hue), 20%, 75%);
-  --md-default-bg-color: hsl(var(--kiwi-content-hue), 25%, 10%);
-  --md-default-bg-color--light: hsl(var(--kiwi-content-hue), 20%, 14%);
+  /* Dark background: neutral/blue-gray (less green cast) */
+  --md-default-bg-color: hsl(var(--kiwi-header-hue), 18%, 9%);
+  --md-default-bg-color--light: hsl(var(--kiwi-header-hue), 16%, 13%);
 
   --md-primary-fg-color: hsl(var(--kiwi-header-hue), 25%, 18%);
   --md-primary-fg-color--light: hsl(var(--kiwi-header-hue), 30%, 22%);
