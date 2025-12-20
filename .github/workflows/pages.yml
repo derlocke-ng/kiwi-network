@@ -34,7 +34,7 @@ jobs:
 
       - name: Build docs
         run: |
-          mkdocs build --site-url https://kiwi-network.eu/docs/
+          mkdocs build
 
       - name: Assemble Pages output
         run: |
