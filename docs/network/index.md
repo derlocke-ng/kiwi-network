@@ -42,8 +42,8 @@ The master (role `master`) runs four modules:
   answers at the master's mesh address (`10.8.0.1`). See
   [DNS, names & certificates](dns.md).
 - **tor** offers a Tor SOCKS5 proxy at the master's mesh address, for mesh
-  clients only (`10.8.0.0/16`), with exits pinned to a set of countries
-  (default `de,ch,at,nl,fr`, `StrictNodes`).
+  clients only (`10.8.0.0/16`), with entry and exit nodes pinned to a set of
+  countries (default `de,ch,at,nl,fr`, `StrictNodes`).
 
 ### What is reachable from the Internet
 

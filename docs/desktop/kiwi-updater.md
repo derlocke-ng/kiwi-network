@@ -89,10 +89,13 @@ default branch. You can still ask for a specific tag with `ref=v2.0.0-rc1` on an
 
 ## Dependencies
 
-An app's `DEPENDS=` lists what it needs. A word that resolves to an app in a
-registered catalog or list is installed *first* (the kiwi-fox providers depend
-on kiwi-fox, for example). Any other word is a plain binary checked with
-`command -v`, and kiwi warns if it is missing.
+An app's `DEPENDS=` lists what it needs. In v2.0.0, each word is checked with
+`command -v` and kiwi warns about anything missing.
+
+On kiwi-updater's `main` branch (not yet released), a word that resolves to an
+app in a registered catalog or list is installed *first*, before the app's own
+installer runs (the kiwi-fox providers depend on kiwi-fox, for example). Any
+other word is still a plain binary checked with `command -v`.
 
 ## One app, one line, even when it needs root
 

@@ -44,7 +44,7 @@ defaults:
   tls:
     auto: true                     # one fleet CA, a *.<hostname> certificate per host
     ca_dir: secrets/ca
-    name_constraints: [home]       # the CA may only sign names under the fleet's domain
+    name_constraints: [home]       # the CA may only sign names under the fleet's domain (default: [])
 
   ucore:
     image: ghcr.io/ublue-os/ucore:stable    # ucore-minimal / ucore / ucore-hci (+ -nvidia, -zfs)

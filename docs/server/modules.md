@@ -48,9 +48,9 @@ Required modules are added automatically and rendered first.
 | | `dhcp_enabled` (+ `dhcp_start`, `dhcp_end`, `dhcp_router`) | `false` | Pi-hole as the LAN's DHCP server, with dhcp-relay |
 | | `fleet_records` | `true` | every host and service name at its mesh address |
 | | `mullvad_socks` | `false` (`true` on master) | see [DNS](../network/dns.md#mullvad-socks5-proxies-by-name) |
-| tor | `countries` | `de,ch,at,nl,fr` | everything else excluded (`StrictNodes`) |
+| tor | `countries` | `de,ch,at,nl,fr` | entry and exit nodes; everything else excluded (`StrictNodes`) |
 | | `socks_policy_accept` | `10.8.0.0/16` | who may use it |
-| cloud | `nextcloud_datadir` | stack directory | point it at a big disk |
+| cloud | `nextcloud_datadir` | `<stack directory>/knnc-data` | point it at a big disk |
 | | `memory_limit`, `upload_limit` | `4096M`, `50G` | |
 | | `startup_apps` | `deck twofactor_totp tasks calendar contacts notes` | |
 | vault | `signups_allowed` | `false` | turn on for the first account, then off again |

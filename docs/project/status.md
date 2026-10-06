@@ -13,7 +13,7 @@ means kiwi follows the default branch, because there is no tag yet.
 | [kiwi-updater](https://github.com/derlocke-ng/kiwi-updater) | installs and updates apps from git catalogs | v2.0.0 | yes | GPL-3.0+ |
 | [kiwi-catalog](https://github.com/derlocke-ng/kiwi-catalog) | the Kiwi app catalog | (a list) | n/a | |
 | [kiwi-killswitch](https://github.com/derlocke-ng/kiwi-killswitch) | fail-closed VPN kill switch for GNOME | v0.2.2 | yes | GPL-3.0+ |
-| [ensconce](https://github.com/derlocke-ng/ensconce) | post-install setup for Bluefin-DX | v2.1.1 | yes | GPL-3.0 |
+| [ensconce](https://github.com/derlocke-ng/ensconce) | post-install setup for Bluefin-DX | v2.1.1 | yes | GPL-3.0+ |
 | [kiwi-fox](https://github.com/derlocke-ng/kiwi-fox) | isolated browser identities in rootless Podman | v0.1.3 | yes | GPL-3.0+ |
 | [kiwi-plugin-tor](https://github.com/derlocke-ng/kiwi-plugin-tor) | kiwi-fox provider: Tor | tracks `main` (0.1.0) | yes | GPL-3.0+ |
 | [kiwi-plugin-vpn](https://github.com/derlocke-ng/kiwi-plugin-vpn) | kiwi-fox provider: gluetun VPN | tracks `main` (0.1.0) | yes | GPL-3.0+ |
@@ -44,6 +44,7 @@ These come straight from the repositories:
   kiwi-fox `main` but not in the v0.1.3 release (see
   [the workaround](../apps/kiwi-fox-providers.md)). The VPN, 9proxy and
   Mysterium modules have not been validated end to end against a real account.
-- **kiwi-updater**: a hosted registry of trusted catalogs
+- **kiwi-updater**: installing an app's kiwi-app dependencies first is on
+  `main`, after v2.0.0. A hosted registry of trusted catalogs
   (`kiwi catalog browse`) and tag signature verification are planned.
 - **kiwi-pentesting**: the CLI, GUI and installer are not written yet.

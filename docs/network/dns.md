@@ -61,8 +61,9 @@ authority** for the fleet in `secrets/ca/` (`kiwiCA.key`, `kiwiCA.pem`, valid
 `<hostname>` and `*.<hostname>` (825 days, the longest lifetime browsers still
 accept), and every machine kiwi-server builds trusts the CA.
 
-The CA carries **name constraints** (`name_constraints: [home]`): it can only
-sign names under the fleet's domain. A stolen `kiwiCA.key` is then worthless for
+Set **name constraints** and the CA can only sign names under the fleet's
+domain: `tls: { name_constraints: [home] }`. The example fleet does this; the
+built-in default is no constraint. A stolen `kiwiCA.key` is then worthless for
 anything else, which matters because every machine trusts it.
 
 ```bash

@@ -5,7 +5,7 @@ ensconce turns a fresh Bluefin install into your configured workstation:
 layered packages, Flatpaks, GNOME extensions, Nextcloud sync, desktop settings,
 the login screen and more, all from plain list files.
 
-- Repository: [derlocke-ng/ensconce](https://github.com/derlocke-ng/ensconce), GPL-3.0
+- Repository: [derlocke-ng/ensconce](https://github.com/derlocke-ng/ensconce), GPL-3.0-or-later (its `kiwi.manifest`; the README says GPL-3.0)
 - Latest release: **v2.1.1**. It is in the [Kiwi catalog](catalogs.md).
 
 ## Quick start
@@ -106,5 +106,6 @@ and `nextcloud/` can contain private material, so check before sharing one.
 - It is a **user-scope** app. The steps that need root (`rpm-ostree`, `/etc`,
   GDM) ask for it themselves. Installing it as root would apply your dconf and
   Flatpak settings to the wrong account.
-- Add your own step by dropping `NN-name.sh` with a `step_name()` function into
-  `steps/`. It is discovered automatically.
+- Add your own step by dropping `NN-<name>.sh` with a `step_<name>()` function
+  into `steps/` (e.g. `step_mystep` in `12-mystep.sh`). It is discovered
+  automatically.

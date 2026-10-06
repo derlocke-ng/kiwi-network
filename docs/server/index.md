@@ -91,7 +91,7 @@ and run `sudo bash sh3.sh`.
 |---|---|
 | `init [path]` | write a commented `fleet.yaml` |
 | `validate fleet.yaml [hosts…]` | check the fleet file, with warnings |
-| `list fleet.yaml` | the hosts, their target, role, modules and disk |
+| `list fleet.yaml` | the hosts and what has been generated for them (name, hostname, target, role, address) |
 | `show fleet.yaml <host>` | what a host ends up with, secrets masked |
 | `render fleet.yaml [hosts…]` | role scripts, stacks and configs into `output/` |
 | `build fleet.yaml [hosts…]` | render, then build the install ISOs |

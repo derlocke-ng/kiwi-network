@@ -30,6 +30,7 @@ kiwi-server openwrt fleet.yaml --wireguard secrets/router.conf          # split:
 kiwi-server openwrt fleet.yaml --wireguard secrets/router.conf --full   # full: everything
 
 # no tunnel on the router: a static route to the gateway node m1
+# (m1 needs a static LAN address in the fleet: network.dhcp false + address)
 kiwi-server openwrt fleet.yaml --via m1
 kiwi-server openwrt fleet.yaml --via 192.168.1.5
 ```

@@ -45,8 +45,9 @@ kiwi-fox-gui                                     # "Kiwi-Fox" in your app grid
 ```
 
 Endpoints can be `socks5://user:pass@host:port`, `http://…`, `https://…`, or the
-vendor paste format `host:port:user:pass`. An exit can also come from a
-[provider module](kiwi-fox-providers.md): Tor, a VPN, 9proxy or Mysterium.
+vendor paste format `host:port:user:pass`. On kiwi-fox's `main` branch (not in
+v0.1.3), an exit can also come from a [provider module](kiwi-fox-providers.md):
+Tor, a VPN, 9proxy or Mysterium.
 
 ## What a new profile is
 

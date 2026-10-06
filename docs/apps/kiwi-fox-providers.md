@@ -13,8 +13,9 @@ image, brings it up on demand, and points a profile's gateway at it.
 | `mysterium` | [kiwi-plugin-myst](https://github.com/derlocke-ng/kiwi-plugin-myst) | the [Mysterium](https://mysterium.network/) dVPN | a registered consumer identity (free to create; connecting spends a small balance) |
 
 All four are GPL-3.0-or-later, at version 0.1.0 with no release tag yet, and are
-in the [Kiwi catalog](../desktop/catalogs.md). Each declares `DEPENDS=kiwi-fox`,
-so kiwi installs kiwi-fox first.
+in the [Kiwi catalog](../desktop/catalogs.md). Each declares `DEPENDS=kiwi-fox`.
+kiwi-updater's `main` branch installs such a dependency first. The released
+v2.0.0 only warns that it is missing, so install kiwi-fox before a provider.
 
 !!! warning "Needs kiwi-fox from `main` for now"
     The provider subsystem (`kiwi-fox module …`) was added to kiwi-fox **after**
@@ -79,12 +80,14 @@ Per-module configuration lives outside any repo, in
 - **vpn**: `vpn.json` with gluetun's settings (`VPN_SERVICE_PROVIDER`,
   `VPN_TYPE`, `WIREGUARD_ADDRESSES`, …) and an optional `leases` list. Every
   `UPPER_CASE` key goes to gluetun as it is.
-- **9proxy**: `config/account.conf`, mounted read-only into the client. Drop the
-  proprietary client into the plugin's `module/containers/vendor/` before
-  `module setup`. Without it the image still builds, but the provider refuses to
-  come up rather than expose an open port.
-- **mysterium**: the node's identity and keystore under `myst/`, plus
-  `kf-consumer-id` holding your registered consumer identity.
+- **9proxy**: `config/account.conf`, mounted read-only into the client. The
+  proprietary client is not shipped: put it in the plugin's
+  `module/containers/vendor/`, add `COPY vendor/ /opt/9proxy/` to
+  `module/containers/Containerfile`, then run `kiwi-fox module setup 9proxy`.
+  Without the client the image still builds, but the provider refuses to come up
+  rather than expose an open port.
+- **mysterium**: `myst/` holds the node's identity and keystore, and
+  `myst/kf-consumer-id` holds your registered consumer identity (`0x…`).
 
 ## Status
 
