@@ -580,6 +580,77 @@ a:hover {
   font-weight: bold;
 }
 
+/* Ecosystem Section */
+.ecosystem {
+  padding: 5rem 0;
+}
+
+.eco-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.eco-card {
+  display: block;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+}
+
+.eco-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+
+.eco-card__tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  margin-bottom: 0.85rem;
+}
+
+.eco-card__tag--build   { background: var(--primary-light); color: var(--master-color); }
+.eco-card__tag--apps    { background: var(--accent-light);  color: var(--node-color); }
+.eco-card__tag--privacy { background: hsla(280, 50%, 50%, 0.12); color: var(--ws-color); }
+.eco-card__tag--tools   { background: hsla(40, 80%, 50%, 0.14);  color: hsl(36, 70%, 45%); }
+
+.eco-card h3 {
+  font-size: 1.15rem;
+  margin: 0 0 0.5rem;
+  font-family: var(--font-mono);
+}
+
+.eco-card p {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.eco-card code {
+  font-family: var(--font-mono);
+  font-size: 0.8125em;
+  background: var(--surface-alt);
+  padding: 0.05em 0.3em;
+  border-radius: 4px;
+}
+
+.eco-foot {
+  text-align: center;
+  margin: 2.5rem 0 0;
+}
+
 /* Architecture Section */
 .architecture {
   padding: 5rem 0;
@@ -1022,6 +1093,10 @@ a:hover {
     grid-template-columns: 1fr;
   }
 
+  .eco-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .fed-diagram {
     flex-direction: column;
   }
@@ -1065,6 +1140,10 @@ a:hover {
 
   .diagram__row {
     flex-direction: column;
+  }
+
+  .eco-grid {
+    grid-template-columns: 1fr;
   }
 
   .arch-arrows {

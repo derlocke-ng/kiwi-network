@@ -13,6 +13,7 @@ theme:
     - navigation.instant
     - navigation.tracking
     - navigation.top
+    - navigation.sections
     - content.code.copy
   palette:
     - scheme: default
@@ -27,6 +28,20 @@ theme:
 extra_css:
   - assets/stylesheets/extra.css
 
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+
 nav:
   - Home: index.md
   - Getting Started:
@@ -37,6 +52,19 @@ nav:
       - kiwi-master: architecture/kiwi-master.md
       - kiwi-node: architecture/kiwi-node.md
       - kiwi-workstation: architecture/kiwi-workstation.md
+  - Build & Deploy:
+      - kiwi-server: build/kiwi-server.md
+  - Apps & Updates:
+      - kiwi-updater: apps/kiwi-updater.md
+      - kiwi-catalog: apps/kiwi-catalog.md
+  - Privacy Apps:
+      - Overview: privacy-apps/index.md
+      - kiwi-fox: privacy-apps/kiwi-fox.md
+      - Provider plugins: privacy-apps/plugins.md
+      - kiwi-killswitch: privacy-apps/kiwi-killswitch.md
+      - kiwi-gen: privacy-apps/kiwi-gen.md
+      - kiwi-pentesting: privacy-apps/kiwi-pentesting.md
+      - Desktop CLI tools: privacy-apps/cli-tools.md
   - Federation: federation/index.md
   - Compliance: compliance/index.md
   - Roadmap: roadmap.md
