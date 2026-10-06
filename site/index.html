@@ -20,7 +20,8 @@
         <span class="appbar__title">Kiwi Network</span>
       </a>
       <nav class="appbar__nav">
-        <a href="#features" class="nav__link">Features</a>
+        <a href="#features" class="nav__link">Roles</a>
+        <a href="#ecosystem" class="nav__link">Apps</a>
         <a href="#architecture" class="nav__link">Architecture</a>
         <a href="#federation" class="nav__link">Federation</a>
         <a href="https://kiwi-network.eu/docs/" class="nav__link">Docs</a>
@@ -46,7 +47,8 @@
       <button class="drawer__close js-drawer-close" aria-label="Close menu">✕</button>
     </div>
     <nav class="drawer__nav">
-      <a href="#features" class="drawer__link js-drawer-close">Features</a>
+      <a href="#features" class="drawer__link js-drawer-close">Roles</a>
+      <a href="#ecosystem" class="drawer__link js-drawer-close">Apps</a>
       <a href="#architecture" class="drawer__link js-drawer-close">Architecture</a>
       <a href="#federation" class="drawer__link js-drawer-close">Federation</a>
       <a href="https://kiwi-network.eu/docs/" class="drawer__link">Docs</a>
@@ -60,7 +62,7 @@
       <div class="hero__content">
         <h1 class="hero__title">Own your infrastructure.</h1>
         <p class="hero__subtitle">
-          Kiwi Network is a privacy-first, self-hosted setup for individuals, SMBs, and public offices — built on open-source and Linux.
+          Kiwi Network is a privacy-first, self-hosted setup for individuals, SMBs, and public offices — built on open-source and Linux. Build your servers from one file, run the apps on your desktop.
         </p>
         <p class="hero__highlight">
           <strong>One WireGuard entry point.</strong> Everything else behind the VPN.
@@ -104,8 +106,8 @@
     <!-- Features Section -->
     <section class="features" id="features">
       <div class="container">
-        <h2 class="section__title">What you get</h2>
-        <p class="section__subtitle">A minimal attack surface with maximum flexibility.</p>
+        <h2 class="section__title">Three roles</h2>
+        <p class="section__subtitle">A minimal attack surface with maximum flexibility — each role built by tooling, not hand-assembled.</p>
         <div class="features__grid">
           <div class="feature-card">
             <div class="feature-card__icon feature-card__icon--master">
@@ -147,6 +149,59 @@
             </ul>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- Ecosystem Section -->
+    <section class="ecosystem" id="ecosystem">
+      <div class="container">
+        <h2 class="section__title">The ecosystem</h2>
+        <p class="section__subtitle">Open-source tools that build the servers and run on the desktop. All installable through <code>kiwi-updater</code>.</p>
+        <div class="eco-grid">
+          <a class="eco-card" href="https://github.com/derlocke-ng/kiwi-server">
+            <span class="eco-card__tag eco-card__tag--build">Build &amp; Deploy</span>
+            <h3>kiwi-server</h3>
+            <p>Write one <code>fleet.yaml</code>, get a first-boot script and an unattended install ISO per host. Boot it, walk away, and the machine comes up as a node or master — on CoreOS, uCore or Debian.</p>
+          </a>
+          <a class="eco-card" href="https://github.com/derlocke-ng/kiwi-updater">
+            <span class="eco-card__tag eco-card__tag--apps">Apps</span>
+            <h3>kiwi-updater</h3>
+            <p>Install and update open-source apps from git catalogs on Silverblue / Bluefin. No accounts, no store, no vendor lock-in — a catalog is just a repo. CLI + GTK4 "Kiwi Apps".</p>
+          </a>
+          <a class="eco-card" href="https://github.com/derlocke-ng/kiwi-fox">
+            <span class="eco-card__tag eco-card__tag--privacy">Privacy</span>
+            <h3>kiwi-fox</h3>
+            <p>Isolated Windows 11 browser identities in rootless Podman — each with its own storage, proxy exit, DNS and frozen fingerprint. Exits plug in: Tor, VPN, 9proxy, Mysterium.</p>
+          </a>
+          <a class="eco-card" href="https://github.com/derlocke-ng/kiwi-killswitch">
+            <span class="eco-card__tag eco-card__tag--privacy">Privacy</span>
+            <h3>kiwi-killswitch</h3>
+            <p>A fail-closed VPN kill switch for GNOME. One root daemon owns the firewall; a Quick Settings toggle, a GTK4 app and a CLI drive it — no password prompt, ever. If the tunnel drops, nothing leaks.</p>
+          </a>
+          <a class="eco-card" href="https://github.com/derlocke-ng/kiwi-gen">
+            <span class="eco-card__tag eco-card__tag--tools">Tools</span>
+            <h3>kiwi-gen</h3>
+            <p>A browser-based manager for SSH keys, SSH certificates and TLS certificates. Everything is created and stored locally in an encrypted vault — nothing is ever sent to a server.</p>
+          </a>
+          <a class="eco-card" href="https://github.com/derlocke-ng/kiwi-pentesting">
+            <span class="eco-card__tag eco-card__tag--privacy">Security</span>
+            <h3>kiwi-pentesting</h3>
+            <p>A containerized suite for <em>authorized</em> security testing, and a client of kiwi-fox: every tool exits through the same identity you browse with. Written authorization, scope allowlist, audit log.</p>
+          </a>
+          <a class="eco-card" href="https://github.com/derlocke-ng/kiwi-cli-tools-desktop">
+            <span class="eco-card__tag eco-card__tag--tools">Tools</span>
+            <h3>kiwi-cli-tools-desktop</h3>
+            <p>Small everyday desktop helpers: <code>pweb</code> serves a directory over HTTPS, <code>select-server</code> picks an SSH host from your config, <code>tethering</code> fixes the TTL for hotspot traffic.</p>
+          </a>
+          <a class="eco-card" href="https://github.com/derlocke-ng/kiwi-catalog">
+            <span class="eco-card__tag eco-card__tag--apps">Apps</span>
+            <h3>kiwi-catalog</h3>
+            <p>The default app catalog that kiwi-updater reads — the Kiwi apps and friends, managed entirely through git. Fork it, add your own apps, send a pull request.</p>
+          </a>
+        </div>
+        <p class="eco-foot">
+          <a href="https://kiwi-network.eu/docs/privacy-apps/" class="btn btn--outline">Browse all apps in the docs</a>
+        </p>
       </div>
     </section>
 
@@ -340,7 +395,7 @@
         </div>
       </div>
       <div class="footer__copy">
-        © 2025 Kiwi Network · Made with open source
+        © 2026 Kiwi Network · Made with open source
       </div>
     </div>
   </footer>
