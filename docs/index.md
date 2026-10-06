@@ -1,64 +1,64 @@
 # Kiwi Network
 
-Kiwi Network is an all-in-one, privacy-first approach to self-hosting your own
-infrastructure with open source and Linux — for private individuals, SMBs and
-public offices.
+Kiwi Network is a set of open-source tools for running your own private
+network: a WireGuard mesh of machines you own, with its own DNS, its own
+certificate authority and your own services behind it, and an atomic Fedora
+desktop with privacy apps on top.
 
-The core idea is simple: **expose as little as possible.** Only a single
-WireGuard entry point ever faces the public Internet; everything else lives
-behind the tunnel.
+It has two halves, and you can use either one without the other.
 
-## The three machine roles
+## The network: `kiwi-server`
 
-| Role | What it is | Built from |
-|---|---|---|
-| [**kiwi-master**](architecture/kiwi-master.md) | The hardened public entry point — WireGuard + core network services | `kiwi-server`, `master` role |
-| [**kiwi-node**](architecture/kiwi-node.md) | Private services (cloud, vault, downloads, LAN gateway), reachable only via VPN/LAN | `kiwi-server`, `node-gw` / `node-cloud` roles |
-| [**kiwi-workstation**](architecture/kiwi-workstation.md) | An easy daily-driver desktop OS (Fedora Silverblue / Bluefin DX) with the Kiwi apps | the Kiwi app suite, installed via `kiwi-updater` |
+[kiwi-server](server/index.md) builds the machines. You describe them in one
+`fleet.yaml`; it renders a first-boot script, an Ignition or preseed config and
+an unattended install ISO for each host. Boot the ISO, and the machine installs
+itself and comes back as one of these:
 
-These are no longer hand-assembled compose stacks. They are **produced by
-tooling** you run on your own machine.
+| Role | What the machine becomes |
+|---|---|
+| `master` | The **kiwi-master**: the WireGuard entry point (wg-easy), whose own traffic leaves through a commercial VPN (gluetun, the "double hop"), with Pi-hole and a Tor SOCKS proxy for the mesh |
+| `node-gw` | A **kiwi-node** in gateway mode: routes a LAN through the VPN, with Pi-hole, DHCP relay, a download station and SFTP |
+| `node-cloud` | A **kiwi-node** in cloud mode: Nextcloud AIO and Vaultwarden behind nginx |
+| `bare` | Just the base system: admin user, SSH, automatic updates |
 
-## How it fits together
+The master is the only machine that has to be reachable from the Internet, and
+its stack publishes exactly one port there: WireGuard, UDP 51820. Nodes,
+laptops, phones and routers dial *out* to it and meet in the mesh
+(`10.8.0.0/16`). See [How the network works](network/index.md).
 
-```
-          ┌─────────────────────────────────────────────┐
-          │  kiwi-server    write one fleet.yaml →        │
-          │                 first-boot scripts + ISOs     │
-          └───────────────┬──────────────┬───────────────┘
-                   builds │              │ builds
-                          ▼              ▼
-                    kiwi-master      kiwi-node(s)
-                  (WireGuard entry) (cloud / gateway)
-                          ▲              ▲
-                          │   VPN tunnel │
-          ┌───────────────┴──────────────┴───────────────┐
-          │  kiwi-workstation  (Silverblue / Bluefin)      │
-          │    kiwi-updater → installs the Kiwi apps:      │
-          │    kiwi-fox · kiwi-killswitch · kiwi-gen · …    │
-          └───────────────────────────────────────────────┘
-```
+Targets: Fedora CoreOS, uCore and Debian stable. Updates install continuously;
+reboots only happen in a window you choose.
 
-- **[kiwi-server](build/kiwi-server.md)** builds the servers. Write one
-  `fleet.yaml`, get a first-boot script, an Ignition/preseed config and an
-  unattended install ISO per host. Boot the ISO, walk away, and the machine
-  comes back as a `kiwi-node` or `kiwi-master`.
-- **[kiwi-updater](apps/kiwi-updater.md)** + **[kiwi-catalog](apps/kiwi-catalog.md)**
-  install and update the desktop apps from open git catalogs — no accounts, no
-  store, no vendor lock-in.
-- **[The Kiwi apps](privacy-apps/index.md)** are the privacy and self-hosting
-  tools that run on the workstation.
+## The desktop: `kiwi-updater`
 
-## Start here
+[kiwi-updater](desktop/kiwi-updater.md) installs and updates apps from **git
+catalogs** on Fedora Silverblue, Bluefin and other ostree systems. No accounts,
+no store: an app is a git repo with a `kiwi.manifest` and an `install.sh`, a
+release is a git tag, and a catalog is a repo listing app URLs.
 
-- New to the project? Read the [Getting Started overview](getting-started/index.md)
-  and the [Network Model](getting-started/network-model.md).
-- Want to deploy servers? See [kiwi-server](build/kiwi-server.md).
-- Setting up a desktop? See [kiwi-updater](apps/kiwi-updater.md) and the
-  [Privacy Apps](privacy-apps/index.md).
+The [Kiwi catalog](desktop/catalogs.md) ships:
 
----
+| App | What it does |
+|---|---|
+| [kiwi-killswitch](apps/kiwi-killswitch.md) | Fail-closed VPN kill switch for GNOME, with a root nftables daemon and no password prompts |
+| [kiwi-fox](apps/kiwi-fox.md) | Isolated Windows 11 browser identities in rootless Podman |
+| [kiwi-fox providers](apps/kiwi-fox-providers.md) | Tor, VPN (gluetun), 9proxy and Mysterium exits for kiwi-fox |
+| [ensconce](desktop/ensconce.md) | Post-install setup for Bluefin-DX from plain list files, and `--export` to clone a machine |
+| [kiwi-cli-tools-desktop](apps/cli-tools.md) | `pweb`, `select-server`, `tethering` |
+| kiwi-updater | Itself: it updates itself like any other app |
 
-- Homepage: <https://kiwi-network.eu>
-- Docs: <https://docs.kiwi-network.eu>
-- Source: <https://github.com/derlocke-ng>
+Also documented here: [kiwi-gen](apps/kiwi-gen.md) (an offline, in-browser SSH
+and TLS key and certificate manager) and
+[kiwi-pentesting](apps/kiwi-pentesting.md) (early scaffold).
+
+## Where to start
+
+- **Run the network:** [kiwi-server quick start](server/index.md)
+- **Set up a desktop:** [Desktop overview](desktop/index.md)
+- **Where each piece stands:** [Repositories & status](project/status.md)
+
+!!! note "Status"
+    These are young projects. kiwi-server's
+    generators are tested, but booting each target end to end on real hardware
+    is still in progress. The [status page](project/status.md) says what is
+    released, what tracks `main`, and what is only a scaffold.
