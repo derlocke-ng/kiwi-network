@@ -34,7 +34,7 @@ jobs:
 
       - name: Build docs
         run: |
-          mkdocs build
+          mkdocs build --strict
 
       - name: Assemble Pages output
         run: |

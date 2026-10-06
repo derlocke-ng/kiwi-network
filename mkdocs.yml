@@ -1,26 +1,44 @@
 site_name: Kiwi Network
-site_description: Self-hosted, privacy-first infrastructure for individuals, SMBs, and public offices.
+site_description: Open-source tools for your own private network — a WireGuard mesh built from one file — and a Fedora Atomic desktop with privacy apps.
 site_url: https://kiwi-network.eu/docs/
 repo_url: https://github.com/derlocke-ng/kiwi-network
-repo_name: kiwi-network
+repo_name: derlocke-ng/kiwi-network
+edit_uri: edit/main/docs/
 
 site_dir: build/docs
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
 
 theme:
   name: material
   language: en
+  logo: assets/kiwi.svg
+  favicon: assets/kiwi.svg
+  font: false
   features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
     - navigation.instant
     - navigation.tracking
-    - navigation.top
-    - navigation.sections
+    - search.suggest
+    - search.highlight
     - content.code.copy
+    - toc.follow
   palette:
-    - scheme: default
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
       toggle:
         icon: material/weather-night
         name: Switch to dark mode
-    - scheme: slate
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
       toggle:
         icon: material/weather-sunny
         name: Switch to light mode
@@ -28,44 +46,50 @@ theme:
 extra_css:
   - assets/stylesheets/extra.css
 
+extra:
+  homepage: https://kiwi-network.eu/
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/derlocke-ng
+      name: derlocke-ng on GitHub
+
 markdown_extensions:
   - admonition
   - attr_list
   - md_in_html
+  - tables
   - toc:
       permalink: true
+  - pymdownx.details
   - pymdownx.highlight:
       anchor_linenums: true
-  - pymdownx.superfences
   - pymdownx.inlinehilite
-  - pymdownx.tabbed:
-      alternate_style: true
-  - tables
+  - pymdownx.superfences
 
 nav:
   - Home: index.md
-  - Getting Started:
-      - Overview: getting-started/index.md
-      - Network Model: getting-started/network-model.md
-  - Architecture:
-      - Overview: architecture/index.md
-      - kiwi-master: architecture/kiwi-master.md
-      - kiwi-node: architecture/kiwi-node.md
-      - kiwi-workstation: architecture/kiwi-workstation.md
-  - Build & Deploy:
-      - kiwi-server: build/kiwi-server.md
-  - Apps & Updates:
-      - kiwi-updater: apps/kiwi-updater.md
-      - kiwi-catalog: apps/kiwi-catalog.md
-  - Privacy Apps:
-      - Overview: privacy-apps/index.md
-      - kiwi-fox: privacy-apps/kiwi-fox.md
-      - Provider plugins: privacy-apps/plugins.md
-      - kiwi-killswitch: privacy-apps/kiwi-killswitch.md
-      - kiwi-gen: privacy-apps/kiwi-gen.md
-      - kiwi-pentesting: privacy-apps/kiwi-pentesting.md
-      - Desktop CLI tools: privacy-apps/cli-tools.md
-  - Federation: federation/index.md
-  - Compliance: compliance/index.md
-  - Roadmap: roadmap.md
-  - Contributing: contributing.md
+  - Network:
+      - How it works: network/index.md
+      - DNS, names & certificates: network/dns.md
+      - Routers: network/routers.md
+  - kiwi-server:
+      - Quick start: server/index.md
+      - The fleet file: server/fleet.md
+      - Roles: server/roles.md
+      - Modules: server/modules.md
+      - Targets, updates & first boot: server/targets.md
+  - Desktop:
+      - Overview: desktop/index.md
+      - kiwi-updater: desktop/kiwi-updater.md
+      - Catalogs & publishing apps: desktop/catalogs.md
+      - ensconce: desktop/ensconce.md
+  - Apps:
+      - kiwi-killswitch: apps/kiwi-killswitch.md
+      - kiwi-fox: apps/kiwi-fox.md
+      - kiwi-fox providers: apps/kiwi-fox-providers.md
+      - kiwi-cli-tools-desktop: apps/cli-tools.md
+      - kiwi-gen: apps/kiwi-gen.md
+      - kiwi-pentesting: apps/kiwi-pentesting.md
+  - Project:
+      - Repositories & status: project/status.md
+      - Contributing: project/contributing.md

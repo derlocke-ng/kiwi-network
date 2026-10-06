@@ -55,3 +55,21 @@
 .md-typeset code {
   border-radius: 0.25rem;
 }
+
+/* No web fonts (theme.font: false): a system stack, nothing fetched from a third party */
+:root {
+  --md-text-font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+  --md-code-font-family: ui-monospace, "SFMono-Regular", "JetBrains Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace;
+}
+
+.md-tabs {
+  background-color: var(--md-primary-fg-color--dark);
+}
+
+.md-typeset table:not([class]) {
+  font-size: 0.72rem;
+}
+
+.md-typeset table:not([class]) th {
+  white-space: nowrap;
+}
