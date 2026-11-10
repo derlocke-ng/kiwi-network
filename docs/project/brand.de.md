@@ -26,7 +26,7 @@ Jedes Icon gibt es in drei Stilen:
 
 | Stil | Aussehen |
 |---|---|
-| **classic** (Standard) | das ausgearbeitete GTK-Icon mit Schale, Fruchtfleisch, Kernen und Mitte |
+| **classic** (Standard) | das detailreiche GTK-Icon mit Schale, Fruchtfleisch, Kernen und Mitte |
 | **flat** | ohne Schale und mit größerer Mitte |
 | **night** | eine invertierte Strichzeichnung auf einer dunklen Scheibe |
 
@@ -43,11 +43,12 @@ Das Repository kiwi-icons enthält diese Dateien:
 
 ## In einer App { #in-an-app }
 
-Die meisten Kiwi-Apps enthalten eine bytegenaue Kopie eines classic-SVG und
-nennen diese Datei in ihrem `kiwi.manifest` unter `ICON=`. gnome-monitor
-verwendet das Icon `kiwi-os`, syncman das Icon `kiwi-cloud`. kiwi-custodia hat
-ein eigenes Icon. Ab Version 2.2 nimmt kiwi-updater das Icon aus seinem Klon der
-App, sodass bei der Installation nichts heruntergeladen wird. Eine App mit einem
-`.desktop`-Starter installiert das Icon außerdem in das Icon-Theme hicolor.
+Die meisten Kiwi-Apps enthalten eine byte-identische Kopie eines SVG im Stil
+classic und nennen diese Datei in ihrem `kiwi.manifest` unter `ICON=`.
+gnome-monitor verwendet das Icon `kiwi-os`, syncman das Icon `kiwi-cloud`.
+kiwi-custodia hat ein eigenes Icon. Ab Version 2.2 nimmt kiwi-updater das Icon
+aus seinem Klon der App, sodass bei der Installation nichts heruntergeladen
+wird. Eine App mit einem `.desktop`-Starter installiert das Icon außerdem in das
+Icon-Theme hicolor.
 
 Für kiwi-icons gibt es noch keine Lizenzangabe.

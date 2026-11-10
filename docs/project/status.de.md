@@ -5,10 +5,10 @@ sein aktuelles Release und seine Lizenz. Am Ende steht, was bekanntermaßen noch
 fehlt oder noch nicht getestet ist.
 
 Alle Repositories liegen unter
-[github.com/derlocke-ng](https://github.com/derlocke-ng). „Veröffentlicht“
-heißt, dass ein Repository ein Versions-Tag hat, denn kiwi-updater installiert
-genau das, worauf ein Versions-Tag zeigt. Die Versionen sind auf dem Stand von
-November 2026.
+[github.com/derlocke-ng](https://github.com/derlocke-ng). Als veröffentlicht
+gilt ein Repository, sobald es ein Versions-Tag hat, denn kiwi-updater
+installiert immer den Stand eines Versions-Tags. Die Versionen sind auf dem
+Stand von November 2026.
 
 ## Das Netzwerk { #the-network }
 
@@ -62,9 +62,9 @@ Diese Lücken nennen die Repositories selbst:
   Wiederherstellung einer neu aufgesetzten Maschine, ein Timer zum Aufräumen
   alter Snapshots und ein Health-Check, der eine hängende Verbindung zum
   kommerziellen VPN-Anbieter neu startet. Dass die Föderation zwischen
-  Netzwerken funktioniert, ist noch nicht gezeigt. Alles läuft nur über IPv4,
-  und das Debian-ISO gibt es nur für amd64. Die Control Plane ist entworfen,
-  aber noch nicht umgesetzt.
+  Netzwerken funktioniert, ist noch nicht nachgewiesen. Alles läuft nur über
+  IPv4, und das Debian-ISO gibt es nur für amd64. Die Control Plane ist
+  entworfen, aber noch nicht umgesetzt.
 - **kiwi-modules**: Die Module für OpenCloud, Immich und Paperless-ngx sind als
   „zum Ausprobieren“ gekennzeichnet. Ein TURN-Server für Anrufe wartet darauf,
   gemergt zu werden.
@@ -78,8 +78,8 @@ Diese Lücken nennen die Repositories selbst:
   fragt der Teil von kiwi-killswitch, der als root läuft, bei einem Update nach
   einem Passwort.
 - **kiwi-proxy**: Sein Modul für kiwi-server ist noch auf keiner Maschine
-  gelaufen. Exits übertragen nur TCP und IPv4. Das VPN-Modul speichert eine
-  Konfiguration pro Maschine.
+  gelaufen. Exits übertragen nur TCP und IPv4. Das VPN-Modul nimmt pro Maschine
+  eine einzige Konfiguration auf.
 - **Provider-Module**: Die Module für VPN und 9proxy wurden noch nicht
   durchgängig mit einem echten Konto geprüft. Das Modul für Mysterium wurde
   am 7. November 2026 geprüft.

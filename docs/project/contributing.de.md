@@ -53,6 +53,6 @@ python -m http.server -d site 8080   # die Homepage
 Wenn du nach `main` pushst, werden Homepage und Dokumentation über GitHub Pages
 veröffentlicht.
 
-Bitte halte die Dokumentation **im Einklang mit den Repositories**. Beschreib,
-was ein Werkzeug heute tut, kennzeichne alles Geplante als geplant, und verlinke
-für Einzelheiten auf den Quellcode, statt sie abzuschreiben.
+Bitte sorg dafür, dass die Dokumentation **zu den Repositories passt**.
+Beschreib, was ein Werkzeug heute tut, kennzeichne alles Geplante als geplant,
+und verlinke für Einzelheiten auf den Quellcode, statt sie abzuschreiben.
