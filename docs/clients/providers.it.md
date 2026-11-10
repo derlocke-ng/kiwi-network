@@ -4,7 +4,7 @@ In [kiwi-proxy](kiwi-proxy.md) un exit è una connessione a un upstream, salvata
 con un nome, attraverso cui le tue box e i tuoi browser mandano il loro
 traffico. Di solito è una connessione che ti è stata fornita, come il proxy
 SOCKS5 che porta nella rete di un cliente. Un modulo provider serve per l’altro
-caso: è lui a creare l’exit, attraverso Tor, un abbonamento VPN, 9proxy o
+caso: è il modulo stesso a creare l’exit, attraverso Tor, un abbonamento VPN, 9proxy o
 Mysterium. Tor e Mysterium, in particolare, servono a darti altri indirizzi IP
 per i test.
 
@@ -68,8 +68,8 @@ SOCKS5 only
 - **9proxy** esegue il client di 9proxy, che apre una porta SOCKS5 verso un exit
   residenziale.
 
-Un solo container provider serve tutti gli exit che usano lo stesso modulo e la
-stessa lease. Una lease è uno degli exit selezionabili che un modulo offre, per
+Un solo container provider serve tutti gli exit che usano lo stesso modulo e lo
+stesso lease. Un lease è uno degli exit selezionabili che un modulo offre, per
 esempio il paese di un server VPN o un nodo Mysterium. Se un tunnel perde la
 sessione, si comporta in modo fail-closed, cioè non lascia uscire alcun
 traffico, e viene riavviato.
@@ -100,7 +100,7 @@ repository:
 
 ## Stato { #status }
 
-Tor non richiede alcun account. Il modulo Mysterium è stato verificato da un
-capo all’altro il 7 novembre 2026. Secondo i rispettivi README, i moduli VPN e
-9proxy sono completi e hanno i loro unit test, ma non sono ancora stati provati
-da un capo all’altro con un abbonamento o un account reale.
+Tor non richiede alcun account. Il modulo Mysterium è stato testato
+end-to-end il 7 novembre 2026. Secondo i rispettivi README, i moduli VPN e
+9proxy sono completi e hanno i loro unit test, ma non sono ancora stati testati
+end-to-end con un abbonamento o un account reale.

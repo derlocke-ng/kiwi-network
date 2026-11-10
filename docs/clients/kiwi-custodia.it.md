@@ -1,7 +1,7 @@
 # kiwi-custodia
 
-kiwi-custodia ti dà un ambiente Linux separato per ogni rete di un cliente in
-cui lavori. Ogni ambiente è un container con una distribuzione Linux a tua
+kiwi-custodia ti dà un ambiente Linux separato per ciascuna delle reti dei
+clienti in cui lavori. Ogni ambiente è un container con una distribuzione Linux a tua
 scelta, e tutto il suo traffico di rete passa da un exit di
 [kiwi-proxy](kiwi-proxy.md). Un exit è una connessione a un upstream, salvata
 con un nome: per esempio il proxy SOCKS5 che porta nella rete di un cliente. In
@@ -25,7 +25,7 @@ l’exit, e questo vale per ogni programma al suo interno: per `dnf`, per il
 client di un gioco e per un programma compilato staticamente che ignora
 `$ALL_PROXY`. Se l’exit si ferma, la box resta del tutto senza rotta.
 
-Per questo conviene lavorare con una box per ogni rete di un cliente. Gli
+Per questo conviene lavorare con una box per la rete di ciascun cliente. Gli
 strumenti, le chiavi e la cronologia della shell del cliente A stanno in una
 box, quelli del cliente B in un’altra, e ogni box raggiunge soltanto il proprio
 cliente.

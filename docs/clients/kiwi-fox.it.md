@@ -1,7 +1,7 @@
 # kiwi-fox
 
-kiwi-fox ti dà un browser separato per ogni rete di un cliente in cui lavori, e
-per ogni account che gestisci. Il profilo del browser dedicato a un cliente
+kiwi-fox ti dà un browser separato per ciascuna delle reti dei clienti in cui
+lavori, e per ogni account che gestisci. Il profilo del browser dedicato a un cliente
 raggiunge le console web di quel cliente attraverso la sua connessione, e non ha
 altre strade verso l’esterno. Per questo non ti serve una connessione VPN
 sull’host.
