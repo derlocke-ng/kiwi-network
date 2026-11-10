@@ -1,67 +1,81 @@
+---
+hide:
+  - toc
+---
+
+<div class="kiwi-hero" markdown>
+
+![](assets/logo.svg)
+
+<p class="kiwi-motto">Ex fructu arbor agnoscitur</p>
+
 # Kiwi Network
 
-*Hortus conclusus*: an enclosed garden.
+<p class="kiwi-lede">Your own private network: a master at the gate, nodes behind it, every machine yours. Built from one file, with one door to the Internet.</p>
 
-Kiwi Network grows a private network of your own from one file. A **master**,
-named after a fruit dish, keeps the gate, and it is the only door that faces the
-Internet. Your **nodes**, named after fruits, grow behind it with your cloud,
-your passwords and your backups. On top of it grow **hubs**, where your
-community meets without a platform, and a **desktop** that installs straight
-from git. Open source, self-hosted, no accounts.
+[How it works](network/index.md){ .md-button .md-button--primary }
+[Build one](server/index.md){ .md-button }
 
-## The network
+</div>
 
-[kiwi-server](server/index.md) turns one `fleet.yaml` into an unattended install
-ISO per machine (Fedora CoreOS, uCore or Debian), then applies each machine's
-role over SSH:
+<div class="kiwi-cards" markdown>
+
+<a href="network/">
+<strong>The network</strong>
+<span>One master, many nodes, one WireGuard mesh. Client groups, a double-hop exit, DNS and certificates of your own.</span>
+<em>How it works →</em>
+</a>
+
+<a href="server/">
+<strong>kiwi-server</strong>
+<span>The fleet file, install ISOs, apply over SSH, enrolment, backups, unlocking. CLI and GTK app.</span>
+<em>Build a network →</em>
+</a>
+
+<a href="server/modules/">
+<strong>Modules</strong>
+<span>All 20: WireGuard, Pi-hole, Tor, Nextcloud, Vaultwarden, backups, Tang, Immich, Paperless-ngx and more.</span>
+<em>What a node can be →</em>
+</a>
+
+<a href="people/">
+<strong>Hubs</strong>
+<span>kiwi-framework: open markets, feeds, chat and sharing on nostr, sealed in the browser. Armory is the first.</span>
+<em>Hubs, not platforms →</em>
+</a>
+
+<a href="desktop/">
+<strong>The desktop</strong>
+<span>kiwi-updater and the apps for Fedora Atomic: kill switch, sealed exits for client networks, setup, sync.</span>
+<em>Apps from git →</em>
+</a>
+
+<a href="project/status/">
+<strong>Status</strong>
+<span>Every repository, its release and its known gaps, described as they are.</span>
+<em>Where things stand →</em>
+</a>
+
+</div>
+
+## The machines
 
 | Role | What the machine becomes |
 |---|---|
-| `master` | the gate: the WireGuard entry point, whose traffic leaves through a commercial VPN (the double hop) or straight out, with Pi-hole, Tor and the admin pages, and optionally a relay and a hub |
-| `node` · `gateway` | routes a LAN through the VPN, with Pi-hole, DHCP relay, a download station and SFTP |
+| `master` | the gate: WireGuard, a double-hop or direct exit, Pi-hole, Tor, the admin pages, and optionally a nostr relay and a hub |
+| `node` · `gateway` | a LAN through the VPN, with Pi-hole as DNS and DHCP, a download station and SFTP |
 | `node` · `cloud` | Nextcloud with Collabora, and Vaultwarden |
-| `node` · `minimal` | the VPN client and nginx, for modules of your choice: backups, Tang, Immich, Paperless-ngx, OpenCloud … |
+| `node` · `minimal` | the tunnel and nginx, for modules of your choice: backups, Tang, Immich, Paperless-ngx, OpenCloud |
 | `bare` | just the base system |
 
-The master publishes one port by default: WireGuard, UDP 51820. Everything else
-dials out to it and meets in the mesh. See [How the network works](network/index.md),
-and [Where it is going](server/roadmap.md) for the control node, federation and
-the orchard.
-
-## Hubs
-
-[kiwi-framework](people/index.md) is the engine for community hubs on nostr:
-[an open marketplace, a feed, chat, file sharing, shared lists, a password
-manager](people/apps.md), all running in the browser, sealed before anything
-leaves it, on relays the community chooses. Anyone can run a hub, any hub can
-serve another's spaces, and a master can carry a private hub of its own.
-[Armory](people/armory.md) is the first distribution.
-
-## The desktop
-
-[kiwi-updater](desktop/kiwi-updater.md) installs apps from **git catalogs** on
-Fedora Silverblue and Bluefin. An app is a repo, a release is a tag, and an app
-that needs root says why before it asks.
-
-| App | What it does |
-|---|---|
-| [kiwi-killswitch](desktop/kiwi-killswitch.md) | a fail-closed VPN kill switch for GNOME |
-| [ensconce](desktop/ensconce.md) | post-install setup for Bluefin-DX from plain list files |
-| [kiwi-proxy](clients/kiwi-proxy.md), [kiwi-custodia](clients/kiwi-custodia.md), [kiwi-fox](clients/kiwi-fox.md) | one sealed exit per client network, with distro boxes and browsers inside |
-| [gnome-monitor](desktop/gnome-monitor.md) | display layouts for GNOME |
-| [syncman](desktop/syncman.md) | two-way folder sync |
-| [kiwi-cli-tools-desktop](desktop/cli-tools.md) | `torlink`, `pweb`, `select-server`, `tethering` |
-| [kiwi-server](server/index.md) | the network's gardener, as a GTK app too |
+Masters are named after fruit dishes (sorbet, crumble, compote), and nodes after
+fruits (papaya, lychee, quince). The master is the only machine that has to be
+reachable from the Internet, and by default it publishes one port: WireGuard,
+UDP 51820.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/derlocke-ng/kiwi-updater/main/get-kiwi.sh | bash
+kiwi install kiwi-server            # or from a clone: ./install.sh install
+kiwi-server init && $EDITOR fleet.yaml
+kiwi-server build fleet.yaml        # an unattended ISO per machine
+kiwi-server apply fleet.yaml papaya # the role, over SSH
 ```
-
-## Where things stand
-
-Young projects, described as they are. kiwi-server was proven on hardware in
-October and November 2026, and some modules and providers are still to be
-validated. The [status page](project/status.md) lists every repository, its
-release and its known gaps.
-
-*Ex fructu arbor agnoscitur*: the tree is known by its fruit.

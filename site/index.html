@@ -3,28 +3,52 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Kiwi Network — one gate, a whole orchard behind it</title>
-  <meta name="description" content="Grow your own private network from one file: a master at the gate, nodes behind it, one door to the Internet. Hubs where your community meets without a platform, and a desktop that installs from git. Open source, self-hosted, no accounts.">
-  <link rel="icon" href="kiwi.svg" type="image/svg+xml">
+  <title>Kiwi Network — your own private network</title>
+  <meta name="description" content="A private network of your own: a master at the gate, nodes behind it, built from one file. WireGuard, DNS, your cloud, passwords and backups on machines you own. Open source, self-hosted.">
+  <link rel="icon" href="logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
   <script>
     try { var t = localStorage.getItem('kiwi-theme'); if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t); } catch (e) {}
   </script>
 </head>
 <body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-gate" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9.5 12l2 2 3.5-4"/></symbol>
+      <symbol id="i-hop" viewBox="0 0 24 24"><path d="M4 19h4a3 3 0 0 0 3-3V8a3 3 0 0 1 3-3h5"/><path d="M16 2l3 3-3 3"/><circle cx="4" cy="19" r="1.5"/></symbol>
+      <symbol id="i-dns" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></symbol>
+      <symbol id="i-tor" viewBox="0 0 24 24"><path d="M12 3c-3 3-6 6-6 10a6 6 0 0 0 12 0c0-4-3-7-6-10z"/><path d="M12 9.5c-1.5 1.5-3 3-3 4.5a3 3 0 0 0 6 0c0-1.5-1.5-3-3-4.5z"/></symbol>
+      <symbol id="i-groups" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14c2.6 0 4.5 1.6 4.5 4"/></symbol>
+      <symbol id="i-cert" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+      <symbol id="i-relay" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 0 0 0 7M15.5 8.5a5 5 0 0 1 0 7M5.5 5.5a9.5 9.5 0 0 0 0 13M18.5 5.5a9.5 9.5 0 0 1 0 13"/></symbol>
+      <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16.5 6.5l3 3"/></symbol>
+      <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 .6-8A6 6 0 0 0 6 10.5 3.8 3.8 0 0 0 7 18z"/></symbol>
+      <symbol id="i-router" viewBox="0 0 24 24"><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 16.5h.01M10.5 16.5h.01M12 13V8M8.5 6a5 5 0 0 1 7 0"/></symbol>
+      <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></symbol>
+      <symbol id="i-photo" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 8"/></symbol>
+      <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></symbol>
+      <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+      <symbol id="i-backup" viewBox="0 0 24 24"><path d="M3.5 12a8.5 8.5 0 1 0 2.5-6L3.5 8.5"/><path d="M3.5 3.5v5h5M12 7.5V12l3 2"/></symbol>
+      <symbol id="i-panel" viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></symbol>
+      <symbol id="i-mtu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h11M4 17h6"/><path d="M17 15l3 3-3 3"/></symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+      <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M3 12h4l2-5 4 10 2-5h6"/></symbol>
+    </defs>
+  </svg>
+
   <a class="skip" href="#main">Skip to content</a>
 
   <header class="bar">
     <div class="wrap bar__inner">
       <a class="brand" href="./">
-        <img src="kiwi.svg" alt="" width="28" height="28">
+        <img src="logo.svg" alt="" width="34" height="34">
         <span>Kiwi Network</span>
       </a>
       <nav class="nav" id="nav" aria-label="Main">
-        <a href="#network">Network</a>
-        <a href="#server">kiwi-server</a>
-        <a href="#hubs">Hubs</a>
-        <a href="#desktop">Desktop</a>
+        <a href="#master">Master</a>
+        <a href="#nodes">Nodes</a>
+        <a href="#build">Build</a>
+        <a href="#more">Hubs &amp; desktop</a>
         <a href="#status">Status</a>
         <a href="docs/">Docs</a>
         <a href="https://github.com/derlocke-ng">GitHub</a>
@@ -42,314 +66,158 @@
   </header>
 
   <main id="main">
-    <!-- Hero -->
+    <!-- Hero: the network itself -->
     <section class="hero">
-      <div class="wrap hero__grid">
-        <div class="hero__text">
-          <p class="eyebrow">Hortus conclusus · an enclosed garden</p>
-          <h1>One gate. A whole orchard behind&nbsp;it.</h1>
-          <p class="lede">
-            Kiwi Network grows a private network of your own from one file.
-            A <strong>master</strong>, named after a fruit dish, keeps the gate:
-            the only door that faces the Internet. Your <strong>nodes</strong>,
-            named after fruits, ripen behind it with your cloud, your passwords
-            and your backups. On top grow <strong>hubs</strong> where your
-            community meets without a platform, and a <strong>desktop</strong>
-            that installs straight from git.
-          </p>
-          <div class="cta">
-            <a class="btn btn--primary" href="docs/server/">Plant a network</a>
-            <a class="btn" href="docs/">Read the docs</a>
+      <div class="wrap hero__center">
+        <img class="hero__logo" src="logo.svg" alt="" width="104" height="104">
+        <p class="motto"><em>Ex fructu arbor agnoscitur</em></p>
+        <h1>Your own private network.</h1>
+        <p class="lede">A master at the gate, nodes behind it, every machine yours. Built from one file, with one door to the Internet.</p>
+        <div class="cta cta--center">
+          <a class="btn btn--primary" href="docs/server/">Build one</a>
+          <a class="btn" href="docs/network/">How it works</a>
+        </div>
+      </div>
+
+      <div class="wrap">
+        <figure class="net" aria-label="A Kiwi Network: one master, nodes and devices">
+          <div class="net__inet">Internet <span>· only UDP 51820 is open ·</span> exit through your VPN provider</div>
+          <div class="net__master">
+            <div class="net__name"><img src="logo.svg" alt="" width="28" height="28"><strong>sorbet</strong><span>master · a VPS</span></div>
+            <ul class="net__chips">
+              <li>WireGuard</li><li>double-hop exit</li><li>Pi-hole</li><li>Tor</li><li>admin pages</li><li>relay &amp; hub</li>
+            </ul>
           </div>
+          <div class="net__mesh"><span>WireGuard mesh · <code>10.8.0.0/16</code></span></div>
+          <div class="net__row">
+            <div class="net__node"><strong>papaya</strong><span>node · cloud</span><small>Nextcloud, Vaultwarden</small></div>
+            <div class="net__node"><strong>lychee</strong><span>node · gateway</span><small>a LAN through the VPN</small></div>
+            <div class="net__node"><strong>quince</strong><span>node · minimal</span><small>backups, Immich, Tang</small></div>
+            <div class="net__node net__node--dev"><strong>your devices</strong><span>client groups</span><small>laptops, phones, routers</small></div>
+          </div>
+        </figure>
+      </div>
+    </section>
+
+    <!-- The master -->
+    <section class="section" id="master">
+      <div class="wrap">
+        <header class="section__head">
+          <p class="eyebrow">The master</p>
+          <h2>The gate, and everything it guards.</h2>
+          <p>One rented VPS (or any box people can reach) named after a fruit dish. It is the only machine with a door to the Internet, and the hub every other machine dials out to.</p>
+        </header>
+        <div class="caps">
+          <div class="cap"><svg><use href="#i-gate"/></svg><h3>One door</h3><p>wg-easy is the entry point for every node and device. By default the only port it publishes is WireGuard, UDP 51820.</p></div>
+          <div class="cap"><svg><use href="#i-hop"/></svg><h3>Double-hop exit</h3><p>The mesh leaves through a commercial VPN (gluetun, Mullvad in the preset), never from the master's own address. Or straight out, if you prefer.</p></div>
+          <div class="cap"><svg><use href="#i-dns"/></svg><h3>DNS for everyone</h3><p>Pi-hole blocks ads for the whole network and answers every name in it. Lookups leave through the exit, over DNS-over-TLS.</p></div>
+          <div class="cap"><svg><use href="#i-groups"/></svg><h3>Client groups</h3><p>Devices reach everything, guests only your services, routers bring whole LANs, and a pentest group reaches nothing inside.</p></div>
+          <div class="cap"><svg><use href="#i-tor"/></svg><h3>Tor for the mesh</h3><p>A Tor SOCKS5 proxy at the master's mesh address, for mesh clients only, with exits pinned to the countries you choose.</p></div>
+          <div class="cap"><svg><use href="#i-cert"/></svg><h3>Your own CA</h3><p>One certificate authority for the fleet, so internal HTTPS just works. Public names get Let's Encrypt when you open the gate.</p></div>
+          <div class="cap"><svg><use href="#i-relay"/></svg><h3>Relay &amp; hub</h3><p>Optionally a nostr relay and a community hub, private to the mesh or open to the world.</p></div>
+          <div class="cap"><svg><use href="#i-key"/></svg><h3>Locked at rest</h3><p>An encrypted disk that keeps its WireGuard identity across a rebuild, and is unlocked over SSH into the initramfs.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- The nodes -->
+    <section class="section section--alt" id="nodes">
+      <div class="wrap">
+        <header class="section__head">
+          <p class="eyebrow">The nodes</p>
+          <h2>Behind the gate, whatever you need.</h2>
+          <p>Machines at home or in the office, named after fruits. They dial out to the master, so they need no open port and work behind any router. Pick a preset, or pick the modules yourself.</p>
+        </header>
+
+        <div class="presets">
+          <div class="preset"><span class="preset__k">preset</span><strong>gateway</strong><span>A LAN through the VPN, with Pi-hole as its DNS and DHCP, a download station and SFTP.</span></div>
+          <div class="preset"><span class="preset__k">preset</span><strong>cloud</strong><span>Your files, calendars and contacts in Nextcloud, and your passwords in Vaultwarden.</span></div>
+          <div class="preset"><span class="preset__k">preset</span><strong>minimal</strong><span>Just the tunnel and nginx: a clean base for the modules you choose.</span></div>
         </div>
 
-        <figure class="file">
-          <figcaption class="file__name"><span>fleet.yaml</span><span class="file__hint">the whole orchard, one file</span></figcaption>
-<pre><code><span class="k">defaults:</span> { <span class="k">domain:</span> home, <span class="k">target:</span> ucore }
-<span class="k">hosts:</span>
-  <span class="h">sorbet:</span>                    <span class="c"># a fruit dish: the master, on a VPS</span>
+        <div class="mods-grid">
+          <div class="mod"><svg><use href="#i-cloud"/></svg><div><h3>Nextcloud</h3><p>files, calendars, contacts; Collabora, Talk, OnlyOffice as switches</p></div></div>
+          <div class="mod"><svg><use href="#i-cert"/></svg><div><h3>Vaultwarden</h3><p>Bitwarden-compatible passwords</p></div></div>
+          <div class="mod"><svg><use href="#i-router"/></svg><div><h3>LAN gateway</h3><p>route a whole LAN through the tunnel</p></div></div>
+          <div class="mod"><svg><use href="#i-dns"/></svg><div><h3>Pi-hole &amp; DHCP</h3><p>the LAN's DNS and addresses</p></div></div>
+          <div class="mod"><svg><use href="#i-down"/></svg><div><h3>Downloads</h3><p>Transmission and JDownloader, no route if the tunnel drops</p></div></div>
+          <div class="mod"><svg><use href="#i-backup"/></svg><div><h3>Backups</h3><p>restic to a backup node each night; restores tested node to node</p></div></div>
+          <div class="mod"><svg><use href="#i-key"/></svg><div><h3>Tang</h3><p>unlock encrypted machines at boot</p></div></div>
+          <div class="mod"><svg><use href="#i-photo"/></svg><div><h3>Immich</h3><p>photos and videos <em>· to try out</em></p></div></div>
+          <div class="mod"><svg><use href="#i-doc"/></svg><div><h3>Paperless-ngx</h3><p>scanned documents with OCR <em>· to try out</em></p></div></div>
+          <div class="mod"><svg><use href="#i-folder"/></svg><div><h3>OpenCloud &amp; SFTP</h3><p>files and sharing; downloads from anywhere</p></div></div>
+          <div class="mod"><svg><use href="#i-panel"/></svg><div><h3>Portainer</h3><p>a web view of the containers</p></div></div>
+          <div class="mod"><svg><use href="#i-relay"/></svg><div><h3>Your names</h3><p><code>cloud.papaya.home</code>, trusted on every device</p></div></div>
+        </div>
+        <p class="more"><a href="docs/server/modules/">All 20 modules →</a> <a href="docs/server/roles/">Roles &amp; presets →</a></p>
+      </div>
+    </section>
+
+    <!-- Build it -->
+    <section class="section" id="build">
+      <div class="wrap">
+        <header class="section__head">
+          <p class="eyebrow">kiwi-server</p>
+          <h2>Describe it. Boot it. Apply it.</h2>
+          <p>Write the fleet once. kiwi-server makes an unattended install ISO per machine (Fedora CoreOS, uCore or Debian), then sends each role over SSH. A CLI and a GTK app. Proven on hardware.</p>
+        </header>
+
+        <div class="build">
+          <figure class="file">
+            <figcaption class="file__name"><span>fleet.yaml</span><span class="file__hint">one file, every machine</span></figcaption>
+<pre><code><span class="k">hosts:</span>
+  <span class="h">sorbet:</span>                <span class="c"># a fruit dish: the master</span>
     <span class="k">role:</span> master
     <span class="k">target:</span> debian
-    <span class="k">master:</span>
-      <span class="k">vpn-server:</span> { <span class="k">wg_host:</span> vpn.example.org }
-  <span class="h">papaya:</span>                    <span class="c"># a fruit: a node at home</span>
+  <span class="h">papaya:</span>                <span class="c"># a fruit: a node</span>
     <span class="k">role:</span> node
     <span class="k">node:</span> { <span class="k">preset:</span> cloud }
   <span class="h">lychee:</span>
     <span class="k">role:</span> node
     <span class="k">node:</span> { <span class="k">preset:</span> gateway }</code></pre>
-          <div class="file__out">
-            <code>$ kiwi-server build fleet.yaml &amp;&amp; kiwi-server apply fleet.yaml papaya</code>
-            <span>→ an <strong>unattended install ISO</strong> per host, then each role over SSH</span>
-          </div>
-        </figure>
-      </div>
-    </section>
-
-    <!-- Network -->
-    <section class="section" id="network">
-      <div class="wrap">
-        <header class="section__head">
-          <p class="eyebrow">The network</p>
-          <h2>One door in. Everything else behind it.</h2>
-          <p>A Kiwi Network is a WireGuard mesh with one hub, the <em>master</em>. It is the only machine that has to be reachable from the Internet, and by default it opens a single port. Nodes, laptops, phones and routers dial out to it and meet in the mesh. Every network gets a mesh of its own (<code>10.8.0.0/16</code> unless you pick another), so a device in two of them can tell them apart.</p>
-        </header>
-
-        <figure class="topo" aria-label="Network topology">
-          <div class="topo__cap">Internet</div>
-          <div class="topo__edge"><span>the mesh's traffic leaves through a commercial VPN<br class="br-sm"> (the <strong>double hop</strong>), or straight from the master</span></div>
-          <div class="topo__master">
-            <div class="topo__title">
-              <strong>sorbet</strong>
-              <span>the master · a VPS · named after a fruit dish</span>
+            <div class="file__out">
+              <code>$ kiwi-server build fleet.yaml</code>
+              <code>$ kiwi-server apply fleet.yaml papaya</code>
+              <code>$ kiwi-server enroll fleet.yaml phone --qr</code>
             </div>
-            <ul class="chips">
-              <li><b>wg-easy</b> WireGuard server · 10.8.0.1</li>
-              <li><b>gluetun</b> the master's own exit</li>
-              <li><b>Pi-hole</b> DNS for the mesh</li>
-              <li><b>Tor</b> SOCKS5 for mesh clients</li>
-              <li><b>nginx</b> admin pages, mesh only</li>
-              <li><b>relay &amp; hub</b> optional, for your people</li>
-            </ul>
-            <div class="topo__port"><span class="dot"></span>UDP 51820: the one port it publishes</div>
-          </div>
-          <div class="topo__edge topo__edge--mesh"><span>WireGuard mesh · every machine dials out to the gate</span></div>
-          <div class="topo__row">
-            <div class="topo__node">
-              <strong>papaya · cloud</strong>
-              <span>Nextcloud with Collabora, Vaultwarden, behind nginx with the fleet's own certificate</span>
-            </div>
-            <div class="topo__node">
-              <strong>lychee · gateway</strong>
-              <span>routes a LAN through the VPN: Pi-hole, a download station with no route when the tunnel drops</span>
-            </div>
-            <div class="topo__node">
-              <strong>devices &amp; guests</strong>
-              <span>client groups decide who reaches what: your devices everything, guests only the nodes</span>
-            </div>
-            <div class="topo__node">
-              <strong>routers</strong>
-              <span>OpenWrt (a generated script), FritzBox and others bring a whole LAN into the mesh</span>
-            </div>
-          </div>
-        </figure>
+          </figure>
 
-        <div class="facts facts--3">
-          <article class="fact">
-            <h3>Named from the orchard</h3>
-            <p>Masters are fruit dishes (crumble, sorbet, compote), nodes are fruits (papaya, lychee, quince), and every service sits beneath its host: <code>cloud.papaya.home</code>.</p>
-            <a href="docs/network/dns/">Names &amp; DNS →</a>
-          </article>
-          <article class="fact">
-            <h3>Names that can't leak</h3>
-            <p>One resolver chain through the master, a domain that is never delegated publicly, and a certificate authority of your own that every machine trusts.</p>
-            <a href="docs/network/dns/#one-ca-for-the-fleet">The fleet CA →</a>
-          </article>
-          <article class="fact">
-            <h3>Client groups</h3>
-            <p>Devices, guests, routers and a pentest group, each with its own reach. Guests see your services, not your network.</p>
-            <a href="docs/network/#client-groups">Groups →</a>
-          </article>
-          <article class="fact">
-            <h3>Locked at rest</h3>
-            <p>Disk encryption on Debian and CoreOS, unlocked at boot by your own Tang rings, or by you, over SSH into the initramfs.</p>
-            <a href="docs/server/operations/#encrypted-disks-and-unlocking">Unlocking →</a>
-          </article>
-          <article class="fact">
-            <h3>Nothing lost</h3>
-            <p>Every node's data goes to a backup node each night, append-only, and restores onto another node (tested). Next: several backup servers, and a rebuilt node that restores itself. The fleet itself is backed up, encrypted, to the nodes you name.</p>
-            <a href="docs/server/operations/#backing-up-the-machines-data">Backups →</a>
-          </article>
-          <article class="fact">
-            <h3>Reboots in your window</h3>
-            <p>Updates install continuously: Zincati on CoreOS, staged rpm-ostree on uCore, unattended-upgrades on Debian. Machines reboot only when you said they may.</p>
-            <a href="docs/server/machines/#updates">Updates →</a>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- kiwi-server -->
-    <section class="section section--alt" id="server">
-      <div class="wrap">
-        <header class="section__head">
-          <p class="eyebrow">kiwi-server</p>
-          <h2>Describe it. Boot it. Apply it.</h2>
-          <p>kiwi-server turns the fleet file into an unattended install ISO per machine (Fedora CoreOS, uCore or Debian), then sends each role over SSH, where podman quadlets bring the stack up. A CLI and a GTK4 app, installed in <code>~/.local</code>. Proven on hardware in October and November 2026.</p>
-        </header>
-
-        <ol class="steps steps--4">
-          <li>
-            <span class="steps__n">1</span>
-            <h3>Describe</h3>
-            <p>Every host, its role and its disk in <code>fleet.yaml</code>. Passwords you leave out grow from one seed.</p>
-          </li>
-          <li>
-            <span class="steps__n">2</span>
-            <h3>Build</h3>
-            <pre><code>kiwi-server build fleet.yaml</code></pre>
-            <p>The ISO installs the base system to the disk you named, <strong>without asking</strong>, and powers off.</p>
-          </li>
-          <li>
-            <span class="steps__n">3</span>
-            <h3>Apply</h3>
-            <pre><code>kiwi-server apply fleet.yaml papaya</code></pre>
-            <p>The role arrives over SSH. It fails loudly unless every container runs.</p>
-          </li>
-          <li>
-            <span class="steps__n">4</span>
-            <h3>Tend it</h3>
-            <pre><code>kiwi-server enroll fleet.yaml phone --qr
-kiwi-server status fleet.yaml</code></pre>
-            <p>Add devices, read every machine's health, back up, unlock.</p>
-          </li>
-        </ol>
-
-        <div class="roles">
-          <article class="role">
-            <h3><code>master</code></h3>
-            <p>The gate: WireGuard, the exit, Pi-hole, Tor, the admin pages. Optionally a relay and a hub.</p>
-            <ul class="mods"><li>vpn-client</li><li>vpn-server</li><li>dns</li><li>tor</li><li>reverse-proxy</li></ul>
-          </article>
-          <article class="role">
-            <h3><code>node</code> · gateway</h3>
-            <p>A LAN through the VPN, with DNS, DHCP relay, a download station and SFTP.</p>
-            <ul class="mods"><li>vpn-client</li><li>dns</li><li>dhcp-relay</li><li>reverse-proxy</li><li>downloader</li><li>gateway</li><li>portainer</li><li>sftp</li></ul>
-          </article>
-          <article class="role">
-            <h3><code>node</code> · cloud</h3>
-            <p>Your files, calendars and passwords, on the LAN and in the mesh.</p>
-            <ul class="mods"><li>vpn-client</li><li>reverse-proxy</li><li>cloud</li><li>vault</li><li>portainer</li></ul>
-          </article>
-          <article class="role">
-            <h3><code>node</code> · minimal</h3>
-            <p>A bare node for modules of your choice: backups, Tang, Immich, Paperless-ngx, OpenCloud.</p>
-            <ul class="mods"><li>vpn-client</li><li>reverse-proxy</li><li>+ yours</li></ul>
-          </article>
-        </div>
-
-        <aside class="later">
-          <h3>Still growing <span class="tag tag--main">designed, not built</span></h3>
-          <p>A <strong>control node</strong> at home that holds the fleet, with a web UI, users and one-time join tokens, so the rented master becomes a replaceable relay. <strong>Federation</strong> between networks, and multi-hop through another network's master. <strong>The orchard</strong>: many masters, run for others, who still own their own networks.</p>
-        </aside>
-
-        <p class="targets">
-          <span>Targets</span>
-          <b>Fedora CoreOS</b><b>uCore</b><b>Debian stable</b>
-          <a href="docs/server/">kiwi-server →</a>
-        </p>
-      </div>
-    </section>
-
-    <!-- Hubs -->
-    <section class="section" id="hubs">
-      <div class="wrap">
-        <header class="section__head">
-          <p class="eyebrow">Hubs</p>
-          <h2>Hubs, not platforms.</h2>
-          <p><strong>kiwi-framework</strong> is the engine for community hubs on <a href="https://nostr.com">nostr</a>. A hub is a set of web apps that run entirely in the browser and sync over relays the community chooses. There is no account server and no backend in the middle, and everything private is sealed on the device before it leaves. Anyone can run a hub, any hub can serve another's spaces, and friends on different hubs are still friends.</p>
-        </header>
-
-        <div class="facts">
-          <article class="fact">
-            <h3>Open markets</h3>
-            <p>Listings with photos, found by category and by where the buyer is, through search labels the relays can match but not read. One market per community: a seed bank and a gem store are the same code on two spaces.</p>
-          </article>
-          <article class="fact">
-            <h3>Spaces &amp; feeds</h3>
-            <p>A space is a community with its own moderators and relays. Its feed holds posts with photos, likes and comments for the space, for friends, a circle or only you.</p>
-          </article>
-          <article class="fact">
-            <h3>Talk &amp; share</h3>
-            <p>Private messages in NIP-17 gift wraps, groups and live rooms, calls between browsers, and files by encrypted link or straight from one browser to another.</p>
-          </article>
-          <article class="fact">
-            <h3>Keep</h3>
-            <p>Shared lists and notes, a password manager with SSH keys and certificates, two-factor codes, and your own CalDAV calendar. It works offline, and your devices heal the relays.</p>
-          </article>
-        </div>
-
-        <div class="split">
-          <a class="split__card" href="docs/people/armory/">
-            <span class="split__k">A distribution</span>
-            <strong>Armory</strong>
-            <span>The first hub built on the framework, with ten tools, and the template to fork for your own: change one file, name your spaces, choose your relays.</span>
-          </a>
-          <a class="split__card" href="docs/people/hubs/#on-a-kiwi-network">
-            <span class="split__k">On your network</span>
-            <strong>A private hub</strong>
-            <span>Your master can carry its own nostr relay and hub, reachable from the mesh only, with the fleet's certificate. Open it to the world when you want.</span>
-          </a>
-        </div>
-        <p class="aside">Relays still see metadata (who writes when, from which IP address). The <a href="docs/people/#privacy-model">privacy model</a> lists every limit.</p>
-      </div>
-    </section>
-
-    <!-- Desktop -->
-    <section class="section section--alt" id="desktop">
-      <div class="wrap">
-        <header class="section__head">
-          <p class="eyebrow">The desktop</p>
-          <h2>Apps from git, on an image-based desktop.</h2>
-          <p>Built for Fedora Silverblue and Bluefin. <strong>kiwi-updater</strong> installs apps from open git catalogs: an app is a repo, a release is a tag. User apps go in your home. An app that needs root says why before it asks, and updates without a password only when its release is signed.</p>
-        </header>
-
-        <div class="install">
-          <div class="install__row">
-            <code id="get-kiwi">curl -fsSL https://raw.githubusercontent.com/derlocke-ng/kiwi-updater/main/get-kiwi.sh | bash</code>
-            <button class="copy js-copy" type="button" data-copy="get-kiwi">Copy</button>
-          </div>
-        </div>
-
-        <div class="apps">
-          <a class="app" href="docs/desktop/kiwi-updater/">
-            <span class="app__meta"><span class="tag tag--rel">v2.4.0</span> CLI + GTK4</span>
-            <h3>kiwi-updater</h3>
-            <p>Kiwi Apps: install, update, pin and diff apps from git catalogs. One user timer; signed releases for root.</p>
-          </a>
-          <a class="app" href="docs/desktop/ensconce/">
-            <span class="app__meta"><span class="tag tag--rel">v2.5.0</span> Bluefin-DX</span>
-            <h3>ensconce</h3>
-            <p>A fresh Bluefin set up from plain list files: packages, Flatpaks, extensions, sync, SSH, the login screen. <code>--export</code> clones a machine.</p>
-          </a>
-          <a class="app" href="docs/desktop/kiwi-killswitch/">
-            <span class="app__meta"><span class="tag tag--rel">v0.2.3</span> user + root</span>
-            <h3>kiwi-killswitch</h3>
-            <p>A fail-closed VPN kill switch for GNOME. If the tunnel drops, nothing leaves, and it never asks for a password.</p>
-          </a>
-          <a class="app" href="docs/desktop/gnome-monitor/">
-            <span class="app__meta"><span class="tag tag--rel">v0.3.2</span> GNOME</span>
-            <h3>gnome-monitor</h3>
-            <p>Save and switch display layouts; hand a screen to another computer and get it back as it was.</p>
-          </a>
-          <a class="app" href="docs/desktop/syncman/">
-            <span class="app__meta"><span class="tag tag--rel">v0.4.1</span> user services</span>
-            <h3>syncman</h3>
-            <p>Two-way folder sync for game saves and more. rsync is the only dependency, and nothing is ever deleted.</p>
-          </a>
-          <a class="app" href="docs/desktop/cli-tools/">
-            <span class="app__meta"><span class="tag tag--rel">v1.2.1</span> CLI</span>
-            <h3>kiwi-cli-tools</h3>
-            <p><code>torlink</code> reaches a machine over Tor with an invite code; <code>pweb</code>, <code>select-server</code> and <code>tethering</code> help every day.</p>
-          </a>
-        </div>
-
-        <div class="clients" id="clients">
-          <div>
-            <p class="eyebrow">Many client networks</p>
-            <h3>Ten clients, ten exits, no mess.</h3>
-            <p>Give each client's SOCKS5 endpoint its own <strong>sealed exit</strong>: a rootless container whose only route is that upstream. Your tools join the exit they need. Nothing runs that isn't in use, and the host's own network is never touched.</p>
-            <a class="more-link" href="docs/clients/">Working with many client networks →</a>
-          </div>
-          <ul class="ticks">
-            <li><b>kiwi-proxy</b>: exits and gateways, and a local SOCKS5 port per exit for any app</li>
-            <li><b>kiwi-custodia</b>: distro boxes where <em>everything</em> leaves through the exit, from <code>dnf</code> to static binaries</li>
-            <li><b>kiwi-fox</b>: browser profiles on an exit, in Camoufox, Firefox or Tor Browser</li>
-            <li><b>Tor &amp; Mysterium</b>: modules for more exit IPs, handy for testing</li>
+          <ul class="ops">
+            <li><svg><use href="#i-pulse"/></svg><div><strong>status</strong><span>every machine's role, stack, disks, backups and certificates, live</span></div></li>
+            <li><svg><use href="#i-backup"/></svg><div><strong>backup &amp; restore</strong><span>nightly, append-only, pruned from your desk; the fleet itself too</span></div></li>
+            <li><svg><use href="#i-key"/></svg><div><strong>unlock</strong><span>Tang rings, or SSH into the initramfs</span></div></li>
+            <li><svg><use href="#i-mtu"/></svg><div><strong>mtu</strong><span>measure a tunnel's real MTU, mobile paths included</span></div></li>
+            <li><svg><use href="#i-clock"/></svg><div><strong>updates</strong><span>install continuously, reboot only in your window</span></div></li>
+            <li><svg><use href="#i-cloud"/></svg><div><strong>vps</strong><span>install a netcup server through its API</span></div></li>
           </ul>
         </div>
 
-        <p class="aside">Also: <a href="docs/desktop/kiwi-gen/"><strong>kiwi-gen</strong></a>, SSH and TLS keys and certificates made offline in your browser (<a href="https://derlocke-ng.github.io/kiwi-gen/">try it</a>).</p>
+        <aside class="later">
+          <h3>Still growing <span class="tag tag--main">designed</span></h3>
+          <p>A <strong>control node</strong> at home that holds the fleet, with a web UI, users and join tokens, so the master becomes a replaceable relay. <strong>Federation</strong> between networks, and multi-hop through another network's master. <strong>The orchard</strong>: many masters, run for others.</p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Hubs & desktop, compact -->
+    <section class="section section--alt" id="more">
+      <div class="wrap">
+        <header class="section__head">
+          <p class="eyebrow">On top of the network</p>
+          <h2>Hubs for people. Apps for your desktop.</h2>
+        </header>
+        <div class="duo">
+          <a class="duo__card" href="docs/people/">
+            <strong>Hubs, not platforms</strong>
+            <span><b>kiwi-framework</b> runs community hubs on nostr: open markets, feeds, chat, file sharing and a password manager, sealed in the browser, on relays you choose. Run one on your master, or try <b>Armory</b>, the first.</span>
+            <em>Hubs →</em>
+          </a>
+          <a class="duo__card" href="docs/desktop/">
+            <strong>Apps from git</strong>
+            <span><b>kiwi-updater</b> installs apps on Fedora Silverblue and Bluefin from open catalogs: a VPN kill switch, sealed exits for many client networks, display layouts, folder sync, post-install setup.</span>
+            <em>Desktop →</em>
+          </a>
+        </div>
       </div>
     </section>
 
@@ -359,23 +227,19 @@ kiwi-server status fleet.yaml</code></pre>
         <header class="section__head">
           <p class="eyebrow">Status</p>
           <h2>Where each piece stands.</h2>
-          <p>Young projects, described as they are. A version means a release tag, which is what kiwi-updater installs.</p>
         </header>
         <div class="table-wrap">
           <table class="status">
             <thead><tr><th>Repository</th><th>Release</th><th>Notes</th></tr></thead>
             <tbody>
-              <tr><td><a href="https://github.com/derlocke-ng/kiwi-server">kiwi-server</a></td><td><span class="tag tag--rel">v2.42.0</span></td><td>Proven on hardware, node backups restored across nodes, MTU tuned for mobile paths. Federation and the control plane are designed.</td></tr>
-              <tr><td><a href="https://github.com/derlocke-ng/kiwi-modules">kiwi-modules</a> · <a href="https://github.com/derlocke-ng/kiwi-stack">kiwi-stack</a></td><td><span class="tag tag--rel">v0.23.0 · v0.5.0</span></td><td>The 20 modules and their renderer, and the machine side; usable without a fleet.</td></tr>
-              <tr><td><a href="https://github.com/derlocke-ng/kiwi-framework">kiwi-framework</a></td><td><span class="tag tag--rel">v0.32.1</span></td><td>Discovery between hubs, approvals and NIP-07/46 signers still to come.</td></tr>
-              <tr><td><a href="https://github.com/derlocke-ng/armory">Armory</a></td><td><span class="tag tag--main">main</span></td><td>Live on <a href="https://derlocke-ng.github.io/armory/">GitHub Pages</a> and as a container image.</td></tr>
-              <tr><td><a href="https://github.com/derlocke-ng/kiwi-updater">kiwi-updater</a></td><td><span class="tag tag--rel">v2.4.0</span></td><td>Signed releases for root; the other apps' tags are not signed yet.</td></tr>
-              <tr><td><a href="https://github.com/derlocke-ng/kiwi-proxy">kiwi-proxy</a> · <a href="https://github.com/derlocke-ng/kiwi-custodia">custodia</a> · <a href="https://github.com/derlocke-ng/kiwi-fox">fox</a></td><td><span class="tag tag--rel">v0.7.3 · v0.2.3 · v0.7.1</span></td><td>TCP and IPv4 only; one VPN configuration per machine.</td></tr>
-              <tr><td>killswitch · ensconce · gnome-monitor · syncman · cli-tools</td><td><span class="tag tag--rel">released</span></td><td>All in the <a href="https://github.com/derlocke-ng/kiwi-catalog">Kiwi catalog</a>.</td></tr>
+              <tr><td><a href="https://github.com/derlocke-ng/kiwi-server">kiwi-server</a></td><td><span class="tag tag--rel">v2.42.0</span></td><td>Proven on hardware. Several backup servers and self-restoring nodes are next; federation and the control plane are designed.</td></tr>
+              <tr><td><a href="https://github.com/derlocke-ng/kiwi-modules">kiwi-modules</a> · <a href="https://github.com/derlocke-ng/kiwi-stack">kiwi-stack</a></td><td><span class="tag tag--rel">v0.23.0 · v0.5.0</span></td><td>The 20 modules and their renderer, and the machine side.</td></tr>
+              <tr><td><a href="https://github.com/derlocke-ng/kiwi-framework">kiwi-framework</a> · <a href="https://github.com/derlocke-ng/armory">Armory</a></td><td><span class="tag tag--rel">v0.32.1</span></td><td>Hubs on nostr; Armory is live on GitHub Pages.</td></tr>
+              <tr><td><a href="https://github.com/derlocke-ng/kiwi-updater">kiwi-updater</a> and the <a href="https://github.com/derlocke-ng/kiwi-catalog">catalog</a></td><td><span class="tag tag--rel">v2.4.0</span></td><td>Signed releases for root; every desktop app is released.</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="aside"><a href="docs/project/status/">Every repository and known gap →</a></p>
+        <p class="more"><a href="docs/project/status/">Every repository and known gap →</a></p>
       </div>
     </section>
   </main>
@@ -383,17 +247,15 @@ kiwi-server status fleet.yaml</code></pre>
   <footer class="foot">
     <div class="wrap foot__inner">
       <div class="brand brand--foot">
-        <img src="kiwi.svg" alt="" width="22" height="22">
+        <img src="logo.svg" alt="" width="26" height="26">
         <span>Kiwi Network</span>
       </div>
       <nav class="foot__links" aria-label="Footer">
         <a href="docs/">Documentation</a>
-        <a href="https://derlocke-ng.github.io/armory/">Armory</a>
         <a href="https://github.com/derlocke-ng">GitHub</a>
         <a href="https://github.com/derlocke-ng/kiwi-network">Edit this site</a>
       </nav>
-      <p class="foot__motto"><em>Ex fructu arbor agnoscitur</em>: the tree is known by its fruit. Everything here is open source, so judge it by the code.</p>
-      <p class="foot__note">This page loads nothing from third parties: no fonts, no analytics, no cookies. Site content AGPL-3.0; each tool carries its own license.</p>
+      <p class="foot__note">Open source, self-hosted, no accounts. This page loads nothing from third parties: no fonts, no analytics, no cookies. Site content AGPL-3.0; each tool carries its own license.</p>
     </div>
   </footer>
 

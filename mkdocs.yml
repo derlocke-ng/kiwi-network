@@ -1,9 +1,6 @@
 site_name: Kiwi Network
 site_description: Open-source tools to connect what is yours — a private WireGuard mesh built from one file, peer-to-peer tools over nostr, and apps for Fedora Atomic desktops.
 site_url: https://kiwi-network.eu/docs/
-repo_url: https://github.com/derlocke-ng/kiwi-network
-repo_name: derlocke-ng/kiwi-network
-edit_uri: edit/main/docs/
 
 site_dir: build/docs
 
@@ -16,8 +13,8 @@ validation:
 theme:
   name: material
   language: en
-  logo: assets/icons/kiwi-network.svg
-  favicon: assets/icons/kiwi-network.svg
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
   font: false
   features:
     - navigation.tabs
@@ -34,11 +31,15 @@ theme:
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
+      primary: custom
+      accent: custom
       toggle:
         icon: material/weather-night
         name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
+      primary: custom
+      accent: custom
       toggle:
         icon: material/weather-sunny
         name: Switch to light mode
@@ -50,8 +51,8 @@ extra:
   homepage: https://kiwi-network.eu/
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/derlocke-ng
-      name: derlocke-ng on GitHub
+      link: https://github.com/derlocke-ng/kiwi-network
+      name: kiwi-network on GitHub
 
 markdown_extensions:
   - admonition
