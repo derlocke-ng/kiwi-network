@@ -1,25 +1,35 @@
 # kiwi-updater
 
-`kiwi` installs and updates open-source apps from **git catalogs** on Fedora
-Silverblue, Bluefin and other ostree systems. An app is a git repo with a
-`kiwi.manifest` and an `install.sh`. kiwi clones it, checks out its latest
-release tag, runs its installer, and keeps it updated in the background,
-itself included.
+kiwi-updater installs open-source apps on your desktop and keeps them up to
+date. Its command is `kiwi`. It gets the apps from **git catalogs** and works
+on Fedora Silverblue, Bluefin and other ostree systems. A catalog is a git
+repository that lists apps. An app is a git repository with a `kiwi.manifest`
+file and an `install.sh` script. kiwi clones the app's repository, checks out
+its latest release tag and runs its installer. After that it updates the app in
+the background, and it updates itself in the same way.
 
-There are no accounts, no store and no vendor. A catalog is a repo you can read,
-fork and send a pull request to.
+You do not need an account, and there is no app store and no vendor. A catalog
+is a repository that you can read, fork and send a pull request to.
 
 - Repository: [derlocke-ng/kiwi-updater](https://github.com/derlocke-ng/kiwi-updater), GPL-3.0-or-later
 - Latest release: **v2.4.0**, a security release
-- **`kiwi`** is the CLI. It needs `git`, coreutils, `util-linux` and `awk`, all
-  in the base image, plus `ssh-keygen` for signature checks.
-- **Kiwi Apps** (`kiwi-gui`) is the GTK4 app: search, filters, a detail view per
-  app with its icon, screenshots and dependencies. It shows the installer and
-  an update's diff before running either, and queues your clicks. Its data comes
-  from the CLI; icons and screenshots are read from the apps' clones, so nothing
-  is fetched for them.
+- **`kiwi`** is the command-line tool (CLI). It needs `git`, coreutils,
+  `util-linux` and `awk`, which are all part of the base image. To check
+  signatures it also needs `ssh-keygen`.
+- **Kiwi Apps** (`kiwi-gui`) is the desktop app, built with GTK4. You can
+  search and filter the apps, and each app has a detail view with its icon,
+  screenshots and dependencies. Kiwi Apps shows you the installer before it
+  installs an app, and what an update changes before it updates one. When
+  you click several actions in a row, it puts them in a queue. It gets its
+  data from the CLI. It reads icons and screenshots from the local clones of
+  the apps, so it does not download anything to show them.
 
 ## Install
+
+kiwi works in two scopes. The user scope is everything in your home directory
+and never needs root. The system scope is a part that is owned by root, for
+apps that need root. You choose at install time how much of the system scope
+you want:
 
 ```bash
 # recommended: user scope plus the root-owned system scope, one password prompt
@@ -32,13 +42,14 @@ curl -fsSL https://raw.githubusercontent.com/derlocke-ng/kiwi-updater/main/get-k
 curl -fsSL https://raw.githubusercontent.com/derlocke-ng/kiwi-updater/main/get-kiwi.sh | bash -s -- --with-system=manual
 ```
 
-The [Kiwi catalog](catalogs.md) is registered by the install. Go straight to
-`kiwi list` or open **Kiwi Apps**.
+The installation registers the [Kiwi catalog](catalogs.md), so you can run
+`kiwi list` or open **Kiwi Apps** right away.
 
-Apps that are only files in your home (the CLI tools, ensconce, syncman) are
-complete on the minimal install. An app with a root half, such as
-kiwi-killswitch, needs the system scope. On a minimal install,
-`kiwi install kiwi-killswitch` sets it up on the spot with one password.
+Some apps consist only of files in your home directory, for example the CLI
+tools, ensconce and syncman. These apps are complete on the minimal install. An
+app with a half that runs as root, such as kiwi-killswitch, needs the system
+scope. On a minimal install, `kiwi install kiwi-killswitch` sets up the system
+scope at that moment and asks for your password once.
 
 ## Commands
 
@@ -58,7 +69,8 @@ kiwi self-update
 kiwi trust --system <app>    # forget the signing key pinned for a system app
 ```
 
-Before you run something, and when something goes wrong:
+The following commands show you what an app will do before you run it, and
+they help when something goes wrong:
 
 ```bash
 kiwi info --installer <app>  # the script an install would run, before it runs
@@ -70,24 +82,30 @@ kiwi doctor                  # stale locks, version skew, bad list files, timers
 
 ## Releases are tags
 
-An app follows its latest **version tag**, one matching
-`^v?[0-9]+(\.[0-9]+){0,3}$` (`v1`, `v1.2`, `1.2.3`, `v1.2.3.4`). Pre-releases
-and scratch tags never overtake a release. A repo without a version tag follows
-its default branch. `ref=<tag>` on a list line asks for a specific one.
+kiwi uses git tags as releases. An app follows its latest **version tag**. A
+version tag is a tag that matches `^v?[0-9]+(\.[0-9]+){0,3}$`, for example
+`v1`, `v1.2`, `1.2.3` or `v1.2.3.4`. Pre-release tags and temporary tags do not
+match, so they are never used in place of a release. A repository without a
+version tag follows its default branch. To ask for one specific version, add
+`ref=<tag>` to the app's line in a list.
 
 ## Dependencies
 
-`DEPENDS=` in a manifest names what an app needs. A word that is an app in your
-own catalog or list is installed **first**, in the same scope, at install time.
-`kiwi install kiwi-plugin-tor`, for example, brings kiwi-proxy along. Any other
-word is a program, checked with `command -v`.
+The `DEPENDS=` line in a manifest names what an app needs. If a word in that
+line is the name of an app in your own catalog or list, kiwi installs that app
+**first**, in the same scope, at the time you install the app that needs it.
+For example, `kiwi install kiwi-plugin-tor` also installs kiwi-proxy. kiwi
+treats every other word as the name of a program and checks with `command -v`
+whether that program is present.
 
 ## One app, two halves
 
-Some apps are only a binary in `~/.local/bin`. Others, like a VPN kill switch,
-are a root daemon **and** a desktop app **and** a GNOME extension. The halves
-install with different privileges, because **root must never execute a file the
-user can write**. The app declares it:
+Some apps are only one program in `~/.local/bin`. Others, such as a VPN kill
+switch, consist of a daemon that runs as root **and** a desktop app **and** a
+GNOME extension. Such an app has two halves, a user half and a system half, and
+the halves are installed with different privileges. The reason is that **root
+must never execute a file the user can write**. The app declares its parts and
+its scopes in its manifest:
 
 ```ini
 COMPONENTS=daemon cli gui gnome-extension
@@ -95,62 +113,73 @@ SCOPES=user system
 ROOT_REASON=installs a root firewall daemon, its D-Bus policy and two systemd units
 ```
 
-A catalog lists that app once, and kiwi installs each half correctly. Before
-asking for your password, it shows the `ROOT_REASON`.
+A catalog lists such an app only once, and kiwi installs each half in the right
+scope. Before kiwi asks for your password, it shows you the `ROOT_REASON`.
 
 | Piece | Where | Why |
 |---|---|---|
-| `kiwi`, Kiwi Apps, user apps | `~/.local` | no root needed; survives an ostree rebase |
-| root's own copy of kiwi | `/usr/local/bin`, cloned into `/var/lib/kiwi-updater/repos/` | root never runs a file you can write |
-| system apps | `/var/lib`, `/etc` | writable on ostree, root-owned |
-| lists | `~/.config/kiwi-updater/apps.list`, `/etc/kiwi-updater/apps.list` | a machine's own entries beat any catalog |
-| pinned signing keys | `/etc/kiwi-updater/signers/<app>` | see below |
+| `kiwi`, Kiwi Apps, user apps | `~/.local` | needs no root, and is kept when the system is rebased to another ostree image |
+| root's own copy of kiwi | `/usr/local/bin`, cloned into `/var/lib/kiwi-updater/repos/` | root never runs a file that you can write |
+| system apps | `/var/lib`, `/etc` | these directories are writable on ostree systems and owned by root |
+| lists | `~/.config/kiwi-updater/apps.list`, `/etc/kiwi-updater/apps.list` | the entries in a machine's own list take precedence over every catalog |
+| pinned signing keys | `/etc/kiwi-updater/signers/<app>` | see the next section |
 
-The immutable `/usr` is never touched.
+kiwi never changes anything in the immutable `/usr`.
 
 ## Root, passwords and signatures
+
+The table shows which actions need root and which actions ask for a password.
 
 | | Needs root | Asks for a password |
 |---|---|---|
 | anything in the user scope | no | no |
-| **updating** a system app | yes | **no**, for a release signed by the key root pinned for that app. **Yes** for an unsigned release, and always in `manual` mode |
+| **updating** a system app | yes | **no**, if the release is signed with the key that root has pinned for that app. **Yes**, if the release is unsigned, and always in `manual` mode |
 | **installing** or **uninstalling** a system app | yes | yes |
 
-Since 2.4.0:
+Since version 2.4.0, these rules apply:
 
-- **Signed releases.** Root pins one SSH signing key per system app, the first
-  one it sees (trust on first use). A release tag signed by that key
-  updates without a password. An unsigned release asks for one and says it could
-  not verify. A tag signed by a different key, or an unsigned tag after signed
-  ones, is refused until you run `kiwi trust --system <app>`. This applies to
-  the system scope.
-- **Root installs only sources it lists**: `/etc/kiwi-updater/apps.list` and
-  catalogs registered for root. For anything else kiwi installs the user half
-  and names the `kiwi add --system <https-url>` to run. Kiwi Apps offers
-  *Register and Install*.
-- **https only.** `http://` sources are refused everywhere.
+- **Signed releases.** For each system app, root pins one SSH signing key. To
+  pin a key means to remember it and to accept only that key from then on. Root
+  pins the first key it sees for the app, which is called trust on first use.
+  If a release tag is signed with the pinned key, the update is installed
+  without a password. If a release is unsigned, kiwi asks for your password and
+  says that it could not verify the release. kiwi refuses a tag that is signed
+  with a different key, and it refuses an unsigned tag when earlier tags were
+  signed. It refuses them until you run `kiwi trust --system <app>`. These
+  rules apply to the system scope.
+- **Root installs only from sources that it lists itself.** These sources are
+  `/etc/kiwi-updater/apps.list` and the catalogs that are registered for root.
+  If an app comes from any other source, kiwi installs only the user half and
+  names the `kiwi add --system <https-url>` command that you have to run. Kiwi
+  Apps offers *Register and Install* in this case.
+- **Only https.** kiwi refuses `http://` sources everywhere.
 
-Passwordless system updates go through one fixed-purpose helper,
-`/usr/local/libexec/kiwi-system-update`. A polkit rule allows it for active
-`wheel` sessions, and it takes app names only as a selection from root's own
-lists.
+System updates without a password are done by one helper program,
+`/usr/local/libexec/kiwi-system-update`, which has only this one purpose. A
+polkit rule allows users in the `wheel` group to run it when their session is
+active. The helper accepts only app names, and a name can only select an app
+from root's own lists.
 
 ## Background updates
 
-There is one timer, and it is yours: `kiwi-updater.timer` runs
-`kiwi update --all` six hours after the last run (ten minutes after boot, with
-some random delay). It updates user halves directly, and system halves through
-the helper above. There is no root timer. In `manual` mode, system halves wait
-for your next interactive `kiwi update`.
+There is one timer for background updates, and it is a user timer, so it runs
+as your user and not as root. `kiwi-updater.timer` runs `kiwi update --all` six
+hours after the last run, and ten minutes after boot, with some random delay.
+This run updates user halves directly. It updates system halves through the
+helper described above. There is no root timer. In `manual` mode the timer does
+not update system halves. They wait until you run `kiwi update` yourself.
 
 ## Trust
 
-Installing an app **runs that repo's `install.sh`**, and an app that declares
-the system scope runs it **as root**. Catalogs are curated, not audited. Add
-the ones you trust, the way you would add a package repository, and use
-`kiwi info --installer`, `kiwi diff` and `kiwi pin` to decide with your eyes
-open. A signature narrows *who may publish*. It says nothing about *what the
-published thing does*.
+When you install an app, kiwi **runs the `install.sh` from that app's
+repository**. If the app declares the system scope, kiwi runs this script **as
+root**. Catalogs are curated, not audited. This means that someone has selected
+the apps. It does not mean that their code has been reviewed. Add only the
+catalogs that you trust, in the same way as you would add a package repository.
+Use `kiwi info --installer`, `kiwi diff` and `kiwi pin` to see what an app does
+before you decide. A signature limits *who may publish* a release. It says
+nothing about *what the published release does*.
 
-Still planned: a hosted registry of trusted catalogs (`kiwi catalog browse`)
-with signer fingerprints per entry.
+One thing is still planned: a hosted registry of trusted catalogs, with the
+command `kiwi catalog browse` and with the fingerprints of the signers for each
+entry.
