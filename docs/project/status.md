@@ -49,7 +49,9 @@ From the repositories themselves:
 
 - **kiwi-server**: proven on hardware in October–November 2026, with node
   backups restored across nodes and the tunnel MTU tuned, mobile paths
-  included. Federation between networks is not proven yet. IPv4 only, and the
+  included. Several backup servers, the automatic restore of a rebuilt machine,
+  a prune timer and a health check for a stuck commercial exit are on the
+  `several-servers` branches of kiwi-server and kiwi-modules, not yet released. Federation between networks is not proven yet. IPv4 only, and the
   Debian ISO is amd64 only. The control plane is designed, not built.
 - **kiwi-modules**: OpenCloud, Immich and Paperless-ngx are "to try out". A TURN
   server for calls is waiting to be merged.

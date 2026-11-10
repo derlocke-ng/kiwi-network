@@ -70,6 +70,32 @@ kiwi-server prune fleet.yaml            # keep 7 daily, 4 weekly, 6 monthly
 
 A restore was tested node to node: papaya's backups onto lychee.
 
+### Coming in the next release
+
+!!! info "On the `several-servers` branch"
+    This work is pushed to the `several-servers` branches of kiwi-modules and
+    kiwi-server, but it isn't merged or released yet. Several servers and the
+    automatic restore were tested on hardware. The VPN health check was not.
+
+- **Several backup servers.** `backup.servers` takes a list, and each server
+  gets a full copy of its own. If one server fails, only its copy is missed.
+  A restore takes the freshest copy from whichever server has it, and
+  `kiwi-stack snapshots` lists them server by server. The single `server`
+  still works.
+- **A rebuilt machine restores itself.** If a machine finds itself in the
+  backups but has made none of them (a rebuild), it restores every module by
+  itself before its first backup, then backs up as before (`backup.restore:
+  auto`, the default). With `hold` it waits for `kiwi-stack restore` or
+  `kiwi-stack backup --new`.
+- **Pruning on a timer.** `kiwi-server prune fleet.yaml --every week` (or
+  `day`) installs a systemd user timer on your computer, the only place that
+  holds the keys that may delete. A missed run comes at the next login.
+  `kiwi-server status` shows each backup copy, and warns when a backup node
+  has not been pruned for three weeks.
+- **A stuck commercial exit starts anew.** gluetun gets a health check. After
+  five unhealthy minutes the container is killed, and its next start picks
+  another server.
+
 ## Encrypted disks and unlocking
 
 - **Debian** (`debian.encrypt: true`) installs with a one-time key you type at

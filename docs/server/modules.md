@@ -53,7 +53,7 @@ See [Running your own hub](../people/hubs.md).
 
 | Module | What it is | Runs on | Requires |
 |---|---|---|---|
-| `backup` | this machine's data with **restic**, encrypted, to a backup-server node: nightly at `03:00` (within 15 minutes after) and with `kiwi-stack backup`. Each module says what of it is kept | both | none |
+| `backup` | this machine's data with **restic**, encrypted, to a backup-server node: nightly at `03:00` (within 15 minutes after) and with `kiwi-stack backup`. Each module says what of it is kept. Next release: several servers and a rebuilt machine that restores itself ([details](operations.md#coming-in-the-next-release)) | both | none |
 | `backup-server` | a **restic REST server**; each machine reaches only its own repository, append-only | node | vpn-client, reverse-proxy |
 | `tang` | **Tang** servers so encrypted machines unlock at boot; one ring is one server with its own keys (default `infra` on `7500`) | node | none |
 
