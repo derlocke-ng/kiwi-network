@@ -153,7 +153,7 @@ fleet file sets them all.
 | wg-easy clients | `10.8.0.0/24`; the server is `10.8.0.1` |
 | Client groups | `10.8.1.0/24` … `10.8.4.0/24` |
 | Stack network | `172.64.0.0/24` on a master, `172.128.0.0/24` on a node |
-| WireGuard MTU | `1376` (`wg_mtu`), measured with `kiwi-server mtu` |
+| WireGuard MTU | `1376` (`wg_mtu`), measured with [`kiwi-server mtu`](../server/operations.md#tunnel-mtu) |
 | Stack bridge MTU | `1500` (`bridge_mtu`) |
 
 Every stack host routes the mesh through its VPN client (on the master, through

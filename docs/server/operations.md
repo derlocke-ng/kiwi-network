@@ -118,12 +118,48 @@ A restore was tested node to node: papaya's backups onto lychee.
 
 ## Tunnel MTU
 
+WireGuard adds its own headers, so a tunnel carries smaller packets than the
+line beneath it, and a mobile path carries smaller ones still. A packet that is
+too big for some link on the way gets dropped or split, and connections stall.
+Kiwi handles this in three layers:
+
+- **Two settings.** `wg_mtu` (default **1376**, a multiple of 16 because
+  WireGuard pads to 16) is the MTU of gluetun, wg-easy's client configs and
+  `wg0`. `bridge_mtu` (default **1500**) is the MTU of the stack network.
+  `validate` refuses a `wg_mtu` whose padded packet plus 80 bytes of headers
+  does not fit the bridge, and anything below 1280, the least IPv6 works with.
+- **The MSS is clamped both ways** to `wg_mtu - 40`, in wg-easy and in the VPN
+  client, so TCP never tries a segment that cannot pass.
+- **TCP probes for itself.** The VPN client runs with
+  `net.ipv4.tcp_mtu_probing=1` and `tcp_base_mss=1024`, so a connection that
+  hits a path silently dropping big packets finds a size that works instead of
+  hanging.
+
+### Measuring a path: `kiwi-server mtu`
+
 ```bash
-kiwi-server mtu fleet.yaml papaya --write   # measure with don't-fragment pings, write wg_mtu
+kiwi-server mtu fleet.yaml papaya --ssh core@<address>   # a node
+kiwi-server mtu fleet.yaml phone --ssh core@<master>     # a device from secrets/devices/
+kiwi-server mtu fleet.yaml papaya --write                # and write wg_mtu into the fleet file
 ```
 
-The default `wg_mtu` of 1376 was measured on real paths. Run `mtu` for a path
-of your own, such as a phone on mobile data.
+The probe sends don't-fragment pings through the tunnel, from inside the
+namespace that holds it. It measures a node from its own VPN client (whose
+firewall drops pings coming in), and a device from the WireGuard server. It
+starts with an ordinary ping, then tries every multiple of 16 from 1280 up and
+reports the largest that arrives **whole**. While it pings, it reads the
+kernel's reassembly counters, so a reply that was split on the way and put back
+together does not count as fitting.
+
+It also says what to set. For a **device**, that is the device's own `MTU =` in
+its WireGuard config, and nobody else is affected. For a **node**, it is
+`wg_mtu` on that node and on its master, which `--write` puts in the fleet file
+(changing only those lines). A packet that is split only on its way out and put
+back together by the far end cannot be seen from this end.
+
+The defaults were measured on the test fleet. For a phone on mobile data, where
+paths are often IPv6-only behind 464XLAT with nested encapsulation, measure the
+phone itself and lower its own `MTU =` if the probe says so.
 
 ## netcup VPSes
 
