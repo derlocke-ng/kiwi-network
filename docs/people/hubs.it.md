@@ -1,4 +1,4 @@
-# Gestire il proprio hub
+# Gestire il tuo hub
 
 Questa pagina spiega come gestire un hub per la tua comunità. Un hub è il sito
 web che una comunità ottiene da kiwi-framework: un mercato aperto, un feed, una

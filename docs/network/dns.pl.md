@@ -1,96 +1,119 @@
 # DNS, nazwy i certyfikaty
 
-## Jeden łańcuch resolverów { #one-resolver-chain }
+Każda maszyna i każda usługa w Kiwi Network ma nazwę, na przykład
+`cloud.papaya.home`, i otwierasz ją przez HTTPS z certyfikatem, któremu ufają
+twoje urządzenia. Na tej stronie znajdziesz opis tego, jak w sieci
+rozwiązywane są nazwy, jak są zbudowane i skąd biorą się certyfikaty. Serwerami
+DNS są Pi-hole’e, które przy okazji blokują niechciane domeny według wspólnej
+listy blokowania.
 
-DNS to jeden łańcuch dla całej sieci:
+## Jeden łańcuch serwerów DNS { #one-resolver-chain }
+
+Wszystkie zapytania DNS w sieci przechodzą przez ten sam łańcuch serwerów DNS:
 
 ```
 LAN device ──▶ gateway node's Pi-hole ──▶ master's Pi-hole ──▶ gluetun DNS-over-TLS (Quad9)
 VPN client ───────────────────────────────▶ master's Pi-hole       └─ leaves through the VPN exit
 ```
 
-- **Klienci VPN** (laptopy, telefony) pytają Pi-hole mastera pod `10.8.0.1`.
-- **Pi-hole node'a** pyta najpierw Pi-hole mastera, więc sieć dzieli jedną
-  listę blokowanych domen, a każde zapytanie wychodzi przez wyjście mastera.
-  Quad9 (`9.9.9.9`, `149.112.112.112`, `fallback_dns`) jest następny w ścisłej
-  kolejności i odpowiada tylko wtedy, gdy master jest nieosiągalny.
-- **Pi-hole mastera** przekazuje zapytania do resolvera DNS-over-TLS swojego
-  klienta VPN (domyślnie Quad9, `dot_providers`).
-- **Nazwy w domenie floty** są przekazywane do mastera i nigdy go nie
-  opuszczają. Master oznacza domenę jako lokalną.
+- **Klienci VPN** (laptopy, telefony) wysyłają zapytania do Pi-hole’a mastera
+  pod adresem `10.8.0.1`.
+- **Pi-hole node’a** pyta najpierw Pi-hole’a mastera. Dzięki temu cała sieć
+  korzysta z jednej listy blokowania, a każde zapytanie trafia do internetu
+  przez wyjście mastera, czyli jego połączenie z internetem. Następny w ściśle
+  ustalonej kolejności jest Quad9 (`9.9.9.9`, `149.112.112.112`, ustawiany
+  przez `fallback_dns`), więc odpowiada tylko wtedy, gdy master jest
+  niedostępny.
+- **Pi-hole mastera** przekazuje zapytania do serwera DNS-over-TLS swojego
+  klienta VPN. Domyślnie jest nim Quad9 (`dot_providers`).
+- **Nazwy w domenie twojej sieci** trafiają do mastera i nie są przekazywane
+  dalej. Master oznacza tę domenę jako lokalną.
 
-Każdy host stacka ma też nazwy floty w `/etc/hosts` (własne nazwy wskazują na
-niego samego), więc kopie zapasowe i odnawianie certyfikatów działają bez
-Pi-hole. Na Fedora CoreOS i uCore sam host rozwiązuje nazwy przez Pi-hole
-własnego stacka.
+Każda maszyna, na której działa stack, ma też nazwy z całej sieci w pliku
+`/etc/hosts`, przy czym jej własne nazwy wskazują na nią samą. Kopie zapasowe
+i odnawianie certyfikatów działają więc także bez Pi-hole’a. Na Fedora CoreOS
+i uCore sama maszyna używa do rozwiązywania nazw Pi-hole’a z własnego stacku.
 
-**Sąsiedzi w tym samym LAN.** Pi-hole node'a i jego plik hosts odpowiadają
-**adresem LAN** tych node'ów floty, które mają statyczny adres w jego własnej
-podsieci, więc ruch między dwiema maszynami w tym samym pokoju zostaje w
-pokoju. Master nadal odpowiada adresami w sieci mesh.
+**Sąsiedzi w tej samej sieci lokalnej.** Jeśli inne node’y z pliku fleet mają
+stały adres w podsieci danego node’a, Pi-hole i plik hosts tego node’a podają
+ich **adres w sieci lokalnej**. Ruch między dwiema maszynami w tej samej sieci
+lokalnej nie opuszcza jej wtedy. Master nadal odpowiada adresami w sieci mesh.
 
 ## Nazwy: `service.hostname.home` { #names-servicehostnamehome }
 
-Każdy host to `<host>.<domain>` (`papaya.home`), a każda usługa, którą
-uruchamia, to nazwa pod nim: `cloud.papaya.home`, `vault.papaya.home`,
-`portainer.papaya.home`, `dl.lychee.home`, a na masterze `wg.sorbet.home`,
-`pihole.sorbet.home`, `hub.sorbet.home`, `relay.sorbet.home`. Każda nazwa
-ogłaszana przez moduł trafia do rekordów DNS floty pod **adresem hosta w sieci
-mesh**. Każdy Pi-hole we flocie rozwiązuje każdą nazwę hosta i usługi
-(split-horizon, `fleet_records`). Własne dodasz przez `extra_records`.
+Każdy host ma nazwę `<host>.<domain>`, na przykład `papaya.home`. Każda
+usługa, która na nim działa, dostaje nazwę pod nazwą hosta: `cloud.papaya.home`,
+`vault.papaya.home`, `portainer.papaya.home`, `dl.lychee.home`, a na masterze
+`wg.sorbet.home`, `pihole.sorbet.home`, `hub.sorbet.home`,
+`relay.sorbet.home`. Każda nazwa zgłoszona przez moduł trafia do rekordów DNS
+sieci z **adresem hosta w sieci mesh** (mesh to prywatna sieć WireGuard,
+do której należą wszystkie twoje maszyny). Każdy Pi-hole w sieci rozwiązuje
+każdą nazwę hosta i każdą nazwę usługi. Odpowiada za to ustawienie
+`fleet_records`, a sama technika nazywa się split-horizon DNS, bo na te nazwy
+odpowiada się tylko wewnątrz twojej sieci. Własne rekordy dodasz w
+`extra_records`.
 
-Domyślna domena to **`.home`**, bo ICANN nie przydzieli jej jako publicznej
-domeny najwyższego poziomu. Nazwa z floty nigdy nie wycieknie do publicznego
-rejestru i nikt inny nie może jej zarejestrować ani uzyskać dla niej
-certyfikatu zaufanego przez przeglądarki. `.kiwi` to prawdziwa TLD i dlatego
-flota od niej odeszła. kiwi-server sprawdza twój wybór: `home`, `corp`,
-`mail`, `internal`, `arpa` i `test` przechodzą bez komentarza, `.local` jest
-odrzucana (należy do mDNS), `.lan` daje ostrzeżenie (routery same na nią
-odpowiadają), a publiczne TLD też dają ostrzeżenie.
+Domyślna domena to **`.home`**. Wybrano ją, bo ICANN nie przydzieli jej jako
+publicznej domeny najwyższego poziomu (TLD). Nazwa z twojej sieci nie trafi
+więc nigdy do publicznego rejestru i nikt inny nie zarejestruje jej ani nie
+dostanie dla niej certyfikatu, któremu ufałyby przeglądarki. `.kiwi` to
+natomiast prawdziwa domena TLD i dlatego Kiwi Network już jej nie używa.
+kiwi-server sprawdza wybraną przez ciebie domenę. `home`, `corp`, `mail`,
+`internal`, `arpa` i `test` przyjmuje bez uwag. `.local` odrzuca, bo należy do
+mDNS. Przy `.lan` wyświetla ostrzeżenie, bo routery same odpowiadają na tę
+domenę, i tak samo ostrzega przy publicznych domenach TLD.
 
-Nazwy *spoza* domeny floty, dla publicznego huba lub przekaźnika, dostają
-certyfikaty Let's Encrypt, gdy reverse proxy mastera jest publiczne.
+Nazwy *spoza* domeny twojej sieci, potrzebne dla publicznego huba albo
+przekaźnika, dostają certyfikaty Let’s Encrypt, jeśli reverse proxy mastera
+jest publiczne.
 
-## Proxy SOCKS5 Mullvad po nazwie { #mullvad-socks5-proxies-by-name }
+## Proxy SOCKS5 Mullvada po nazwie { #mullvad-socks5-proxies-by-name }
 
-Od kiwi-server 2.2.0 Pi-hole mastera odpowiada za każde **proxy SOCKS5
-Mullvad**, zarówno jako `de-fra-wg-socks5-001.relays.mullvad.net`, jak i w
-krótkiej formie `de-fra-001.mullvad.home`. gluetun odrzuca takie odpowiedzi z
-prywatnych zakresów (ochrona przed DNS rebinding), więc bez tych rekordów nazwy
-rozwiązywałyby się tylko przez resolvery zapasowe. Timer hosta
-(`km-mullvad-socks.timer`, co 6 godzin) odświeża listę z
+Proxy SOCKS5 Mullvada mają adresy z prywatnego zakresu, a ta funkcja pozwala
+korzystać z nich po nazwie. Od wersji kiwi-server 2.2.0 Pi-hole mastera zna
+każde **proxy SOCKS5 Mullvada**, zarówno pod pełną nazwą, np.
+`de-fra-wg-socks5-001.relays.mullvad.net`, jak i pod krótką, np.
+`de-fra-001.mullvad.home`. gluetun odrzuca odpowiedzi DNS wskazujące na adresy
+prywatne, bo tak chroni się przed atakiem DNS rebinding. Bez tych rekordów
+nazwy dałoby się więc rozwiązać tylko przez zapasowe serwery DNS. Timer na
+hoście (`km-mullvad-socks.timer`, co 6 godzin) odświeża listę z
 [derlocke-ng/mullvad-socks5](https://github.com/derlocke-ng/mullvad-socks5).
-Przyjmowane są z niej tylko nazwy `*.relays.mullvad.net` z adresami `10.x`,
-więc lista nigdy nie może przekierować żadnej innej nazwy.
+Z tej listy przyjmowane są wyłącznie nazwy `*.relays.mullvad.net` z adresami
+`10.x`, więc lista nie może przekierować żadnej innej nazwy.
 
-Jest to włączone w presecie mastera, którego wyjściem jest Mullvad. Wyłączysz
-to przez `mullvad_socks: false` w bloku `dns:` mastera.
+Funkcja jest włączona w presecie mastera, bo wyjście w tym presecie prowadzi
+przez Mullvada. Żeby ją wyłączyć, ustaw `mullvad_socks: false` w bloku `dns:`
+mastera.
 
-## Jeden CA dla floty { #one-ca-for-the-fleet }
+## Jeden urząd certyfikacji dla całej sieci { #one-ca-for-the-fleet }
 
-Z `tls.auto: true` (domyślnie) kiwi-server prowadzi **jeden urząd
-certyfikacji** dla floty w `secrets/ca/` (`kiwiCA.key`, `kiwiCA.pem`,
-RSA-4096, ważny 3650 dni), tworzony przy pierwszej potrzebie certyfikatu dla
-hosta. Każdy host z reverse proxy dostaje certyfikat dla `<hostname>` i
-`*.<hostname>` (825 dni, najdłuższy okres ważności, jaki przeglądarki jeszcze
-akceptują, odnawiany, gdy zostaje mniej niż 30 dni), a każda maszyna zbudowana
-przez kiwi-server instaluje CA w swoim magazynie zaufanych certyfikatów.
+Urząd certyfikacji (CA) podpisuje certyfikaty, których twoje usługi używają do
+HTTPS. Przy `tls.auto: true`, czyli domyślnie, kiwi-server prowadzi **jeden
+urząd certyfikacji** dla całej sieci w `secrets/ca/`. CA składa się z plików
+`kiwiCA.key` i `kiwiCA.pem`, używa RSA-4096 i jest ważny przez 3650 dni.
+kiwi-server tworzy go wtedy, gdy któryś host po raz pierwszy potrzebuje
+certyfikatu. Każdy host z reverse proxy dostaje certyfikat dla `<hostname>`
+i `*.<hostname>`. Taki certyfikat jest ważny 825 dni, bo to najdłuższy okres,
+jaki przeglądarki jeszcze akceptują, i jest odnawiany, gdy do końca zostaje
+mniej niż 30 dni. Każda maszyna zbudowana przez kiwi-server instaluje CA
+w swoim magazynie zaufanych certyfikatów.
 
-Ustaw **ograniczenia nazw** (name constraints), a CA będzie mógł podpisywać
-tylko nazwy w domenie floty: `tls: { name_constraints: [home] }`. Przykładowa
-flota to robi; wbudowane ustawienie domyślne to brak ograniczeń. Skradziony
-`kiwiCA.key` jest wtedy bezwartościowy do czegokolwiek innego, co ma
-znaczenie, bo ufa mu każda maszyna.
+Jeśli ustawisz **ograniczenia nazw** (name constraints), CA może podpisywać
+tylko nazwy w domenie twojej sieci: `tls: { name_constraints: [home] }`.
+Przykładowy plik fleet to ustawia, ale wbudowana wartość domyślna nie ma
+żadnego ograniczenia. Z ograniczeniem skradziony `kiwiCA.key` jest
+bezużyteczny dla wszystkich innych nazw. Ma to znaczenie, bo CA ufa każda
+twoja maszyna.
 
 ```bash
-kiwi-server ca fleet.yaml        # pokaż CA floty
+kiwi-server ca fleet.yaml        # pokaż CA sieci
 ```
 
-Zaimportuj `kiwiCA.pem` na swoich urządzeniach (przeglądarki, telefony), żeby
-`https://cloud.papaya.home` był zaufany. Jeśli wolisz własne certyfikaty,
-ustaw `tls_fullchain` i `tls_privkey` w module reverse-proxy.
+Zaimportuj `kiwiCA.pem` na swoich urządzeniach (w przeglądarkach, na
+telefonach), żeby ufały `https://cloud.papaya.home`. Jeśli wolisz własne
+certyfikaty, ustaw `tls_fullchain` i `tls_privkey` w module reverse-proxy.
 
-!!! warning "Zachowaj `secrets/` w tajemnicy"
-    `kiwiCA.key` podpisuje certyfikaty, którym ufa każda twoja maszyna. Trzymaj
-    `secrets/` i `output/` poza gitem (`output/` jest już w `.gitignore`
-    kiwi-server).
+!!! warning "Nie udostępniaj nikomu `secrets/`"
+    `kiwiCA.key` podpisuje certyfikaty, którym ufa każda twoja maszyna.
+    Nie wrzucaj `secrets/` ani `output/` do gita (`output/` jest już w pliku
+    `.gitignore` narzędzia kiwi-server).

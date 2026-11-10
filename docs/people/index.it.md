@@ -149,7 +149,7 @@ mostrati soltanto a chi ha un account.
 ## Per approfondire { #read-on }
 
 - [Armory e le sue app](armory.md)
-- [Gestire il proprio hub](hubs.md)
+- [Gestire il tuo hub](hubs.md)
 - [L’architettura](https://github.com/derlocke-ng/kiwi-framework/blob/main/docs/architecture.md)
   e il [protocollo di rete](https://github.com/derlocke-ng/kiwi-framework/blob/main/docs/protocol.md)
   del framework, documentati nel suo repository

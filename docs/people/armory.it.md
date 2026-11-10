@@ -84,4 +84,4 @@ account.
 
 Armory è anche il modello per il tuo hub. Fai il fork del repository oppure
 usalo come template, modifica `distribution.js` e le traduzioni, e pubblica il
-risultato. I passaggi sono descritti in [Gestire il proprio hub](hubs.md).
+risultato. I passaggi sono descritti in [Gestire il tuo hub](hubs.md).

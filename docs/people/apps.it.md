@@ -67,4 +67,4 @@ una shell (la cornice attorno alle pagine dell’app), una pagina iniziale e una
 pagina delle impostazioni, i testi in tutte le lingue, una voce nel registro
 delle app e un mount. Le app usano soltanto l’API pubblica del framework e non
 accedono mai direttamente all’archivio dei dati o alle chiavi.
-[Gestire il proprio hub](hubs.md) spiega come compilare e pubblicare un hub.
+[Gestire il tuo hub](hubs.md) spiega come compilare e pubblicare un hub.
