@@ -15,11 +15,11 @@ ciò che è privato viene cifrato sul dispositivo prima di essere inviato. Le
 altre parti di Kiwi Network collegano le tue macchine, gli hub collegano le
 persone. Ogni app è descritta in [Le app del framework](apps.md).
 
-Armory è il primo hub costruito con il framework. È un esempio tra i tanti
-possibili, ed è anche il modello che le altre comunità copiano per costruire il
+Armory è il primo hub costruito con il framework. È un esempio di hub, ed è
+anche il modello che le altre comunità copiano per costruire il
 proprio.
 
-Il software è distribuito in tre repository:
+Il software si trova in tre repository:
 
 | Repository | Che cos’è |
 |---|---|
@@ -99,7 +99,7 @@ messaggi firmati conservati sui relay, e non appartengono a un hub.
 qualsiasi parte. Usa AES-256-GCM con chiavi derivate tramite HKDF. I messaggi
 privati sono messaggi NIP-17 racchiusi in gift wrap NIP-59. Un gift wrap è un
 secondo strato di cifratura, grazie al quale un relay vede soltanto che una
-certa chiave ha ricevuto un messaggio incartato. Ogni file viene cifrato con una
+certa chiave ha ricevuto un messaggio impacchettato. Ogni file viene cifrato con una
 chiave AES-256-GCM casuale, diversa per ciascun file, prima di essere caricato
 su un server multimediale. Le foto vengono prima ricodificate, e questo elimina
 i metadati aggiunti dalle fotocamere. Il Vault è cifrato con una frase segreta
@@ -142,8 +142,7 @@ modo che possa leggerla solo tu. Il secondo sono le segnalazioni, pubbliche e
 firmate. Il terzo sono le regole di ciascun relay.
 
 Ogni spazio ha dei moderatori. Quando un moderatore segnala un post, il post
-viene chiuso subito, cioè mostrato ripiegato. Negli altri casi un post viene
-chiuso dopo tre segnalazioni da parte di persone non bloccate. Un post può
+viene subito ripiegato. Negli altri casi un post viene ripiegato dopo tre segnalazioni da parte di persone non bloccate. Un post può
 essere contrassegnato come 18+ o come pubblicità, e i post contrassegnati sono
 mostrati soltanto a chi ha un account.
 
@@ -153,4 +152,4 @@ mostrati soltanto a chi ha un account.
 - [Gestire il proprio hub](hubs.md)
 - [L’architettura](https://github.com/derlocke-ng/kiwi-framework/blob/main/docs/architecture.md)
   e il [protocollo di rete](https://github.com/derlocke-ng/kiwi-framework/blob/main/docs/protocol.md)
-  del framework, descritti nel suo repository
+  del framework, documentati nel suo repository

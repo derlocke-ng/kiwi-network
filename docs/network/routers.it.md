@@ -70,12 +70,14 @@ Fritz!OS ha un client WireGuard e le rotte statiche, ma non sa inoltrare le
 query DNS di un singolo dominio. Della regola DNS deve quindi occuparsi un
 node:
 
-1. **Tunnel:** vai in Internet → Abilitazioni → VPN (WireGuard) → Aggiungere
-   connessione, scegli di collegarti a un altro servizio WireGuard e importa la
-   configurazione emessa dal master. È la riga `AllowedIPs` di quella
+I nomi dei menu sono quelli dell’interfaccia in inglese.
+
+1. **Tunnel:** vai in Internet → Permit Access → VPN (WireGuard) → Add
+   Connection, scegli di collegarti a un altro servizio WireGuard (connect to
+   another WireGuard service) e importa la configurazione emessa dal master. È la riga `AllowedIPs` di quella
    configurazione a decidere se il tunnel è split o full.
-2. **Oppure una rotta statica:** vai in Rete domestica → Rete → Impostazioni di
-   rete → Route IPv4. Inserisci `10.8.0.0` come destinazione, `255.255.0.0` come
+2. **Oppure una rotta statica:** vai in Home Network → Network → Network
+   Settings → IPv4 Routes. Inserisci `10.8.0.0` come destinazione, `255.255.0.0` come
    maschera di sottorete e l’indirizzo LAN del node gateway come gateway.
 3. **DNS:** fai in modo che la LAN usi un Pi-hole come server DNS. Puoi
    impostare il node gateway come server DNS locale, oppure lasciare che il

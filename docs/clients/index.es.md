@@ -30,8 +30,8 @@ el resto del host no cambia nada.
 
 ## Cómo se mantienen separados los exits { #how-it-stays-clean }
 
-- **Un gateway es fail-closed.** Es decir, un fallo corta la conexión y nunca
-  abre otro camino. El cortafuegos de un gateway descarta todo lo que no vaya
+- **Un gateway es fail-closed:** un fallo corta la conexión y nunca abre otro
+  camino. El cortafuegos de un gateway descarta todo lo que no vaya
   dirigido a su único upstream. Si el gateway se detiene, todo lo que depende
   de él se queda sin conexión. Ningún programa tiene que darse cuenta del fallo
   y reaccionar, porque sin el gateway sencillamente no hay ruta.

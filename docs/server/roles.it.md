@@ -15,7 +15,7 @@ cioè i sistemi operativi che kiwi-server sa installare.
 | `node`, preset `cloud` | Un **kiwi-node** su cui girano Nextcloud e Vaultwarden | `vpn-client`, `reverse-proxy`, `cloud`, `vault`, `portainer` |
 | `node`, preset `minimal` | Un **kiwi-node** con i soli due moduli di base, a cui aggiungi i moduli che vuoi | `vpn-client`, `reverse-proxy` |
 
-Il ruolo `node` esiste in diversi preset. Un preset è un elenco di moduli già
+Per il ruolo `node` esistono diversi preset. Un preset è un elenco di moduli già
 pronto. I vecchi nomi di ruolo `node-gw` e `node-cloud` funzionano ancora e
 corrispondono ai preset `gateway` e `cloud`.
 
@@ -100,5 +100,5 @@ Un ruolo senza moduli fa il proprio lavoro direttamente in `ks_role_apply()`.
 Può usare la libreria in `roles/common/lib.sh`, che proviene da kiwi-stack. Le
 impostazioni dichiarate in `role.yaml` arrivano allo script come variabili con
 il nome `KS_ROLE_<KEY>`. Lo script gira come root con `set -euo pipefail`. I
-test del progetto generano ogni ruolo presente nell’albero e lo passano a
+test del progetto generano ogni ruolo presente nel repository e lo passano a
 shellcheck.

@@ -8,7 +8,7 @@ Per ogni host kiwi-server crea una **ISO di installazione automatica**, cioè
 un’immagine di installazione che installa Fedora CoreOS, uCore o Debian senza
 fare domande e poi spegne la macchina. Dopodiché kiwi-server **applica** il
 ruolo della macchina via SSH, e la macchina diventa un `kiwi-master` o un
-`kiwi-node`. Da quel momento continua a occuparsi della fleet: registra i
+`kiwi-node`. Da quel momento kiwi-server continua a occuparsi della fleet: registra i
 client WireGuard, legge lo stato di ogni macchina, custodisce i segreti, fa il
 backup della fleet e sblocca i dischi cifrati.
 
@@ -134,7 +134,7 @@ barra laterale trovi una panoramica, una riga per ogni host e i valori
 predefiniti. La scheda *Overview* di un host mostra le informazioni aggiornate
 di `kiwi-server status`: l’app le recupera una volta al minuto, finché la
 finestra è in primo piano, via SSH e in sola lettura. La scheda *Settings* di
-un host è un modulo costruito a partire dai ruoli e dai moduli. *Apply*,
+un host è un form costruito a partire dai ruoli e dai moduli. *Apply*,
 *Build* e *Render* eseguono lo strumento a riga di comando e ne mostrano
 l’output man mano che arriva. Prima di partire, *Build* elenca i dischi che
 cancellerà. *Unlock* e *Lock* aprono e chiudono l’archivio dei segreti. L’app
@@ -143,9 +143,9 @@ commenti vanno persi.
 
 ## Da tenere a mente { #mind }
 
-!!! danger "Le ISO cancellano il disco che hanno ricevuto come destinazione"
+!!! danger "Le ISO cancellano il disco indicato, senza chiedere"
     Una ISO di installazione cancella il disco per cui è stata creata appena
-    una macchina si avvia da lei, senza chiedere nulla. Metti un’etichetta alle
+    una macchina viene avviata da quella ISO, senza chiedere nulla. Metti un’etichetta alle
     tue ISO. È proprio per questo che `build` pretende l’impostazione `disk:`.
 
 - **L’output contiene segreti**: hash delle password, chiavi WireGuard, chiavi
@@ -179,7 +179,7 @@ passano ogni script a shellcheck e validano ogni configurazione Butane.
 Confrontano inoltre byte per byte quattro stack di riferimento, detti golden
 stack, con l’output salvato.
 
-La federazione tra reti non è ancora stata testata. Tutto usa IPv4. La ISO di
+La federazione tra reti non è ancora stata testata. Tutto funziona su IPv4. La ISO di
 Debian esiste solo per amd64. Un control plane (`kiwi-server serve`) è previsto
 e progettato, ma non ancora realizzato.
 

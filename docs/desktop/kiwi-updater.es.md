@@ -31,7 +31,7 @@ un fork y al que puedes enviar una pull request.
 kiwi trabaja en dos ámbitos. El ámbito de usuario es todo lo que está en tu
 carpeta personal, y nunca necesita root. El ámbito del sistema es una parte que
 pertenece a root, para las apps que necesitan permisos de root. Al instalar
-eliges cuánto ámbito del sistema quieres:
+kiwi eliges en qué medida quieres usar el ámbito del sistema:
 
 ```bash
 # recomendado: ámbito de usuario más el ámbito del sistema de root, una sola petición de contraseña
@@ -191,6 +191,6 @@ Usa `kiwi info --installer`, `kiwi diff` y `kiwi pin` para ver qué hace una app
 antes de decidirte. Una firma limita *quién puede publicar* una versión, pero
 no dice nada sobre *qué hace la versión publicada*.
 
-Hay una cosa prevista todavía: un registro alojado de catálogos de confianza,
+Queda una cosa prevista: un registro alojado de catálogos de confianza,
 con el comando `kiwi catalog browse` y con las huellas de los firmantes de cada
 entrada.

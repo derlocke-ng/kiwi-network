@@ -22,7 +22,7 @@ sono tre strade:
 | Tipo | Come funziona | Esempio |
 |---|---|---|
 | **Pubblico** | L’hub usa relay pubblici e chiunque può aprirlo. | Armory |
-| **Privato** | Le persone non possono sostituire i relay dell’hub (`policy.relays: 'locked'`), e le pagine restano in attesa finché uno di questi relay non risponde (`requireHub`). I relay si trovano dentro una VPN. | l’hub di un’azienda sul suo kiwi-master |
+| **Privato** | Chi usa l’hub non può sostituire i relay (`policy.relays: 'locked'`), e le pagine restano in attesa finché uno di questi relay non risponde (`requireHub`). I relay si trovano dentro una VPN. | l’hub di un’azienda sul suo kiwi-master |
 | **Semipubblico** | Un hub privato che ha anche un’area pubblica. Lì alcune app scelte, per esempio la chat, usano relay pubblici. | |
 
 I relay di un hub formano reti separate: la rete propria dell’hub, l’area
@@ -95,7 +95,7 @@ docker run --rm -p 8080:80 \
 | `HUB_RELAYS` | I relay propri dell’hub. |
 | `HUB_PUBLIC_RELAYS` | I relay dell’area pubblica. Se la variabile è impostata ma vuota, l’area pubblica non c’è. |
 | `HUB_DIRECTORY_RELAYS` | I relay su cui vengono pubblicati e cercati gli elenchi di relay. |
-| `HUB_RELAYS_LOCKED` | Con `true`, le persone non possono sostituire i relay dell’hub. |
+| `HUB_RELAYS_LOCKED` | Con `true`, chi usa l’hub non può sostituirne i relay. |
 | `HUB_REQUIRE_HUB` | Con `true`, le pagine restano in attesa finché nessuno dei relay dell’hub risponde. |
 | `HUB_PUBLIC_MOUNTS` | I mount che usano l’area pubblica, elencati per identificativo. |
 | `HUB_ACCOUNT_MOUNTS` | I mount che richiedono un account. |
@@ -161,6 +161,6 @@ Queste voci sono nella roadmap del framework e ancora non esistono:
 - Seguire uno spazio che il tuo hub non include.
 - L’accesso tramite un’estensione del browser (NIP-07) o un firmatario remoto
   (NIP-46).
-- Un server TURN nello stack Kiwi. Il lavoro necessario è in attesa in
+- Un server TURN nello stack Kiwi. Il lavoro su questo punto è in sospeso in
   kiwi-modules. Senza TURN, due telefoni collegati con la rete mobile spesso non
   riescono a stabilire una connessione diretta.

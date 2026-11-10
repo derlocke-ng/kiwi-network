@@ -5,7 +5,7 @@ qualsiasi comunità può gestire il proprio hub. Nel linguaggio del framework
 Armory è una **distribuzione**: il framework insieme a un nome, ai relay
 predefiniti e a una selezione di app. Armory include tutte e dieci le app del
 framework e dà a ciascuna un nome suo. Il mercato e il feed sono pensati per chi
-coltiva canapa. Questo tema è una scelta di questo hub e non del framework:
+coltiva canapa. L’argomento è una scelta di questo hub, non del framework:
 un’altra comunità userebbe le stesse app per il proprio. Puoi usare Armory così
 com’è, oppure copiarlo come modello per il tuo hub.
 
@@ -19,8 +19,8 @@ app web.
 - **Aprilo:** [derlocke-ng.github.io/armory](https://derlocke-ng.github.io/armory/)
 - Il repository è [derlocke-ng/armory](https://github.com/derlocke-ng/armory),
   la licenza è GPL-3.0-or-later.
-- Armory è una distribuzione di [kiwi-framework](index.md) 0.32.1, fissato a un
-  commit preciso. Armory in sé non ha ancora tag di release.
+- Armory è una distribuzione di [kiwi-framework](index.md) 0.32.1, e fissa il
+  framework a un commit preciso. Armory in sé non ha ancora tag di release.
 - È disponibile in inglese, tedesco, francese, spagnolo, italiano, olandese,
   polacco e portoghese.
 

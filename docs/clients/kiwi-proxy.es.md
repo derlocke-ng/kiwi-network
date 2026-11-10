@@ -20,8 +20,8 @@ que se ejecutan con tu propio usuario y sin permisos de root.
 Un **exit** es una conexión a un upstream, guardada con un nombre. El upstream
 es el proxy al que se envía el tráfico: o bien un proxy SOCKS5 que te han
 dado, o bien uno que te crea un [módulo de proveedor](providers.md) a través
-de Tor, de un túnel VPN, de 9proxy o de Mysterium. Un exit por sí solo no es
-más que una entrada guardada, y no hay nada funcionando para él. Cuando activas
+de Tor, de un túnel VPN, de 9proxy o de Mysterium. Un exit, por sí solo, no es
+más que una entrada guardada: mientras no lo actives, no se ejecuta nada. Cuando activas
 un exit, kiwi-proxy arranca para él un contenedor **gateway**:
 
 ```

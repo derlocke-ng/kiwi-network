@@ -61,7 +61,7 @@ hide:
 ## L’idea { #the-idea }
 
 Internet non è un posto tranquillo, e badare ai propri server è un lavoro che
-non finisce mai. Kiwi Network lo fa al posto tuo. Descrivi le tue macchine in un
+non finisce mai. Kiwi Network questo lavoro lo fa al posto tuo. Descrivi le tue macchine in un
 solo file, e le operazioni di routine vengono eseguite in automatico.
 Intrusioni, dischi guasti e macchine perse sono messi in conto fin dall’inizio.
 

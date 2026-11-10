@@ -21,9 +21,9 @@ VPN client ───────────────────────
 - **Il Pi-hole di un node** interroga per primo il Pi-hole del master. Così
   tutta la rete usa la stessa lista di blocco, e ogni query arriva a Internet
   attraverso l’uscita del master, cioè la connessione del master a Internet.
-  Quad9 (`9.9.9.9`, `149.112.112.112`, impostato con `fallback_dns`) viene
-  subito dopo, in ordine rigoroso: risponde quindi soltanto quando il master
-  non è raggiungibile.
+  Il secondo server è Quad9 (`9.9.9.9`, `149.112.112.112`, impostato con
+  `fallback_dns`). I server vengono interrogati rigorosamente in quest’ordine,
+  quindi Quad9 risponde soltanto quando il master non è raggiungibile.
 - **Il Pi-hole del master** inoltra le query al resolver DNS-over-TLS del
   proprio client VPN. Per impostazione predefinita questo resolver è Quad9
   (`dot_providers`).
@@ -45,7 +45,8 @@ indirizzi della mesh.
 ## Nomi: `service.hostname.home` { #names-servicehostnamehome }
 
 Ogni host ha il nome `<host>.<domain>`, per esempio `papaya.home`. Ogni
-servizio che gira su quell’host riceve un nome sotto il nome dell’host:
+servizio che gira su quell’host riceve un nome che è un sottodominio di quello
+dell’host:
 `cloud.papaya.home`, `vault.papaya.home`, `portainer.papaya.home`,
 `dl.lychee.home`, e sul master `wg.sorbet.home`, `pihole.sorbet.home`,
 `hub.sorbet.home`, `relay.sorbet.home`. Ogni nome dichiarato da un modulo
@@ -63,8 +64,8 @@ invece, è un vero TLD, ed è per questo che Kiwi Network non lo usa più.
 kiwi-server controlla il dominio che scegli. `home`, `corp`, `mail`,
 `internal`, `arpa` e `test` vengono accettati senza osservazioni. `.local`
 viene rifiutato, perché è riservato a mDNS. `.lan` produce un avviso, perché i
-router rispondono da soli per quel dominio, e un avviso lo producono anche i
-TLD pubblici.
+router rispondono già in proprio alle query per quel dominio. Un avviso lo
+producono anche i TLD pubblici.
 
 I nomi *esterni* al dominio della fleet, che ti servono per un hub o un relay
 pubblico, ricevono certificati Let’s Encrypt se il reverse proxy del master è
@@ -74,8 +75,8 @@ pubblico.
 
 I proxy SOCKS5 di Mullvad hanno indirizzi in un intervallo privato, e questa
 funzione ti permette di usarli per nome. Da kiwi-server 2.2.0 il Pi-hole del
-master risponde per ogni **proxy SOCKS5 di Mullvad**, sia con il nome completo,
-come `de-fra-wg-socks5-001.relays.mullvad.net`, sia con un nome breve, come
+master risolve il nome di ogni **proxy SOCKS5 di Mullvad**, sia quello
+completo, come `de-fra-wg-socks5-001.relays.mullvad.net`, sia uno breve, come
 `de-fra-001.mullvad.home`. gluetun scarta le risposte DNS che puntano a
 indirizzi privati: è la sua protezione contro il DNS rebinding. Senza questi
 record, quindi, quei nomi verrebbero risolti soltanto dai resolver di riserva.
@@ -104,9 +105,8 @@ CA tra i certificati attendibili del sistema.
 Se imposti dei **vincoli sui nomi** (name constraints), la CA può firmare
 soltanto nomi del dominio della fleet: `tls: { name_constraints: [home] }`. La
 fleet di esempio li imposta, mentre il valore predefinito integrato non prevede
-alcun vincolo. Con il vincolo, una `kiwiCA.key` rubata non serve a nulla per
-qualsiasi altro nome. È importante, perché tutte le macchine si fidano della
-CA.
+alcun vincolo. Con il vincolo, chi rubasse `kiwiCA.key` non potrebbe usarla per
+nessun altro nome. È importante, perché tutte le macchine si fidano della CA.
 
 ```bash
 kiwi-server ca fleet.yaml        # mostra la CA della fleet
@@ -116,7 +116,7 @@ Importa `kiwiCA.pem` sui tuoi dispositivi (browser, telefoni), così si
 fideranno di `https://cloud.papaya.home`. Se preferisci usare certificati tuoi,
 imposta `tls_fullchain` e `tls_privkey` nel modulo reverse-proxy.
 
-!!! warning "Tieni privata `secrets/`"
+!!! warning "Tieni privata la cartella `secrets/`"
     `kiwiCA.key` firma certificati di cui si fidano tutte le tue macchine.
     Tieni `secrets/` e `output/` fuori da git (`output/` è già nel `.gitignore`
     di kiwi-server).

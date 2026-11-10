@@ -35,7 +35,7 @@ notifiche non sono un’app a parte: fanno parte dell’hub stesso.
 
 - Uno **spazio** è una comunità con un nome e un proprietario. Ha un
   identificativo, la chiave del proprietario, un nome, dei moderatori, i suoi
-  relay e un indicatore che lo segnala come riservato agli adulti. Riprende il
+  relay e un contrassegno che lo riserva agli adulti. Riprende il
   modello delle comunità moderate di nostr (NIP-72), quindi anche altri client
   nostr possono leggerlo. Ogni post e ogni annuncio appartiene a un solo spazio.
 - Un **mount** è un’app usata per uno spazio, con un identificativo, un nome e

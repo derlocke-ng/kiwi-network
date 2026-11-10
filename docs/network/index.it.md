@@ -44,11 +44,12 @@ Il master è la macchina a cui si collegano tutte le altre. Il suo ruolo,
 condividono il namespace di rete del server WireGuard. Un namespace di rete è
 l’insieme di interfacce, indirizzi e rotte che appartiene a un container:
 questi tre servizi, quindi, non hanno una rete propria ma usano quella del
-server WireGuard. Per questo vengono riavviati insieme a lui.
+server WireGuard. Per questo vengono riavviati insieme al server WireGuard.
 
-- **vpn-server** (wg-easy) è il server WireGuard. Ogni client e ogni node si
-  collega a lui e da lui riceve la propria configurazione WireGuard. Le
-  configurazioni può crearle kiwi-server al posto tuo (`kiwi-server enroll`).
+- **vpn-server** (wg-easy) è il server WireGuard. Tutti i client e tutti i
+  node si collegano a questo server, che fornisce a ciascuno la propria
+  configurazione WireGuard. Le configurazioni può crearle kiwi-server al posto
+  tuo (`kiwi-server enroll`).
 - **vpn-client** (gluetun) collega il master a un provider VPN commerciale. Il
   preset usa Mullvad, ma va bene qualsiasi provider compatibile con gluetun. La
   rotta predefinita del server WireGuard punta a questo client VPN: il traffico
@@ -63,8 +64,8 @@ server WireGuard. Per questo vengono riavviati insieme a lui.
   master nella mesh, `10.8.0.1`. Vedi [DNS, nomi e certificati](dns.md).
 - **tor** mette a disposizione dei client della mesh un proxy SOCKS5 su
   `10.8.0.1:9050`. I nodi di ingresso e di uscita di Tor sono limitati a un
-  elenco di paesi (il valore predefinito è `de,ch,at,nl,fr`, e viene imposto
-  con `StrictNodes`).
+  elenco di paesi (per impostazione predefinita `de,ch,at,nl,fr`; il limite
+  è imposto con `StrictNodes`).
 - **reverse-proxy** (nginx) serve le pagine di amministrazione, cioè le
   interfacce web di wg-easy e Pi-hole: `wg.<master>` e `pihole.<master>`. Le
   serve soltanto all’interno della mesh, e soltanto ai client autorizzati a
@@ -82,7 +83,7 @@ Per impostazione predefinita il master ha **una sola porta** aperta verso
 Internet: WireGuard, sulla UDP 51820. Le pagine di amministrazione si aprono
 soltanto dall’interno della mesh. Due impostazioni aprono altre porte:
 
-- `reverse-proxy.public: true` apre le porte 80 e 443 e richiede certificati
+- `reverse-proxy.public: true` apre le porte 80 e 443 e ottiene certificati
   Let’s Encrypt per i nomi che non appartengono al dominio della fleet. Tutto
   il resto rimane raggiungibile solo dalla mesh, e alle richieste che arrivano
   da fuori le pagine di amministrazione rispondono con l’errore 403. È
@@ -94,8 +95,8 @@ soltanto dall’interno della mesh. Due impostazioni aprono altre porte:
   proprie chiavi.
 
 kiwi-server non tocca SSH: resta come lo configura il sistema operativo, cioè,
-per impostazione predefinita, con accesso solo tramite chiavi. Lo stesso
-kiwi-server usa SSH per `apply` e `status`.
+per impostazione predefinita, con accesso solo tramite chiavi. kiwi-server
+stesso usa SSH per `apply` e `status`.
 
 ## Gruppi di client { #client-groups }
 
@@ -117,7 +118,7 @@ kiwi-server enroll fleet.yaml anna  --group guests --split # dal tunnel passa so
 
 I membri di ogni gruppo raggiungono anche Internet attraverso l’uscita del
 master, a meno che per quel gruppo tu non imposti `internet: false`. Un client
-con un indirizzo fuori da tutti i gruppi (`10.8.0.x`) è un normale membro della
+il cui indirizzo non rientra in nessun gruppo (`10.8.0.x`) è un normale membro della
 mesh: raggiunge tutto, e può aprire le pagine di amministrazione finché
 `admin_from_mesh` è attivo.
 
@@ -161,8 +162,8 @@ a base di frutta** (`crumble`, `sorbet`, `compote`, `chutney`, `strudel`,
 `cobbler`, `trifle`, `cider`) e **i node nomi di frutti** (`papaya`, `lychee`,
 `guava`, `quince`, `damson`). Così, davanti a una qualsiasi riga di log, capisci
 subito di che tipo di macchina si tratta. È soltanto una convenzione, e va bene
-qualsiasi nome. Un servizio prende un nome sotto quello della macchina su cui
-gira: `cloud.papaya.home`, `vault.papaya.home`, `wg.sorbet.home`. Vedi
+qualsiasi nome. Il nome di un servizio è un sottodominio del nome della macchina su
+cui gira: `cloud.papaya.home`, `vault.papaya.home`, `wg.sorbet.home`. Vedi
 [DNS, nomi e certificati](dns.md).
 
 ## Come la mesh arriva a Internet { #ways-out }
@@ -183,7 +184,7 @@ SOCKS5 di Tor.
 
 Ogni rete ha la propria mesh, con un intervallo di indirizzi tutto suo.
 L’intervallo predefinito è `10.8.0.0/16`. Master e node stanno in `10.8.0.0/24`,
-poi vengono i gruppi: guests in `.1`, pentest in `.2`, devices in `.3` e
+seguono i gruppi: guests in `.1`, pentest in `.2`, devices in `.3` e
 routers in `.4`. Una seconda rete usa un altro intervallo, per esempio
 `10.9.0.0/16`, così un dispositivo che appartiene a entrambe le reti riesce a
 distinguerle. Oggi l’intervallo non si imposta in un punto solo, ma è
@@ -216,7 +217,7 @@ ottiene un nuovo indirizzo di uscita. Il secondo è l’**aggiornamento
 settimanale**, la domenica alle 00:00: esegue `podman auto-update`, purché sia
 impostato `auto_update: registry`. Anche il sistema operativo si aggiorna da
 solo, e si riavvia soltanto
-[nella finestra oraria che hai stabilito](../server/machines.md#updates).
+[nelle ore che hai autorizzato](../server/machines.md#updates).
 
 ## Un’intera LAN nella mesh { #a-whole-lan-in-the-mesh }
 
