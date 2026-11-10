@@ -1,18 +1,22 @@
-# Eine Maschine, ohne Fleet
+# Eine Maschine ohne Fleet
 
-kiwi-server besteht aus zwei kleineren Werkzeugen, und du kannst sie auch einzeln
-benutzen:
+kiwi-server verwaltet eine ganze Reihe von Maschinen. Wenn du nur auf einer
+einzelnen Maschine einen Stack betreiben willst, brauchst du es nicht. Ein Stack
+sind alle Container und Dienste, die eine Maschine betreibt. kiwi-server besteht
+aus zwei kleineren Werkzeugen, und die kannst du auch für sich allein verwenden:
 
 | Repository | Was es ist |
 |---|---|
-| [**kiwi-modules**](https://github.com/derlocke-ng/kiwi-modules) | Die Module und ihr Renderer: **eine Maschinendatei rein, ein Stack-Bundle raus**. v0.23.0, GPL-3.0-or-later |
-| [**kiwi-stack**](https://github.com/derlocke-ng/kiwi-stack) | Die Maschinenseite: der Befehl `kiwi-stack` und die Bibliothek, die ein Bundle auf CoreOS, uCore oder Debian bringen und am Laufen halten. v0.5.0, GPL-3.0-or-later |
+| [**kiwi-modules**](https://github.com/derlocke-ng/kiwi-modules) | Die Module und ihr Renderer. Er liest **eine Maschinendatei und schreibt daraus ein Stack-Bundle**, ein Verzeichnis mit der erzeugten Konfiguration des Stacks dieser Maschine. v0.23.0, GPL-3.0-or-later |
+| [**kiwi-stack**](https://github.com/derlocke-ng/kiwi-stack) | Der Teil, der auf der Maschine läuft. Er besteht aus dem Befehl `kiwi-stack` und einer Bibliothek, die ein Bundle auf eine CoreOS-, uCore- oder Debian-Maschine bringen und es dort am Laufen halten. v0.5.0, GPL-3.0-or-later |
 
-Nutze sie, wenn du einen Stack auf einer Maschine ohne den Rest willst: einen Node,
-den du von Hand einrichtest, ein Modul, das du entwickelst, oder eine Maschine, die
-ihren eigenen Stack rendert. kiwi-server bringt beide mit, festgelegt per Tag. Eine
-Maschine, die auf die eine oder andere Weise eingerichtet wurde, ist am Ende
-identisch, und beide leiten aus demselben Seed dieselben Secrets ab.
+Die beiden Werkzeuge sind das Richtige, wenn du einen Stack auf einer Maschine
+willst, aber den Rest von kiwi-server nicht brauchst. Beispiele sind ein Node,
+den du von Hand einrichtest, ein Modul, das du gerade entwickelst, oder eine
+Maschine, die ihren Stack selbst erzeugt. kiwi-server enthält eine Kopie beider
+Werkzeuge, jeweils auf ein Release-Tag festgelegt. Eine Maschine sieht am Ende
+gleich aus, egal ob du sie mit kiwi-server oder mit den beiden Werkzeugen
+einrichtest, und beide Wege leiten aus demselben Seed dieselben Secrets ab.
 
 ```
 machine.yaml ──kiwi-modules render──▶ bundle/ ──copy──▶ sudo kiwi-stack apply bundle/
@@ -21,7 +25,11 @@ machine.yaml ──kiwi-modules render──▶ bundle/ ──copy──▶ sudo
                                       quadlets/  configs  → kiwi-stack.target, verify
 ```
 
-## Eine Maschine rendern { #render-a-machine }
+## Eine Maschine erzeugen { #render-a-machine }
+
+Die folgenden Befehle installieren kiwi-modules, legen einen Seed an und
+erzeugen aus der Beispiel-Maschinendatei ein Bundle. Die letzte Zeile kopiert
+das Bundle auf die Maschine und wendet es dort an.
 
 ```bash
 git clone https://github.com/derlocke-ng/kiwi-modules && cd kiwi-modules
@@ -32,12 +40,15 @@ kiwi-modules render sh3/sh3.yaml -o sh3/sh3.bundle
 scp -r sh3/sh3.bundle sh3:/tmp/ && ssh sh3 sudo kiwi-stack apply /tmp/sh3.bundle
 ```
 
-Es braucht Python 3 mit PyYAML und Jinja2. `kiwi-modules modules -v` listet jedes
-Modul und jede Einstellung auf, und `kiwi-modules profiles` listet die Rollen und
-ihre Presets.
+kiwi-modules braucht Python 3 mit PyYAML und Jinja2. `kiwi-modules modules -v`
+listet jedes Modul und jede Einstellung auf, `kiwi-modules profiles` die Rollen
+und ihre Presets.
+
+Eine Maschinendatei beschreibt eine einzelne Maschine, so wie in diesem
+Beispiel:
 
 ```yaml
-# a cloud node
+# ein Cloud-Node
 name: sh3
 domain: home
 target: ucore
@@ -50,20 +61,22 @@ node:
   reverse-proxy:
     tls_fullchain: secrets/sh3-fullchain.pem
     tls_privkey: secrets/sh3-privkey.pem
-dns_records:                    # the network's names
+dns_records:                    # die Namen im Netzwerk
   - [10.8.0.1, gate.home]
   - [10.8.0.25, cloud.sh3.home]
 master_ip: 10.8.0.1
-ca_cert: ca.pem                 # trusted inside the containers and on the host
-seed: secrets/seed              # generated passwords derive from it
+ca_cert: ca.pem                 # vertrauenswürdig in den Containern und auf dem Host
+seed: secrets/seed              # daraus werden die Passwörter abgeleitet
 ```
 
-kiwi-modules hat keine eigene Zertifizierungsstelle, daher braucht ein
-eigenständiges Rendern die Dateien mit TLS-Zertifikat und Schlüssel. Die
-WireGuard-Konfiguration wird unter `secrets/<hostname>.conf` gefunden, wenn die
-Maschinendatei keine nennt.
+kiwi-modules hat keine eigene Zertifizierungsstelle. Wenn du eine Maschine ohne
+kiwi-server erzeugst, musst du das TLS-Zertifikat und die Schlüsseldatei deshalb
+selbst bereitstellen. Nennt die Maschinendatei keine WireGuard-Konfiguration,
+sucht kiwi-modules sie unter `secrets/<hostname>.conf`.
 
 ## Auf die Maschine bringen { #put-it-on-the-machine }
+
+Installiere auf der Maschine kiwi-stack und wende das Bundle an:
 
 ```bash
 git clone https://github.com/derlocke-ng/kiwi-stack && cd kiwi-stack
@@ -72,16 +85,18 @@ sudo kiwi-stack apply /tmp/sh3.bundle
 kiwi-stack status
 ```
 
-Es braucht bash und systemd, dazu podman 4.4+ mit catatonit (oder docker mit dem
-Compose-Plugin), je nachdem, welche `runtime` das Bundle hat. Unter Debian
-installiert es podman selbst.
+kiwi-stack braucht bash und systemd. Außerdem braucht es die Container-Laufzeit,
+die unter `runtime` im Bundle steht, also entweder podman 4.4+ mit catatonit
+oder docker mit dem Compose-Plugin. Unter Debian installiert kiwi-stack podman
+selbst.
 
-`apply` tut das, was eine kiwi-server-Rolle mit einem Stack tut (siehe
-[Maschinen](machines.md#apply)), außer Hostname und Zeitzone zu setzen. Es ist
-wiederholbar: Dasselbe Bundle noch einmal ändert nichts. Es gibt kein Rollback.
-Daten kommen mit `kiwi-stack restore` aus dem Backup-Modul zurück, und eine ältere
-Konfiguration, indem du ein älteres Bundle anwendest.
+`apply` macht mit einem Stack dasselbe wie eine Rolle von kiwi-server (siehe
+[Maschinen](machines.md#apply)), setzt aber weder den Hostnamen noch die
+Zeitzone. Du kannst es beliebig oft ausführen, und dasselbe Bundle noch einmal
+anzuwenden ändert nichts. Einen Rollback gibt es nicht. Daten holst du mit
+`kiwi-stack restore` aus dem Modul backup zurück. Eine ältere Konfiguration
+bekommst du zurück, indem du ein älteres Bundle anwendest.
 
-Auf der Maschine heißen die Namen weiterhin `kiwi-server`
-(`/etc/kiwi-server/stack.env`, `/var/lib/kiwi-server/`), mit Absicht: Sie sind der
-Vertrag zwischen den beiden.
+Einige Namen auf der Maschine lauten noch `kiwi-server`, zum Beispiel
+`/etc/kiwi-server/stack.env` und `/var/lib/kiwi-server/`. Das ist Absicht, denn
+über diese Namen sind die beiden Werkzeuge miteinander verbunden.

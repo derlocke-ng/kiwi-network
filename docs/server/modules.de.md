@@ -1,14 +1,23 @@
 # Module
 
-Ein Modul ist ein Dienst einer Maschine im Kiwi Network. Eine [Rolle](roles.md)
-wählt eine Reihe von Modulen aus, und der Renderer macht daraus einen **Stack** für
-einen Host. Der Renderer ist [kiwi-modules](https://github.com/derlocke-ng/kiwi-modules),
-das kiwi-server mitbringt. Der Stack besteht aus einer Compose-Datei,
-**Podman-Quadlets** (eine systemd-Unit pro Container), den Konfigurationen und
-Host-Units und `stack.sh`, dem Manifest, das sie alle nennt.
-[kiwi-stack](single.md) bringt ihn auf die Maschine. Alles Templating geschieht auf
-der Maschine, die rendert. Das Ziel braucht nur podman 4.4 oder neuer (oder docker
-mit dem Compose-Plugin, mit `runtime: docker`).
+Ein Modul ist ein Dienst, den eine Maschine in deinem Kiwi Network übernehmen
+kann, zum Beispiel der VPN-Server, der DNS-Server mit Werbeblocker, Nextcloud
+oder das nächtliche Backup. Über die Module legst du fest, was jede Maschine
+tut. Eine [Rolle](roles.md) bringt eine Auswahl an Modulen mit, und in der
+Fleet-Datei kannst du diese Auswahl ändern.
+
+Ein Renderer macht aus den Modulen eines Hosts einen **Stack**, also alles, was
+die Maschine braucht, um diese Dienste zu betreiben. Der Renderer ist
+[kiwi-modules](https://github.com/derlocke-ng/kiwi-modules), und kiwi-server
+enthält eine Kopie davon. Ein Stack besteht aus einer Compose-Datei,
+**podman-Quadlets** (eine systemd-Unit pro Container), den
+Konfigurationsdateien, den systemd-Units für den Host und `stack.sh`, einem
+Manifest, das all das auflistet. [kiwi-stack](single.md) installiert den Stack
+auf der Maschine. Alle Vorlagen werden auf dem Rechner ausgefüllt, der den Stack
+erzeugt. Die Maschine, auf der der Stack läuft, braucht nur podman 4.4 oder
+neuer oder, wenn du `runtime: docker` setzt, docker mit dem Compose-Plugin.
+
+Dieser Befehl listet jedes Modul mit seinen Einstellungen auf.
 
 ```bash
 kiwi-server modules -v      # jedes Modul und jede Einstellung mit ihrem Standardwert
@@ -16,47 +25,55 @@ kiwi-server modules -v      # jedes Modul und jede Einstellung mit ihrem Standar
 
 ## Das Netzwerk { #the-network }
 
-| Modul | Was es ist | Läuft auf | Benötigt | Auf dem Host |
+Diese Module bauen das Mesh auf, also das private WireGuard-Netzwerk, in dem
+alle deine Maschinen hängen, und sie bestimmen, wie dessen Verkehr ins Internet
+gelangt.
+
+| Modul | Was es ist | Läuft auf | Setzt voraus | Auf dem Host |
 |---|---|---|---|---|
-| `vpn-server` | **wg-easy**: der Einstiegspunkt für jeden Client und jeden Node; seine Standardroute ist der VPN-Client (der Double Hop) | Master | nichts | `51820/udp`; die Oberfläche auf `127.0.0.1:51821` |
-| `vpn-client` | **gluetun**: der Tunnel, an dem jede Maschine hängt: auf einem Node zum Master, auf dem Master zu einem kommerziellen VPN | beiden | nichts | nichts |
-| `dns` | **Pi-hole 6**: blockiert Werbung für das Mesh oder das LAN, liefert die Namen der Fleet und optional die SOCKS5-Proxys von Mullvad per Name | beiden | nichts | `53` auf einem Node |
-| `tor` | ein **Tor-SOCKS5**-Proxy für Mesh-Clients, auf Länder festgelegt | beiden | nichts | `127.0.0.1:9050` auf einem Node; die Mesh-Adresse `:9050` auf einem Master |
-| `reverse-proxy` | **nginx** mit TLS: ein Server-Block pro Dienst; Admin-Seiten antworten nur dem Mesh; optional öffentliche Namen mit Let's Encrypt | beiden | nichts | `80`, `443` auf einem Node oder auf einem öffentlichen Master |
-| `gateway` | Policy-Routing auf dem Host: LAN-Clients, die diese Maschine als Gateway benutzen, gehen über das VPN hinaus | Node | vpn-client | eine Host-Unit |
-| `dhcp-relay` | leitet das DHCP des LANs an Pi-hole weiter, sodass Pi-hole der DHCP-Server des LANs sein kann | Node | dns | `67/udp` |
+| `vpn-server` | **wg-easy**, der WireGuard-Server, mit dem sich jeder Client und jeder Node verbindet. Seine Standardroute ist der VPN-Client, Verkehr ins Internet läuft also weiter über das kommerzielle VPN des Masters (der Double Hop) | Master | nichts | `51820/udp` und die Weboberfläche unter `127.0.0.1:51821` |
+| `vpn-client` | **gluetun**, der VPN-Tunnel, durch den der Verkehr einer Maschine läuft. Auf einem Node führt der Tunnel zum Master, auf dem Master zu einem kommerziellen VPN | Master und Node | nichts | nichts |
+| `dns` | **Pi-hole 6**, ein DNS-Server, der für das Mesh oder das LAN Werbung blockiert. Er beantwortet die Namen der Fleet und kann außerdem Namen für die SOCKS5-Proxys von Mullvad bereitstellen | Master und Node | nichts | `53` auf einem Node |
+| `tor` | Ein **Tor-SOCKS5**-Proxy für Clients im Mesh. Er nutzt nur Tor-Knoten in den Ländern, die du festlegst | Master und Node | nichts | `127.0.0.1:9050` auf einem Node, auf einem Master die Mesh-Adresse `:9050` |
+| `reverse-proxy` | **nginx** mit TLS. Es hat einen Server-Block pro Dienst, sodass jeder Dienst unter seinem eigenen Namen erreichbar ist. Admin-Seiten sind nur aus dem Mesh erreichbar. Öffentliche Namen mit Let's-Encrypt-Zertifikaten sind optional | Master und Node | nichts | `80`, `443` auf einem Node, oder auf einem Master mit eingeschaltetem `public` |
+| `gateway` | Policy-Routing auf dem Host. Geräte im LAN, die diese Maschine als Gateway nutzen, schicken ihren Internetverkehr durch das VPN | Node | vpn-client | eine systemd-Unit auf dem Host |
+| `dhcp-relay` | Reicht die DHCP-Anfragen des LAN an Pi-hole weiter, damit Pi-hole der DHCP-Server des LAN sein kann | Node | dns | `67/udp` |
 
 ## Dienste { #services }
 
-| Modul | Was es ist | Läuft auf | Benötigt |
+| Modul | Was es ist | Läuft auf | Setzt voraus |
 |---|---|---|---|
-| `cloud` | **Nextcloud** aus den Containern des AIO-Projekts, *ohne* den AIO-Master-Container (kein Docker-Socket, läuft unter podman). Collabora, OnlyOffice, Talk, Imaginary, ClamAV, Volltextsuche und Whiteboard sind Schalter | Node | vpn-client, reverse-proxy |
-| `vault` | **Vaultwarden**, der Bitwarden-kompatible Passwortmanager | Node | vpn-client, reverse-proxy |
-| `downloader` | **Transmission** und **JDownloader** im Netzwerk-Namespace des VPN-Clients: kein Tunnel, kein Verkehr | Node | vpn-client |
-| `sftp` | ein SFTP-Server auf einem eigenen Port (`2224`), um Downloads abzuholen | Node | nichts |
-| `portainer` | **Portainer CE**, eine Web-Oberfläche für die Container (`127.0.0.1:9443` und `portainer.<host>`) | beiden | nichts |
-| `opencloud` | **OpenCloud**: Dateien und Teilen in einem einzigen Go-Binary (zum Ausprobieren) | Node | vpn-client, reverse-proxy |
-| `immich` | **Immich**: Fotos und Videos (zum Ausprobieren) | Node | vpn-client, reverse-proxy |
-| `paperless` | **Paperless-ngx**: gescannte Dokumente mit OCR und Volltextsuche (zum Ausprobieren) | Node | vpn-client, reverse-proxy |
+| `cloud` | **Nextcloud**, aufgebaut aus den Containern des AIO-Projekts, aber *ohne* dessen Master-Container. Es braucht deshalb keinen docker-Socket und läuft unter podman. Collabora, OnlyOffice, Talk, Imaginary, ClamAV, die Volltextsuche und Whiteboard lassen sich jeweils ein- und ausschalten | Node | vpn-client, reverse-proxy |
+| `vault` | **Vaultwarden**, ein Passwortmanager, der mit Bitwarden kompatibel ist | Node | vpn-client, reverse-proxy |
+| `downloader` | **Transmission** und **JDownloader**. Beide laufen im Netzwerk-Namespace des VPN-Clients, nutzen also dessen Netzwerkverbindung und haben keine eigene. Solange der Tunnel nicht steht, übertragen sie nichts | Node | vpn-client |
+| `sftp` | Ein SFTP-Server auf einem eigenen Port (`2224`), über den du die Downloads abholen kannst | Node | nichts |
+| `portainer` | **Portainer CE**, eine Weboberfläche für die Container. Erreichbar unter `127.0.0.1:9443` und unter `portainer.<host>` | Master und Node | nichts |
+| `opencloud` | **OpenCloud** für Dateien und zum Teilen von Dateien, als ein einziges Go-Programm (zum Ausprobieren) | Node | vpn-client, reverse-proxy |
+| `immich` | **Immich** für Fotos und Videos (zum Ausprobieren) | Node | vpn-client, reverse-proxy |
+| `paperless` | **Paperless-ngx** für eingescannte Dokumente, mit Texterkennung (OCR) und Volltextsuche (zum Ausprobieren) | Node | vpn-client, reverse-proxy |
 
-Die letzten drei stecken in keinem Preset; füge sie zu `modules:` hinzu.
+Die letzten drei Module gehören zu keinem Preset. Wenn du eines davon nutzen
+willst, trag es in `modules:` ein.
 
-## Menschen { #people }
+## Hubs { #people }
 
-| Modul | Was es ist | Läuft auf | Benötigt |
+Ein Hub ist die eigene Seite einer Community im Browser. Diese beiden Module
+betreiben einen Hub und das Relay, auf dem der Hub seine Events speichert.
+
+| Modul | Was es ist | Läuft auf | Setzt voraus |
 |---|---|---|---|
-| `nostr-relay` | **strfry**, das Relay, auf dem ein Hub seine Events hält (unter `relay.<host>`). Aus dem Internet dürfen Mitglieder posten, nachdem sie ihren Schlüssel nachgewiesen haben (NIP-42): `approved`-Schlüssel auf der signierten Liste der Admins oder jeder, der mit einem Konto `registered` ist. Das Mesh darf immer posten | Master | reverse-proxy |
-| `hub` | ein **kiwi-framework-Hub** als Container (standardmäßig Armory, unter `hub.<host>`), privat, halböffentlich oder öffentlich | Master | reverse-proxy |
+| `nostr-relay` | **strfry**, das Relay, auf dem ein Hub seine Events ablegt. Erreichbar unter `relay.<host>`. Wer sich aus dem Internet verbindet, darf nur schreiben, wenn er Mitglied ist und nachgewiesen hat, dass ihm sein Schlüssel gehört (NIP-42). Mit `approved` sind die Mitglieder die Schlüssel auf einer Liste, die die Admins signieren. Mit `registered` ist jeder Mitglied, der ein Konto hat. Verbindungen aus dem Mesh dürfen immer schreiben | Master | reverse-proxy |
+| `hub` | Ein **kiwi-framework-Hub**, der als Container läuft. Standardmäßig ist das Armory, erreichbar unter `hub.<host>`. Ein Hub kann privat, halböffentlich oder öffentlich sein | Master | reverse-proxy |
 
 Siehe [Einen eigenen Hub betreiben](../people/hubs.md).
 
 ## Backups und Festplatten { #backups-and-disks }
 
-| Modul | Was es ist | Läuft auf | Benötigt |
+| Modul | Was es ist | Läuft auf | Setzt voraus |
 |---|---|---|---|
-| `backup` | die Daten dieser Maschine mit **restic**, verschlüsselt, auf einen Backup-Server-Node: nachts um `03:00` (innerhalb von 15 Minuten danach) und mit `kiwi-stack backup`. Jedes Modul sagt, was davon aufbewahrt wird. Nächstes Release: mehrere Server und eine neu aufgebaute Maschine, die sich selbst wiederherstellt ([Details](operations.md#coming-in-the-next-release)) | beiden | nichts |
-| `backup-server` | ein **restic-REST-Server**; jede Maschine erreicht nur ihr eigenes Repository, nur anhängend | Node | vpn-client, reverse-proxy |
-| `tang` | **Tang**-Server, damit verschlüsselte Maschinen beim Booten entsperren; ein Ring ist ein Server mit eigenen Schlüsseln (Standard `infra` auf `7500`) | Node | nichts |
+| `backup` | Sichert die Daten dieser Maschine verschlüsselt mit **restic** auf einen Node, auf dem das Modul backup-server läuft. Das Backup läuft jede Nacht um `03:00` oder bis zu 15 Minuten später und außerdem immer dann, wenn du `kiwi-stack backup` ausführst. Jedes Modul legt selbst fest, welche seiner Daten gesichert werden. Für das nächste Release sind Backups auf mehrere Server geplant und dass eine neu aufgesetzte Maschine ihre Daten selbst wiederherstellt ([Details](operations.md#coming-in-the-next-release)) | Master und Node | nichts |
+| `backup-server` | Ein **restic-REST-Server**, der die Backups speichert. Jede Maschine erreicht nur ihr eigenes Repository und kann dort nur etwas hinzufügen, nicht löschen (append-only) | Node | vpn-client, reverse-proxy |
+| `tang` | **Tang**-Server, mit deren Hilfe Maschinen ihre verschlüsselten Festplatten beim Start entsperren, ohne dass jemand dabei sein muss. Ein Ring ist ein Tang-Server mit eigenen Schlüsseln. Standardmäßig gibt es einen Ring namens `infra` auf Port `7500` | Node | nichts |
 
 Siehe [Betrieb](operations.md).
 
@@ -64,43 +81,45 @@ Siehe [Betrieb](operations.md).
 
 | Modul | Einstellung | Standard | Hinweise |
 |---|---|---|---|
-| vpn-server | `wg_host` | (erforderlich) | der Name oder die IP, mit der sich Clients verbinden |
+| vpn-server | `wg_host` | (Pflicht) | der Name oder die IP-Adresse, mit der sich Clients verbinden |
 | | `server_ip` / `wg_subnet` | `10.8.0.1` / `10.8.0.0/24` | |
 | | `groups` | guests, pentest, devices, routers | siehe [Client-Gruppen](../network/index.md#client-groups) |
-| | `unlock_relay` | `{}` | Tang-Ports für Maschinen hinter NAT |
-| vpn-client | `vpn_provider` | `custom` | `custom`: die WireGuard-Konfiguration, die der Master ausgestellt hat (ein Node); oder ein gluetun-Anbieter (`mullvad`, `protonvpn`, `airvpn`, `ivpn`, `windscribe`, …) |
+| | `unlock_relay` | `{}` | Ports auf dem Master, über die Maschinen hinter NAT ihren Tang-Ring erreichen |
+| vpn-client | `vpn_provider` | `custom` | `custom` verwendet die WireGuard-Konfiguration, die der Master ausgestellt hat, und das braucht ein Node. Ansonsten gibst du einen Anbieter an, den gluetun kennt (`mullvad`, `protonvpn`, `airvpn`, `ivpn`, `windscribe`, …) |
 | | `wireguard_config` | `secrets/<hostname>.conf` | |
-| | `server_countries`, `server_cities` | | wo ein kommerzieller Ausgang liegt |
-| | `dot_providers` | `quad9` | das DNS-over-TLS von gluetun |
-| | `extra_dnat_rules` | `[]` | z. B. SSH aus dem Mesh zum Host |
-| dns | `fallback_dns` | `9.9.9.9;149.112.112.112` | nur, solange der Master nicht erreichbar ist |
-| | `dhcp_enabled` | `false` | mit `dhcp_start`, `dhcp_end`, `dhcp_router` |
-| | `mullvad_socks` | `true` auf einem Master | [die Proxys von Mullvad per Name](../network/dns.md#mullvad-socks5-proxies-by-name) |
-| tor | `countries` | `de,ch,at,nl,fr` | Eingangs- und Ausgangs-Nodes, `StrictNodes` |
-| reverse-proxy | `public` | `false` | nur Master: 80/443 mit Let's Encrypt für Namen außerhalb der Domain der Fleet |
-| cloud | `nextcloud_datadir` | `<docker_dir>/knnc-data` | auf eine große Festplatte zeigen lassen |
+| | `server_countries`, `server_cities` | | die Länder und Städte der kommerziellen VPN-Server, die genutzt werden sollen |
+| | `dot_providers` | `quad9` | der DNS-over-TLS-Anbieter, den gluetun nutzt |
+| | `extra_dnat_rules` | `[]` | zusätzliche Weiterleitungsregeln, zum Beispiel für SSH aus dem Mesh auf den Host |
+| dns | `fallback_dns` | `9.9.9.9;149.112.112.112` | wird nur genutzt, solange der Master nicht erreichbar ist |
+| | `dhcp_enabled` | `false` | zusammen mit `dhcp_start`, `dhcp_end` und `dhcp_router` |
+| | `mullvad_socks` | `true` auf einem Master | [die Proxys von Mullvad per Namen](../network/dns.md#mullvad-socks5-proxies-by-name) |
+| tor | `countries` | `de,ch,at,nl,fr` | die Länder der Tor-Eingangs- und Exit-Knoten, durchgesetzt mit `StrictNodes` |
+| reverse-proxy | `public` | `false` | nur auf dem Master. Öffnet 80/443 und nutzt Let's Encrypt für Namen außerhalb der Fleet-Domain |
+| cloud | `nextcloud_datadir` | `<docker_dir>/knnc-data` | leg es auf eine große Festplatte |
 | | `collabora` / `talk` | `true` / `false` | |
 | | `startup_apps` | `deck twofactor_totp tasks calendar contacts notes end_to_end_encryption` | |
-| vault | `signups_allowed` | `false` | für das erste Konto einschalten, dann aus |
-| downloader | `download_dir` | (erforderlich) | |
+| vault | `signups_allowed` | `false` | einschalten, um das erste Konto anzulegen, danach wieder ausschalten |
+| downloader | `download_dir` | (Pflicht) | |
 | nostr-relay | `members` | `approved` | oder `registered` |
-| | `write_pubkeys` | `[]` | die Admins: Sie dürfen immer posten, und nur ihre Mitglieder- und Sperrlisten zählen |
-| hub | `image` | `ghcr.io/derlocke-ng/armory:latest` | jeder kiwi-framework-Hub |
-| | `public_relays`, `public_mounts` | `[]` | ein halböffentlicher Hub |
-| backup | `server` | (erforderlich) | `https://…` eines Backup-Server-Nodes, der diese Maschine aufführt |
-| tang | `rings` | `{ infra: "7500" }` | Name und Port |
+| | `write_pubkeys` | `[]` | die Schlüssel der Admins. Admins dürfen immer schreiben, und nur ihre Mitglieder- und Sperrlisten gelten |
+| hub | `image` | `ghcr.io/derlocke-ng/armory:latest` | das Image eines beliebigen Hubs, der mit kiwi-framework gebaut ist |
+| | `public_relays`, `public_mounts` | `[]` | für einen halböffentlichen Hub |
+| backup | `server` | (Pflicht) | die `https://…`-Adresse eines Backup-Server-Nodes, der diese Maschine in seiner Liste führt |
+| tang | `rings` | `{ infra: "7500" }` | Name und Port jedes Rings |
 
-Passwörter und Schlüssel, die du weglässt, werden aus dem Seed der Fleet erzeugt.
+Lässt du ein Passwort oder einen Schlüssel weg, wird er aus dem Seed der Fleet
+erzeugt.
 
 ## Namen { #names }
 
-Jedes Modul kündigt seine Namen beim Reverse Proxy und beim DNS der Fleet an,
-unterhalb des Namens des Hosts:
+Jedes Modul meldet die Namen seiner Dienste beim Reverse-Proxy und im DNS der
+Fleet an. Jeder Name setzt sich aus dem Namen des Dienstes und dem Namen des
+Hosts zusammen.
 
 | Dienst | Name |
 |---|---|
 | wg-easy (Master) | `wg.<host>` |
-| Pi-hole (jeder Host mit `dns` und dem Reverse Proxy) | `pihole.<host>` |
+| Pi-hole (jeder Host mit `dns` und dem Reverse-Proxy) | `pihole.<host>` |
 | Nextcloud | `cloud.<host>` |
 | Vaultwarden | `vault.<host>` |
 | Transmission / JDownloader | `dl.<host>` / `jd.<host>` |
@@ -111,22 +130,27 @@ unterhalb des Namens des Hosts:
 
 ## Container { #containers }
 
-- Unter podman ist jeder Dienst ein Quadlet in `/etc/containers/systemd`, gestartet
-  über `kiwi-stack.target`, mit seinem Log im Journal. Ein Container, der im
-  Netzwerk-Namespace eines anderen lebt, ist an diesen gebunden und kommt mit ihm
-  zurück.
-- Secrets landen in Dateien `kiwi/env/<service>.env`, die nur root lesen kann, nie in
-  den Units.
-- Feste Adressen folgen dem v1-Plan, sodass eine migrierte Maschine sie behält:
+- Unter podman ist jeder Dienst ein Quadlet in `/etc/containers/systemd`.
+  Gestartet werden die Quadlets über `kiwi-stack.target`, und ihre Logs landen
+  im systemd-Journal. Ein Container, der den Netzwerk-Namespace eines anderen
+  Containers mitbenutzt, ist an diesen gebunden und wird deshalb zusammen mit
+  ihm neu gestartet.
+- Secrets werden in `kiwi/env/<service>.env`-Dateien geschrieben, die nur root
+  lesen kann. In den Units selbst stehen sie nie.
+- Die Container haben feste Adressen nach dem Adressplan von v1. Eine Maschine,
+  die von v1 übernommen wurde, behält deshalb ihre Adressen. Die Adressen sind:
   vpn-client `.2`, vpn-server `.3`, dns `.4`, reverse-proxy `.5`, cloud `.6`,
-  vault `.7`, tor `.8`, downloader `.9`, gateway `.10`, portainer `.250`, sftp
-  `.251`. Andere Module zählen ab `.100` hoch. Container ohne feste Adresse benutzen
-  das dritte Viertel des Netzwerks (`.128/26`).
-- Fedora CoreOS und uCore laufen mit eingeschaltetem SELinux, daher tragen
-  Bind-Mounts das Label `:z`. Mounts des Container-Sockets und von `/lib/modules`
-  werden nie gelabelt.
+  vault `.7`, tor `.8`, downloader `.9`, gateway `.10`, portainer `.250` und
+  sftp `.251`. Andere Module bekommen Adressen, die ab `.100` hochgezählt
+  werden. Container ohne feste Adresse bekommen eine aus dem dritten Viertel des
+  Netzes (`.128/26`).
+- Fedora CoreOS und uCore laufen mit eingeschaltetem SELinux, deshalb bekommen
+  Bind-Mounts das Label `:z`. Die Mounts des Container-Sockets und von
+  `/lib/modules` bekommen nie ein Label.
 
-## Ein Modul schreiben { #writing-a-module }
+## Ein eigenes Modul schreiben { #writing-a-module }
+
+Ein Modul ist ein Verzeichnis mit diesen Dateien:
 
 ```
 modules/<name>/
@@ -135,19 +159,25 @@ modules/<name>/
 └── *.j2                     any config file it ships
 ```
 
-`module.yaml` deklariert die Metadaten und Node-Typen des Moduls, seine
-Abhängigkeiten, die Host-Ports, die es öffnet, seine Templates und wohin ihre
-Ausgabe geht, Speicher, was davon gesichert wird, die Host-Integration (sysctls,
-Kernel-Module), die nginx-Server-Blöcke, die es ankündigt, die URLs, die ausgegeben
-werden, wenn die Rolle fertig ist, seine Validierungsregeln und seine `settings`.
-Das Settings-Schema validiert die Fleet-Datei und baut das Formular der App.
-Templates sind Jinja2 und sehen den Host-Kontext: Name und Typ des Hosts, die
-Adresse jedes Moduls, das Mesh, die Namen der Fleet, jedes aktivierte Modul und die
-Einstellungen jedes Moduls.
+`module.yaml` beschreibt das Modul. Darin stehen die Metadaten des Moduls und
+die Node-Typen, auf denen es läuft, seine Abhängigkeiten und die Ports, die es
+auf dem Host öffnet. Es nennt die Vorlagen des Moduls und wohin deren Ausgabe
+geschrieben wird, seine Speicherorte und welche seiner Daten gesichert werden.
+Außerdem legt es die Einbindung in den Host fest (sysctls und Kernelmodule), die
+nginx-Server-Blöcke, die das Modul anmeldet, die URLs, die nach dem Einrichten
+der Rolle ausgegeben werden, die Prüfregeln und die `settings` des Moduls.
 
-Unter podman wird die Compose-Datei in Quadlets übersetzt. Nur eine bekannte Menge
-von Compose-Schlüsseln wird übersetzt, und alles andere ist beim Rendern ein Fehler.
+Das Schema der Einstellungen dient zwei Zwecken: Es prüft die Fleet-Datei, und
+die App Kiwi Server baut daraus ihr Einstellungsformular. Die Vorlagen sind in
+Jinja2 geschrieben und können auf den Kontext des Hosts zugreifen. Dazu gehören
+der Name und der Typ des Hosts, die Adresse jedes Moduls, das Mesh, die Namen
+der Fleet, die eingeschalteten Module und die Einstellungen jedes Moduls.
+
+Unter podman wird die Compose-Datei in Quadlets übersetzt. Die Übersetzung kennt
+eine feste Auswahl an Compose-Schlüsseln. Jeder andere Schlüssel führt zu einem
+Fehler, wenn der Stack erzeugt wird.
 
 Module werden in [kiwi-modules](https://github.com/derlocke-ng/kiwi-modules)
-entwickelt und veröffentlicht. Die vollständige Referenz des Formats ist
-[docs/modules.md von kiwi-server](https://github.com/derlocke-ng/kiwi-server/blob/main/docs/modules.md).
+entwickelt und veröffentlicht. Die vollständige Referenz des Formats steht in
+[docs/modules.md von
+kiwi-server](https://github.com/derlocke-ng/kiwi-server/blob/main/docs/modules.md).

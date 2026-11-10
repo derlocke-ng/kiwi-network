@@ -1,73 +1,87 @@
 # kiwi-gen: Kiwi Key Generator
 
-Ein browserbasierter Manager für **SSH-Schlüssel, SSH-Zertifikate und
-TLS-Zertifikate**. Alles wird lokal in einem verschlüsselten Tresor erstellt und
-gespeichert, und nichts wird an irgendeinen Server geschickt.
+kiwi-gen ist eine Webseite, mit der du **SSH-Schlüssel, SSH-Zertifikate und
+TLS-Zertifikate** in deinem Browser erzeugst und verwaltest. Alles entsteht auf
+deinem eigenen Rechner und wird dort in einem verschlüsselten Tresor
+gespeichert. An einen Server wird nichts geschickt.
 
 - Repository: [derlocke-ng/kiwi-gen](https://github.com/derlocke-ng/kiwi-gen), MIT
 - Live: [derlocke-ng.github.io/kiwi-gen](https://derlocke-ng.github.io/kiwi-gen/)
-- Es ist eine statische Webseite, keine kiwi-updater-App. Es gibt keine Release-Tags.
+- Es ist eine statische Webseite, keine App für kiwi-updater. Release-Tags gibt
+  es nicht.
 
-Nutze es für die SSH-Schlüssel in deiner Fleet-Datei, eine CA für deine eigenen
-Dienste oder Client-Zertifikate, alles offline im Browser erzeugt.
+Du kannst damit die SSH-Schlüssel für deine Fleet-Datei erzeugen (die Datei,
+die jede Maschine deines Kiwi Network beschreibt), eine Zertifizierungsstelle
+(CA) für deine eigenen Dienste oder Client-Zertifikate. All das entsteht
+offline im Browser.
 
 ## Funktionen { #features }
 
-**Tresor.** Schlüssel und Zertifikate liegen in einem verschlüsselten Tresor:
-AES-256-GCM, mit dem Schlüssel per PBKDF2-SHA256 mit 600.000 Iterationen aus deinem
-Master-Passwort abgeleitet. Der Tresor wird verschlüsselt im localStorage des
-Browsers gespeichert und nur im Speicher entschlüsselt, solange er entsperrt ist.
-Exportiere ihn als Datei, um ihn zu sichern oder umzuziehen. Du kannst vorhandene
-Schlüssel und Zertifikate importieren (ein Zertifikat mit seinem Schlüssel und
-seiner Kette wird zu einem Eintrag), einen anderen Tresor zusammenführen, Notizen
-hinzufügen, suchen und sehen, was bald abläuft.
+**Tresor.** Schlüssel und Zertifikate liegen in einem gemeinsamen,
+verschlüsselten Tresor. Verschlüsselt wird mit AES-256-GCM, und der Schlüssel
+dafür wird mit PBKDF2-SHA256 und 600.000 Iterationen aus deinem Master-Passwort
+abgeleitet. Der Tresor liegt verschlüsselt im localStorage des Browsers.
+Entschlüsselt wird er nur im Arbeitsspeicher und nur, solange er entsperrt ist.
+Um den Tresor zu sichern oder auf einen anderen Rechner zu bringen, exportierst
+du ihn als Datei. Vorhandene Schlüssel und Zertifikate kannst du importieren,
+und ein Zertifikat, das mit seinem Schlüssel und seiner Kette kommt, wird als
+ein Eintrag gespeichert. Außerdem kannst du einen anderen Tresor mit deinem
+zusammenführen, Notizen anlegen, suchen und sehen, was bald abläuft.
 
-**SSH-Schlüssel.** Ed25519, ECDSA (P-256/384/521) und RSA (3072/4096), im echten
-OpenSSH-Format, das `ssh`, `ssh-keygen` und `ssh-add` akzeptieren. Optionale
-Passphrasen werden so verschlüsselt, wie `ssh-keygen` es tut (bcrypt-KDF,
-aes256-ctr), und der SHA256-Fingerabdruck wird angezeigt.
+**SSH-Schlüssel.** kiwi-gen erzeugt Schlüssel vom Typ Ed25519, ECDSA
+(P-256/384/521) und RSA (3072/4096). Sie werden im echten OpenSSH-Format
+geschrieben, das `ssh`, `ssh-keygen` und `ssh-add` annehmen. Eine Passphrase
+ist optional. Setzt du eine, wird der Schlüssel genauso verschlüsselt, wie
+`ssh-keygen` es tut (bcrypt-KDF, aes256-ctr). Der SHA256-Fingerprint des
+Schlüssels wird angezeigt.
 
-**SSH-Zertifikate.** Erstelle eine SSH-CA oder lade eine, dann signiere Benutzer-
-oder Host-Zertifikate. Du bekommst fertige Zeilen für `sshd_config` und
-`known_hosts`.
+**SSH-Zertifikate.** Du kannst eine SSH-CA erzeugen oder eine vorhandene laden
+und damit Benutzer- oder Host-Zertifikate signieren. kiwi-gen liefert dir die
+passenden Zeilen für `sshd_config` und `known_hosts` gleich mit.
 
-**TLS-Zertifikate.** Erstelle eine Root- oder Zwischen-CA (ECDSA oder RSA) oder lade
-eine vorhandene. Stelle Server-Zertifikate (Hostnamen, Wildcards, IPs) oder
-Client-Zertifikate aus und signiere CSRs von anderswo, sodass der private Schlüssel
-nie hierher kommen muss. Es erzeugt Full-Chain-Dateien und `.p12`-Bundles.
-Zertifikate bestehen `openssl verify -x509_strict` und erfüllen Apples Anforderungen
-an TLS-Server-Zertifikate.
+**TLS-Zertifikate.** Du kannst eine Root-CA oder eine Zwischen-CA (ECDSA oder
+RSA) erzeugen oder eine vorhandene laden. Mit der CA stellst du
+Server-Zertifikate für Hostnamen, Wildcards und IP-Adressen aus oder
+Client-Zertifikate. Du kannst auch einen Certificate Signing Request (CSR)
+signieren, der anderswo erzeugt wurde. Der private Schlüssel muss dann nie in
+kiwi-gen landen. kiwi-gen erzeugt Dateien mit der vollständigen Kette und
+`.p12`-Bundles. Die Zertifikate bestehen `openssl verify -x509_strict` und
+erfüllen Apples Anforderungen an TLS-Server-Zertifikate.
 
-**Prüfen & konvertieren.** Lies Zertifikate, CSRs, Schlüssel und SSH-Zertifikate
-(PEM oder DER), prüfe, ob ein Schlüssel zu einem Zertifikat passt, konvertiere
-private Schlüssel zwischen PKCS#8, PKCS#1 und OpenSSH (mit Hinzufügen oder
-Entfernen einer Passphrase) und konvertiere öffentliche Schlüssel zwischen SSH und
-PEM.
+**Untersuchen und umwandeln.** kiwi-gen liest Zertifikate, CSRs, Schlüssel und
+SSH-Zertifikate im Format PEM oder DER. Es kann prüfen, ob ein Schlüssel zu
+einem Zertifikat passt. Private Schlüssel wandelt es zwischen PKCS#8, PKCS#1
+und dem OpenSSH-Format um und kann dabei eine Passphrase hinzufügen oder
+entfernen. Öffentliche Schlüssel wandelt es zwischen dem SSH- und dem
+PEM-Format um.
 
 ## Starten { #running-it }
 
-Öffne `index.html` in einem modernen Browser (es funktioniert direkt von der
-Festplatte) oder liefere den Ordner aus:
+Öffne `index.html` in einem aktuellen Browser. Das funktioniert direkt von der
+Festplatte, ohne Webserver. Du kannst den Ordner aber auch ausliefern:
 
 ```bash
 git clone https://github.com/derlocke-ng/kiwi-gen.git && cd kiwi-gen
 python3 -m http.server 8000      # dann http://localhost:8000
 ```
 
-WebCrypto funktioniert nur in sicheren Kontexten: HTTPS, `localhost` oder
-`file://`. Einfaches HTTP von einer anderen Maschine aus funktioniert nicht.
+Die WebCrypto-Funktionen des Browsers arbeiten nur in einem sicheren Kontext,
+also auf einer Seite, die über HTTPS, von `localhost` oder über `file://`
+geladen wurde. Öffnest du die Seite über einfaches HTTP von einem anderen
+Rechner aus, funktioniert sie nicht.
 
 ## So funktioniert es { #how-it-works }
 
-Die gesamte Kryptografie nutzt die
+Alle kryptografischen Operationen übernimmt die
 [Web Crypto API](https://developer.mozilla.org/docs/Web/API/Web_Crypto_API) des
-Browsers. Die Kodierung für OpenSSH, X.509, PKCS#8, PKCS#10 und PKCS#12 steckt in
-einer einzigen Datei ohne Abhängigkeiten, `kiwi-crypto.js`. Es gibt keinen
-Build-Schritt, und nichts wird von einem CDN geladen. Eine
-Content-Security-Policy blockiert alle Netzwerkanfragen, sodass Schlüssel die Seite
-nicht verlassen können.
+Browsers. Der Code, der die Formate OpenSSH, X.509, PKCS#8, PKCS#10 und PKCS#12
+kodiert, steht in einer einzigen Datei, `kiwi-crypto.js`, die keine
+Abhängigkeiten hat. Es gibt keinen Build-Schritt, und die Seite lädt nichts von
+einem CDN. Eine Content-Security-Policy blockiert alle Netzwerkanfragen, sodass
+Schlüssel die Seite nicht verlassen können.
 
-Eine Webseite kann nicht als SSH-Agent arbeiten. Lade die Schlüssel, die du
-erstellst, mit `ssh-add` in deinen üblichen `ssh-agent`. Der Tresor ist nur so
-sicher wie dein Master-Passwort und dein Browserprofil. Ed25519 braucht einen
-aktuellen Browser (Chrome 137+, Firefox 129+, Safari 17+).
+Eine Webseite kann nicht als SSH-Agent arbeiten. Um die erzeugten Schlüssel zu
+benutzen, lädst du sie mit `ssh-add` in deinen gewohnten `ssh-agent`. Der
+Tresor ist nur so sicher wie dein Master-Passwort und dein Browser-Profil.
+Ed25519 braucht einen aktuellen Browser (Chrome 137+, Firefox 129+,
+Safari 17+).

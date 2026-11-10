@@ -1,73 +1,94 @@
 # Armory
 
-**Des outils web pair-à-pair, armés de nostr.** Chaque outil tourne entièrement
-dans votre navigateur et se synchronise via les relais que vous choisissez. Pas
-d’inscription, pas de serveur chez nous et pas de pistage, et tout est chiffré avant
-de quitter votre appareil. Installez-le comme application web depuis la page
-d’accueil.
+Armory est le premier hub construit avec kiwi-framework, le logiciel qui permet
+à n’importe quelle communauté de faire tourner son propre hub. Dans le
+vocabulaire du framework, Armory est une **distribution** : le framework,
+plus un nom, des relais par défaut et une sélection d’applications. Armory
+reprend les dix applications du framework et leur donne ses propres noms. Son
+marché et son fil sont pensés pour les cultivateurs de chanvre. Ce thème est le
+choix de ce hub-là, pas celui du framework : une autre communauté utiliserait
+les mêmes applications pour son propre sujet. Vous pouvez utiliser Armory tel
+quel, ou le copier pour en faire le modèle de votre propre hub.
 
-- **L’ouvrir :** [derlocke-ng.github.io/armory](https://derlocke-ng.github.io/armory/)
-- Dépôt : [derlocke-ng/armory](https://github.com/derlocke-ng/armory), GPL-3.0-or-later
-- Une distribution de [kiwi-framework](index.md) 0.32.1 (épinglé par commit). Il n’y
-  a pas encore de tags de version.
-- En anglais, allemand, français, espagnol, italien, néerlandais, polonais et
-  portugais.
+Chaque outil tourne entièrement dans votre navigateur. Les outils se
+synchronisent par des relais, c’est-à-dire des serveurs qui stockent vos
+données et les retransmettent, et c’est vous qui choisissez les relais. Vous
+n’avez pas besoin de vous inscrire, le projet n’exploite lui-même aucun
+serveur pour Armory, et rien ne vous piste. Tout est chiffré avant de quitter votre
+appareil. Depuis la page d’accueil, vous pouvez installer Armory comme une
+application web.
 
-Armory s’appelait auparavant weaponized.js.
+- **L’ouvrir :** [derlocke-ng.github.io/armory](https://derlocke-ng.github.io/armory/)
+- Le dépôt est [derlocke-ng/armory](https://github.com/derlocke-ng/armory),
+  sous licence GPL-3.0-or-later.
+- Armory est une distribution de [kiwi-framework](index.md) 0.32.1, qu’il
+  épingle par commit. Armory n’a pas encore de tags de version.
+- Il est disponible en anglais, en allemand, en français, en espagnol, en
+  italien, en néerlandais, en polonais et en portugais.
+
+Armory s’appelait autrefois weaponized.js.
 
 ## Les outils { #the-tools }
 
 | Outil | Ce qu’il fait |
 |---|---|
-| [**Loadout**](https://derlocke-ng.github.io/armory/loadout/) | Listes de courses et de choses à faire partagées, inventaires de la maison et notes Markdown entre vos appareils et avec les personnes avec qui vous les partagez. Chiffré de bout en bout, avec des liens en modification ou en lecture seule. Fonctionne hors ligne, et vos appareils remettent en place ce que les relais oublient. |
-| [**Uplink**](https://derlocke-ng.github.io/armory/uplink/) | Messages et fichiers à vos amis (NIP-17, scellés sur votre appareil), groupes qui restent jusqu’à ce que leur hôte les ferme, et salons en direct ouverts à qui a le lien, qui disparaissent une fois vides. Réponses, réactions, modifications, épinglages, recherche sur l’appareil, messages éphémères, et appels audio et vidéo jusqu’à six personnes. |
-| [**Payload**](https://derlocke-ng.github.io/armory/payload/) | Un partage de fichiers : un lien qui attend, chiffré, sur vos serveurs de médias jusqu’à ce que vous le supprimiez ; des fichiers à vos amis et groupes dans Uplink ; ou directement de votre navigateur au leur, stockés nulle part. |
-| [**Vault**](https://derlocke-ng.github.io/armory/vault/) | Un gestionnaire de mots de passe : identifiants, notes, cartes et codes de double authentification sur chaque appareil où vous vous connectez. Un générateur, un bilan de santé (mots de passe faibles, réutilisés, anciens et, si vous l’activez, compromis), imports et exports, clés SSH, une autorité de certification SSH, une autorité de certification X.509 et des certificats TLS. Scellé par sa propre phrase secrète. Pas de remplissage automatique. |
-| [**Authenticator**](https://derlocke-ng.github.io/armory/authenticator/) | Des codes de double authentification (TOTP) pour vos comptes ailleurs : ajoutez-en un par un code QR, un lien ou un secret, ou un export de Google Authenticator. Conservés dans le même coffre scellé. |
-| [**Calendar**](https://derlocke-ng.github.io/armory/calendar/) | Vos agendas depuis votre propre Nextcloud ou tout serveur CalDAV : les prochains jours ou un mois, les événements qui se répètent, des rappels tant qu’une page est ouverte. Rien ne va aux relais ; l’identifiant est scellé dans votre compte. Votre serveur doit autoriser l’origine d’Armory (CORS). |
-| [**Outpost**](https://derlocke-ng.github.io/armory/outpost/) | Carnets et rapports de culture : des entrées avec photos, semaine après semaine, pour tout le monde dans Outpost, vos amis, un cercle ou vous seul. Hashtags, j’aime et commentaires. Scellés sur votre appareil, photos chiffrées. |
-| [**Trading Post**](https://derlocke-ng.github.io/armory/tradingpost/) | Un marché du chanvre : graines, boutures et matériel avec photos, trouvés par catégorie et selon l’endroit où ils sont envoyés. « Message seller » ouvre Uplink. Pour les personnes ayant un compte (pas de vérification d’âge). Les vendeurs doivent d’abord se montrer dans Outpost (trois publications, chacune aimée par trois personnes) ou être approuvés par un modérateur. |
-| [**DevBoard**](https://derlocke-ng.github.io/armory/devboard/) | Un tableau d’affichage pour freelances : dites que vous recrutez ou que vous êtes disponible, signé avec votre clé, appuyé par une preuve de travail, soumis au vote, disparu à l’expiration (de 24 heures à 30 jours). Public par conception. |
-| [**pongjs**](https://derlocke-ng.github.io/armory/pongjs/) | Un Pong rétro à deux joueurs entre deux navigateurs. Partagez un lien ou un code QR, ou choisissez une partie ouverte, ou entraînez-vous hors ligne contre l’ordinateur. |
+| [**Loadout**](https://derlocke-ng.github.io/armory/loadout/) | Des listes de courses et de choses à faire, des inventaires de la maison et des notes en markdown, partagés. Ils restent identiques sur tous vos appareils et chez les personnes avec qui vous les partagez. Tout est chiffré de bout en bout, et vous partagez une liste par un lien qui permet soit de la modifier, soit seulement de la consulter. Loadout fonctionne hors ligne, et vos appareils renvoient aux relais ce que ceux-ci ont perdu. |
+| [**Uplink**](https://derlocke-ng.github.io/armory/uplink/) | Des messages et des fichiers pour vos amis (NIP-17, chiffrés sur votre appareil). Les groupes existent jusqu’à ce que leur hôte les ferme. N’importe qui ayant le lien peut rejoindre un salon en direct, et le salon disparaît quand la dernière personne est partie. Uplink permet de répondre, de réagir, de modifier et d’épingler des messages, de chercher sur votre appareil et d’envoyer des messages éphémères. Les appels audio et vidéo réunissent jusqu’à six personnes. |
+| [**Payload**](https://derlocke-ng.github.io/armory/payload/) | Le partage de fichiers, de trois façons. Vous pouvez créer un lien vers des fichiers qui restent chiffrés sur vos serveurs de médias jusqu’à ce que vous les supprimiez. Vous pouvez envoyer des fichiers à vos amis et à vos groupes dans Uplink. Vous pouvez enfin envoyer des fichiers directement de votre navigateur à celui d’une autre personne : ils ne sont alors stockés nulle part. |
+| [**Vault**](https://derlocke-ng.github.io/armory/vault/) | Un gestionnaire de mots de passe pour les identifiants, les notes, les cartes et les codes de double authentification, disponible sur chaque appareil où vous vous connectez. Il comprend un générateur de mots de passe et un bilan de santé. Ce bilan repère les mots de passe faibles, réutilisés ou anciens et, si vous activez cette vérification, ceux qui ont fuité. Vault importe et exporte des entrées. Il gère aussi des clés SSH, une autorité de certification SSH, une CA X.509 et des certificats TLS. Il est chiffré avec une phrase secrète qui lui est propre. Il ne remplit pas les mots de passe à votre place sur les sites web. |
+| [**Authenticator**](https://derlocke-ng.github.io/armory/authenticator/) | Des codes de double authentification (TOTP) pour vos comptes sur d’autres services. Vous ajoutez un compte à partir d’un code QR, d’un lien ou d’un secret, ou d’un export de Google Authenticator. Les codes sont conservés dans le même coffre chiffré que celui de Vault. |
+| [**Calendar**](https://derlocke-ng.github.io/armory/calendar/) | Vos agendas, depuis votre propre Nextcloud ou tout autre serveur CalDAV. Il affiche les prochains jours ou un mois, gère les événements récurrents et vous rappelle les événements tant qu’une page est ouverte. Rien n’est envoyé aux relais, et l’identifiant de votre serveur est stocké chiffré dans votre compte. Votre serveur doit accepter les requêtes venant de l’origine d’Armory (CORS). |
+| [**Outpost**](https://derlocke-ng.github.io/armory/outpost/) | Le fil d’Armory, consacré aux comptes rendus et aux journaux de culture. Vous publiez des entrées avec des photos, semaine après semaine. Chaque entrée peut s’adresser à tout le monde dans Outpost, à vos amis, à un cercle d’amis ou à vous uniquement. Les entrées peuvent avoir des hashtags, des j’aime et des commentaires. Elles sont chiffrées sur votre appareil, tout comme les photos. |
+| [**Trading Post**](https://derlocke-ng.github.io/armory/tradingpost/) | Le marché d’Armory, consacré au chanvre : graines, boutures et matériel. Les annonces ont des photos, et les acheteurs les trouvent par catégorie et selon les lieux de livraison. Le bouton « Écrire au vendeur » ouvre Uplink. Il faut un compte pour utiliser Trading Post, et il n’y a aucune vérification de l’âge. Avant de pouvoir vendre, il faut avoir publié dans Outpost (trois publications, chacune aimée par trois personnes) ou avoir été approuvé par un modérateur. |
+| [**DevBoard**](https://derlocke-ng.github.io/armory/devboard/) | Un tableau d’affichage pour les freelances. Vous publiez une note pour dire que vous recrutez ou que vous êtes disponible. Chaque note est signée avec votre clé et exige une preuve de travail, un petit calcul qui rend coûteuse la publication en masse. Les autres peuvent voter pour une note. Une note disparaît quand elle expire, c’est-à-dire entre 24 heures et 30 jours après sa publication. Toutes les notes sont publiques, et c’est voulu. |
+| [**pongjs**](https://derlocke-ng.github.io/armory/pongjs/) | Un Pong rétro à deux joueurs, dans deux navigateurs. Pour lancer une partie, partagez un lien ou un code QR, ou choisissez une des parties ouvertes. Vous pouvez aussi vous entraîner contre l’ordinateur, hors ligne. |
 
 Un blog est prévu.
 
-Chaque outil est l’une des apps du framework, montée sous le nom d’Armory : Loadout
-est `boards`, Uplink `chat`, Outpost `feed`, Trading Post `market`, DevBoard
-`notices`, pongjs `pong`.
+Chaque outil est une application du framework, sous un nom qu’Armory lui a
+donné. Loadout est l’application `boards` du framework, Uplink est `chat`,
+Outpost est `feed`, Trading Post est `market`, DevBoard est `notices` et
+pongjs est `pong`.
 
-## Un compte, tous les outils { #one-account-every-tool }
+## Un compte pour tous les outils { #one-account-every-tool }
 
-Connectez-vous ou créez un compte sur la page d’accueil (nom d’utilisateur et mot
-de passe, ou une clé nostr) et chaque outil l’utilise. Les listes que vous avez
-créées sur un appareil avant de vous connecter sont reprises. Sans compte, chaque
-appareil utilise sa propre clé.
+Vous vous connectez ou créez un compte sur la page d’accueil, soit avec un nom
+d’utilisateur et un mot de passe, soit avec une clé nostr. Tous les outils
+utilisent ensuite ce compte. Les listes que vous avez créées sur un appareil
+avant de vous connecter sont reprises dans le compte. Si vous n’utilisez pas de
+compte, chaque appareil fonctionne avec sa propre clé.
 
-La page des réglages couvre tout le hub : votre compte et vos appareils, amis et
-cercles, personnes bloquées, relais, espaces et serveurs de médias, notifications,
-et sauvegardes chiffrées.
+La page de réglages vaut pour tout le hub. Elle couvre votre compte et vos
+appareils, vos amis et vos cercles, les personnes bloquées, les relais, les
+espaces et les serveurs de médias, les notifications et les sauvegardes
+chiffrées.
 
 ## Relais et serveurs de médias { #relays-and-media-servers }
 
 Les relais par défaut d’Armory sont `wss://nos.lol`, `wss://relay.damus.io`,
-`wss://nostr.mom` et `wss://relay.primal.net`. Ses serveurs de médias (Blossom) par
-défaut sont `nostr.download`, `blossom.yakihonne.com`, `blossom.band` (photos
-uniquement) et `blossom.primal.net`. Vous pouvez choisir les vôtres dans les
-réglages.
+`wss://nostr.mom` et `wss://relay.primal.net`. Les serveurs de médias stockent
+les fichiers que vous envoyez et utilisent un protocole appelé Blossom. Les
+serveurs de médias par défaut d’Armory sont `nostr.download`,
+`blossom.yakihonne.com`, `blossom.band` (qui n’accepte que les photos) et
+`blossom.primal.net`. Vous pouvez choisir vos propres relais et serveurs de
+médias dans les réglages.
 
-Les relais transmettent les données, mais ils ne peuvent pas lire ce qui a été
-chiffré avant. Le [modèle de confidentialité](index.md#privacy-model) liste ce
-qu’ils peuvent voir.
+Les relais stockent les données et les retransmettent, mais ne peuvent rien
+lire de ce qui a été chiffré avant l’envoi. Le
+[modèle de confidentialité](index.md#privacy-model) indique ce que les relais
+peuvent voir.
 
 ## Modération { #moderation }
 
-Les modérateurs d’Armory modèrent Outpost, Trading Post et DevBoard. Les entrées
-d’Outpost peuvent être marquées 18+ ou comme publicité par leur auteur, par deux
-signalements ou par un modérateur. Ces entrées ne s’affichent qu’aux personnes
-ayant un compte.
+Les modérateurs d’Armory s’occupent d’Outpost, de Trading Post et de DevBoard.
+Une entrée d’Outpost peut être marquée 18+ ou comme publicité. Cette marque
+peut être posée par l’auteur, par un modérateur, ou à la suite de deux
+signalements. Les entrées marquées ne sont montrées qu’aux personnes qui ont un
+compte.
 
 ## Votre propre Armory { #your-own-armory }
 
-Armory est le modèle pour votre propre hub. Forkez-le (ou utilisez-le comme
-modèle), modifiez `distribution.js` et les traductions, et publiez-le. Voir
-[Héberger votre propre hub](hubs.md).
+Armory sert aussi de modèle pour votre propre hub. Faites un fork du dépôt ou
+utilisez-le comme modèle, modifiez `distribution.js` et les traductions, puis
+publiez le résultat. La page [Héberger votre propre hub](hubs.md) décrit les
+étapes.

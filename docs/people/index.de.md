@@ -16,7 +16,7 @@ bevor es gesendet wird. Die anderen Teile von Kiwi Network verbinden deine
 Maschinen, Hubs verbinden Menschen. Was die einzelnen Apps können, steht unter
 [Die Apps des Frameworks](apps.md).
 
-Armory ist der erste Hub, der mit dem Framework gebaut wurde. Er ist ein
+Armory ist der erste Hub, der mit dem Framework gebaut wurde. Armory ist ein
 Beispiel und zugleich die Vorlage, die andere Communities für ihren eigenen Hub
 kopieren.
 
@@ -89,8 +89,8 @@ gehören zu keinem Hub.
   gewöhnlichen nostr-Events auf, ein Verzeichnis aller Konten gibt es nicht.
   Dein Passwort läuft durch scrypt, eine Funktion, deren Berechnung absichtlich
   lange dauert, und erst das Ergebnis entsperrt deinen Schlüssel. Ohne das
-  Passwort kann niemand ein Konto übernehmen oder überschreiben. Ein Passwort
-  lässt sich **nicht zurücksetzen**.
+  Passwort kann niemand ein Konto übernehmen oder überschreiben. Passwörter
+  lassen sich **nicht zurücksetzen**.
 - Du kannst dich auch mit einem nostr-Schlüssel anmelden, den du schon hast, als
   `nsec`, in Hex-Schreibweise oder als `ncryptsec`. Die Anmeldung über eine
   Browser-Erweiterung (NIP-07) oder einen Remote-Signer (NIP-46) ist geplant,
@@ -108,7 +108,7 @@ dadurch nur, dass irgendein Schlüssel eine verpackte Nachricht bekommen hat.
 Jede Datei wird mit einem eigenen zufälligen AES-256-GCM-Schlüssel
 verschlüsselt, bevor sie auf einen Medienserver hochgeladen wird. Fotos werden
 vorher neu kodiert, dabei verschwinden die Metadaten, die Kameras hineinschreiben.
-Der Vault ist mit einer eigenen Passphrase verschlüsselt (scrypt +
+Vault, der Passwortmanager, ist mit einer eigenen Passphrase verschlüsselt (scrypt +
 AES-256-GCM). Anrufe laufen direkt von Browser zu Browser und werden von WebRTC
 verschlüsselt.
 
@@ -122,7 +122,7 @@ ist, auf dem sie lagen, *und* es kein Backup gibt.
 **Was andere sehen können.** Die Grenzen nennen die Repositories selbst:
 
 - Relays sehen Metadaten: wer wann wie viel an welche Adressen schreibt und von
-  welcher IP-Adresse aus. Wenn dich das stört, nutze ein VPN oder Tor.
+  welcher IP-Adresse aus. Wenn dir das wichtig ist, nutze ein VPN oder Tor.
 - Der Schlüssel eines Space ist nicht geheim. Er sorgt nur dafür, dass die
   Beiträge einer Community nicht offen lesbar sind. Relays können Likes und
   Meldungen sehen und auch, wer was kommentiert hat.

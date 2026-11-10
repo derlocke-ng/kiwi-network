@@ -1,43 +1,57 @@
 # Catalogues et publication d’applications
 
+Un catalogue est une liste d’applications que kiwi-updater peut installer.
+C’est un dépôt git : vous pouvez donc le lire, le copier et y proposer des
+modifications. Cette page présente le catalogue Kiwi, montre comment créer
+votre propre catalogue, par exemple pour tous les postes de travail dont vous
+vous occupez, et explique comment publier une application pour que d’autres
+puissent l’installer avec kiwi.
+
 ## Le catalogue Kiwi { #the-kiwi-catalog }
 
 [derlocke-ng/kiwi-catalog](https://github.com/derlocke-ng/kiwi-catalog) est le
-catalogue d’applications du Kiwi Network. L’installation de kiwi-updater
-l’enregistre, et
-`kiwi catalog add https://github.com/derlocke-ng/kiwi-catalog.git` l’enregistre
-à la main.
+catalogue d’applications de Kiwi Network. Il est enregistré automatiquement
+quand vous installez kiwi-updater. Pour l’enregistrer à la main, lancez
+`kiwi catalog add https://github.com/derlocke-ng/kiwi-catalog.git`.
+
+Le tableau liste les applications du catalogue. La colonne *Portées* indique
+où une application est installée. La portée utilisateur, c’est votre dossier
+personnel. La portée système, c’est une partie qui appartient à root.
 
 | Application | Version | Portées | Ce que c’est |
 |---|---|---|---|
 | [kiwi-updater](kiwi-updater.md) | v2.4.0 | utilisateur | le gestionnaire de mises à jour lui-même |
-| [kiwi-killswitch](kiwi-killswitch.md) | v0.2.3 | utilisateur + système | kill switch VPN pour GNOME qui se ferme en cas de panne |
-| [ensconce](ensconce.md) | v2.5.0 | utilisateur | configuration post-installation pour Bluefin-DX |
+| [kiwi-killswitch](kiwi-killswitch.md) | v0.2.3 | utilisateur + système | kill switch VPN pour GNOME. Il est fail-closed : tant que le VPN n’est pas actif, tout le trafic reste bloqué |
+| [ensconce](ensconce.md) | v2.5.0 | utilisateur | configure une installation toute fraîche de Bluefin-DX |
 | [kiwi-cli-tools-desktop](cli-tools.md) | v1.2.1 | utilisateur | `pweb`, `select-server`, `tethering`, `torlink` |
-| [kiwi-proxy](../clients/kiwi-proxy.md) | v0.7.3 | utilisateur | sorties SOCKS5/VPN scellées dans Podman rootless |
-| [kiwi-fox](../clients/kiwi-fox.md) | v0.7.1 | utilisateur | identités de navigateur isolées sur des sorties kiwi-proxy |
-| [kiwi-custodia](../clients/kiwi-custodia.md) | v0.2.3 | utilisateur | box de distributions dont le trafic ne sort que par une sortie |
-| [kiwi-server](../server/index.md) | v2.42.0 | utilisateur | construire et faire tourner votre propre réseau |
-| [syncman](syncman.md) | v0.4.1 | utilisateur | synchronisation bidirectionnelle de dossiers |
-| [gnome-monitor](gnome-monitor.md) | v0.3.2 | utilisateur | dispositions d’écrans pour GNOME |
-| [kiwi-plugin-tor](../clients/providers.md) | v0.3.0 | utilisateur | fournisseur kiwi-proxy : Tor |
-| [kiwi-plugin-vpn](../clients/providers.md) | v0.2.2 | utilisateur | fournisseur kiwi-proxy : un VPN via gluetun |
-| [kiwi-plugin-9proxy](../clients/providers.md) | v0.2.0 | utilisateur | fournisseur kiwi-proxy : 9proxy |
-| [kiwi-plugin-myst](../clients/providers.md) | v0.5.2 | utilisateur | fournisseur kiwi-proxy : Mysterium |
+| [kiwi-proxy](../clients/kiwi-proxy.md) | v0.7.3 | utilisateur | des exits pour les connexions SOCKS5 et VPN. Un exit est un conteneur isolé dans Podman rootless |
+| [kiwi-fox](../clients/kiwi-fox.md) | v0.7.1 | utilisateur | des identités de navigateur isolées qui passent par des exits kiwi-proxy |
+| [kiwi-custodia](../clients/kiwi-custodia.md) | v0.2.3 | utilisateur | des box (des conteneurs contenant une distribution Linux) dont le trafic passe uniquement par un exit |
+| [kiwi-server](../server/index.md) | v2.42.0 | utilisateur | l’outil avec lequel vous construisez et faites tourner votre propre réseau |
+| [syncman](syncman.md) | v0.4.1 | utilisateur | synchronise des dossiers dans les deux sens |
+| [gnome-monitor](gnome-monitor.md) | v0.3.2 | utilisateur | enregistre des dispositions d’écrans dans GNOME et passe de l’une à l’autre |
+| [kiwi-plugin-tor](../clients/providers.md) | v0.3.0 | utilisateur | module fournisseur pour kiwi-proxy : Tor |
+| [kiwi-plugin-vpn](../clients/providers.md) | v0.2.2 | utilisateur | module fournisseur pour kiwi-proxy : un VPN via gluetun |
+| [kiwi-plugin-9proxy](../clients/providers.md) | v0.2.0 | utilisateur | module fournisseur pour kiwi-proxy : 9proxy |
+| [kiwi-plugin-myst](../clients/providers.md) | v0.5.2 | utilisateur | module fournisseur pour kiwi-proxy : Mysterium |
 
-kiwi synchronise le catalogue avant chaque vérification et chaque mise à jour, si
-bien que gérer une flotte de postes de bureau, ce n’est que du git :
+kiwi récupère la version actuelle du catalogue avant chaque vérification et
+chaque mise à jour. Vous pouvez donc gérer les applications de tout un parc de
+postes de travail avec git, sans rien d’autre :
 
-- **ajouter une application** : ajoutez son URL à `apps.list` et faites un commit ;
-- **épingler ou revenir en arrière** : ajoutez `ref=<tag>` à sa ligne (sur une seule
-  machine, `kiwi pin <app> <tag>` fait la même chose) ;
-- **la retirer** : supprimez la ligne (les copies installées restent jusqu’à ce que
-  vous les désinstalliez).
+- **Pour ajouter une application**, ajoutez son URL à `apps.list` et faites
+  un commit.
+- **Pour épingler une application à une version ou revenir à une version
+  antérieure**, ajoutez `ref=<tag>` à la fin de sa ligne. Sur une seule
+  machine, `kiwi pin <app> <tag>` fait la même chose.
+- **Pour retirer une application**, supprimez sa ligne. Les copies déjà
+  installées le restent jusqu’à ce que vous les désinstalliez.
 
 ## Votre propre catalogue { #your-own-catalog }
 
-Un catalogue est un dépôt git avec un `apps.list` et, en option, un
-`catalog.manifest` qui le décrit :
+Un catalogue est un dépôt git qui contient un fichier `apps.list`. Il peut
+aussi contenir un fichier `catalog.manifest`, dans lequel le catalogue se
+décrit lui-même :
 
 ```ini
 # catalog.manifest
@@ -48,25 +62,31 @@ MAINTAINER=you
 ```
 
 ```
-# apps.list : une ligne par application, même quand elle a une moitié root et une moitié utilisateur
+# apps.list : une ligne par application, même si elle a une moitié root et une moitié utilisateur
 https://github.com/derlocke-ng/kiwi-updater.git
 https://github.com/you/your-tool.git ref=v1.2.0
 ```
 
+Une ligne de `apps.list` peut porter ces options après l’URL :
+
 | Option | Signification |
 |---|---|
-| `branch=<name>` | suivre une branche plutôt que les tags de version |
-| `ref=<tag>` | épingler une version exacte |
-| `scope=user\|system` | n’installer que cette moitié sur les machines qui utilisent cette liste. C’est un *filtre*, pas une déclaration |
+| `branch=<name>` | suivre une branche au lieu des tags de version |
+| `ref=<tag>` | rester exactement sur cette version |
+| `scope=user\|system` | n’installer que cette moitié de l’application sur les machines qui utilisent cette liste. Cette option est un *filtre* : elle ne déclare pas quelles portées l’application possède |
 
-La liste propre à une machine (`~/.config/kiwi-updater/apps.list`, ou
-`/etc/kiwi-updater/apps.list` pour root) l’emporte toujours sur un catalogue.
-`kiwi add <url>` y ajoute une ligne.
+Chaque machine a aussi sa propre liste :
+`~/.config/kiwi-updater/apps.list` pour votre utilisateur et
+`/etc/kiwi-updater/apps.list` pour root. Une entrée de la liste propre à la
+machine l’emporte toujours sur un catalogue. `kiwi add <url>` ajoute une ligne
+à cette liste.
 
 ## Publier une application { #publishing-an-app }
 
-Placez un `kiwi.manifest` et un `install.sh` à la racine de votre dépôt. Des modèles
-se trouvent dans [`templates/`](https://github.com/derlocke-ng/kiwi-updater/tree/main/templates)
+Pour publier une application, placez un fichier `kiwi.manifest` et un script
+`install.sh` à la racine de votre dépôt. Vous trouverez des modèles dans le
+répertoire
+[`templates/`](https://github.com/derlocke-ng/kiwi-updater/tree/main/templates)
 de kiwi-updater.
 
 ```ini
@@ -74,7 +94,7 @@ NAME=my-tool
 DESCRIPTION=Short description
 # COMPONENTS: cli gui daemon service gnome-extension config module
 COMPONENTS=cli
-# SCOPES: user, system, or both
+# SCOPES: user, system, ou les deux
 SCOPES=user
 VERSION=0.1.0
 HOMEPAGE=https://…
@@ -83,17 +103,20 @@ ICON=data/my-tool.svg
 INSTALLER=install.sh
 ```
 
-Autres clés : `AUTHOR`, `CATEGORY`, `TAGS`, `SCREENSHOTS`, `ABOUT` (un fichier que
-Kiwi Apps affiche), `DEPENDS` et, pour tout ce qui a une moitié système,
-`ROOT_REASON`. `ICON=` est un SVG ou un PNG d’au plus 1 Mio dans le dépôt. La
-plupart des applications Kiwi prennent la leur dans [kiwi-icons](../project/brand.md).
+Un manifeste peut comporter d’autres clés : `AUTHOR`, `CATEGORY`, `TAGS`,
+`SCREENSHOTS`, `ABOUT` (un fichier que Kiwi Apps affiche), `DEPENDS` et
+`ROOT_REASON`. Toute application qui a une moitié système doit avoir un
+`ROOT_REASON`. `ICON=` désigne un fichier SVG ou PNG d’au plus 1 Mio, situé
+dans le dépôt. La plupart des applications Kiwi prennent leur icône dans
+[kiwi-icons](../project/brand.md).
 
-!!! warning "Les commentaires vont sur leur propre ligne"
-    Une valeur court jusqu’à la fin de la ligne. `COMPONENTS=cli  # … gui …` fait du
-    commentaire une partie de la valeur, et l’application est alors traitée comme
-    ayant une interface graphique.
+!!! warning "Mettez les commentaires sur une ligne à part"
+    Une valeur s’étend jusqu’à la fin de sa ligne. Si vous écrivez
+    `COMPONENTS=cli  # … gui …`, le commentaire fait partie de la valeur, et
+    kiwi considère alors que l’application a une interface graphique.
 
-kiwi exécute votre installateur une fois **par portée déclarée**, avec :
+kiwi lance votre script d’installation une fois **pour chaque portée que
+l’application déclare**. Il lui fournit ces variables :
 
 | Variable | Valeur |
 |---|---|
@@ -101,31 +124,34 @@ kiwi exécute votre installateur une fois **par portée déclarée**, avec :
 | `KIWI_PREFIX` | `~/.local` ou `/usr/local` |
 | `KIWI_APP_DIR` | chemin absolu du clone |
 | `KIWI_ACTION` | `install`, `update` ou `uninstall` |
-| `KIWI_GUI` | `0` sur une machine sans écran, ou avec `--cli-only` |
+| `KIWI_GUI` | `0` sur une machine sans bureau graphique, ou avec `--cli-only` |
 | `KIWI_PURGE` | `1` quand l’utilisateur a demandé `--purge` |
-| `PATH` | `$KIWI_PREFIX/bin` en premier ; un chemin système fixe pour la portée système |
+| `PATH` | `$KIWI_PREFIX/bin` passe en premier. La portée système reçoit un chemin système fixe |
 
-Un installateur à double portée se branche sur `KIWI_SCOPE` et ne fait que cette
-moitié à chaque fois. Sans `--purge`, laissez la configuration de l’utilisateur là
-où elle est.
+Le script d’installation d’une application qui a les deux portées doit
+vérifier `KIWI_SCOPE` et, à chaque exécution, ne faire que le travail de la
+moitié concernée. Si l’utilisateur n’a pas demandé `--purge`, laissez sa
+configuration en place.
 
-**Publiez une version avec un tag signé**, pour qu’une moitié système se mette à
-jour sans mot de passe :
+**Publiez chaque version sous forme de tag signé.** C’est la condition pour
+qu’une moitié système puisse être mise à jour sans mot de passe :
 
 ```bash
 git config gpg.format ssh            # signer avec votre clé SSH
 git tag -s v1.3.0 -m v1.3.0 && git push origin v1.3.0
 ```
 
-Le `templates/release.yml` de kiwi-updater ne publie une release GitHub que pour un
-tag signé par une clé figurant dans `.github/allowed_signers`, et ne crée jamais de
-tags lui-même. Ouvrez ensuite une pull request qui ajoute votre URL au catalogue.
-Tout ce qui est open source et réellement utilisable sans compte, sans abonnement
-et sans traqueur est bienvenu.
+kiwi-updater fournit un workflow de publication, `templates/release.yml`. Il
+ne publie une version sur GitHub que pour un tag signé avec une clé listée dans
+`.github/allowed_signers`, et il ne crée jamais de tag lui-même. Pour finir,
+ouvrez une pull request qui ajoute votre URL au catalogue. Toute application
+est la bienvenue si elle est open source et réellement utilisable sans compte,
+sans abonnement et sans pisteur.
 
 ## Confiance { #trust }
 
-Le catalogue est **sélectionné, pas audité**. Y figurer signifie que quelqu’un a
-jugé que l’application valait la peine, pas que son code a été relu. Lisez
-`kiwi info <app>` avant d’installer quelque chose que vous ne connaissez pas déjà,
-et `kiwi info --installer <app>` pour voir exactement ce qui va s’exécuter.
+Le catalogue est **sélectionné, pas audité**. Une application y figure parce
+que quelqu’un a jugé qu’elle en valait la peine. Cela ne veut pas dire que son
+code a été relu. Avant d’installer une application que vous ne connaissez pas,
+lisez la sortie de `kiwi info <app>`. Lancez `kiwi info --installer <app>` pour
+voir exactement ce qui va s’exécuter.

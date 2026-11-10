@@ -1,18 +1,29 @@
 # kiwi-proxy
 
-Versiegelte SOCKS5- und VPN-Ausgänge in rootless Podman, für Browser,
-Testwerkzeuge, Host-Anwendungen und kiwi-server-Maschinen.
+kiwi-proxy ist für Leute gedacht, die in vielen Kundennetzen arbeiten und
+jedes davon über eine eigene VPN- oder SOCKS-Verbindung erreichen. Jede
+Verbindung speicherst du als **Exit** unter einem Namen und startest sie nur,
+wenn du sie brauchst. Die Exits sind voneinander abgeschottet, und ein
+Programm, das einen Exit nutzt, erreicht das Netzwerk nur über diesen Exit.
+Zehn Kunden bedeuten deshalb nicht zehn VPN-Verbindungen, die gleichzeitig auf
+dem Host laufen. Browser, Testwerkzeuge, Programme auf dem Host und Maschinen,
+die du mit kiwi-server betreibst, können einen Exit nutzen. kiwi-proxy läuft in rootless Podman,
+also in Containern, die unter deinem eigenen Benutzer ohne Root-Rechte laufen.
 
 - Repository: [derlocke-ng/kiwi-proxy](https://github.com/derlocke-ng/kiwi-proxy), GPL-3.0-or-later
-- Aktuelles Release: **v0.7.3**. Es steht im [Kiwi-Katalog](../desktop/catalogs.md), Benutzerbereich.
-- Eine CLI (`kiwi-proxy`), eine GTK4-App (**Kiwi Proxy**) und systemd-Benutzer-Units.
-  Es ist die Proxy-Engine, die früher in kiwi-fox steckte, herausgelöst, damit sie
-  mehr als einer App dient.
+- Aktuelles Release: **v0.7.3**. Es steht im [Kiwi-Katalog](../desktop/catalogs.md), Scope user.
+- Es besteht aus einem Kommandozeilenwerkzeug (`kiwi-proxy`), einer GTK4-App
+  (**Kiwi Proxy**) und systemd-Benutzer-Units. Die Proxy-Technik war früher
+  Teil von kiwi-fox. Sie wurde in ein eigenes Projekt ausgelagert, damit mehr
+  als eine App sie nutzen kann.
 
-Ein **Ausgang** ist ein Upstream mit Namen: ein SOCKS5, das du bekommen hast, oder
-eines, das ein [Provider-Modul](providers.md) erzeugt (Tor, ein VPN-Tunnel, 9proxy,
-Mysterium). Ein Ausgang ist nur Daten. Wird er hochgefahren, entsteht ein
-**Gateway**:
+Ein **Exit** ist eine Verbindung zu einem Upstream, die einen Namen hat. Der
+Upstream ist der Proxy, an den der Verkehr geschickt wird. Das ist entweder ein
+SOCKS5-Proxy, den du bekommen hast, oder einer, den ein
+[Provider-Modul](providers.md) für dich über Tor, einen VPN-Tunnel, 9proxy oder
+Mysterium anlegt. Ein Exit allein ist nur ein gespeicherter Eintrag, für ihn
+läuft noch nichts. Erst wenn du einen Exit startest, fährt kiwi-proxy dafür
+einen **Gateway-Container** hoch:
 
 ```
 gateway container   owns the network namespace
@@ -21,9 +32,13 @@ gateway container   owns the network namespace
                     dnscrypt-proxy 127.0.0.2:53: DNS through the same exit, with blocklists
 ```
 
-Was auch immer dem Namespace des Gateways beitritt (ein kiwi-fox-Browser, eine
-kiwi-custodia-Box, ein Werkzeug-Container), hat keine Route außer diesem Upstream.
-Stirbt das Gateway, verlieren seine Mitglieder ihre Route.
+Zum Gateway gehört ein Netzwerk-Namespace, also ein eigener Netzwerk-Stack mit
+eigenen Routen und Firewall-Regeln. Ein Browser von kiwi-fox, eine Box von
+kiwi-custodia oder ein Werkzeug-Container teilt sich diesen Namespace und hängt
+damit als Mitglied am Gateway. Von da an führt seine einzige Route zum Upstream
+des Exits. Fällt das Gateway aus, haben seine Mitglieder keine Route mehr. Das
+heißt fail-closed: Ein Ausfall kappt die Verbindung und öffnet nie einen
+anderen Weg.
 
 ## Installation { #install }
 
@@ -32,32 +47,35 @@ kiwi install kiwi-proxy      # kiwi-fox und kiwi-custodia bringen es mit
 kiwi-proxy setup             # das Gateway-Image, DNS-Daten, Images der Provider-Module
 ```
 
-Es braucht rootless Podman, Python 3.12+ mit pydantic und GTK4 + libadwaita für die
-App. Passwörter landen im Schlüsselbund des Desktops (`secret-tool`) oder, auf einer
-Maschine ohne Schlüsselbund, in Dateien mit 0600.
+kiwi-proxy braucht rootless Podman und Python 3.12+ mit pydantic. Die App
+braucht außerdem GTK4 und libadwaita. Passwörter werden über `secret-tool` im
+Schlüsselbund des Desktops gespeichert. Auf einem Rechner ohne Schlüsselbund
+landen sie in Dateien mit den Rechten 0600, die nur dein Benutzer lesen kann.
 
-## Benutzung { #use }
+## Bedienung { #use }
 
 ```bash
-kiwi-proxy add client-a socks5://user:pass@host:1080   # an exit; nothing runs yet
-kiwi-proxy add tor-de --module tor --country de        # an exit from a provider module
+kiwi-proxy add client-a socks5://user:pass@host:1080   # ein Exit; noch läuft nichts
+kiwi-proxy add tor-de --module tor --country de        # ein Exit aus einem Provider-Modul
 kiwi-proxy list
-kiwi-proxy check client-a      # what the world sees through it
-kiwi-proxy up client-a         # bring its gateway up and keep it up
-kiwi-proxy down client-a       # tear it down, with whoever joined it
-kiwi-proxy ps                  # running gateways, whichever app started them
-kiwi-proxy reap                # tear down gateways nobody uses
-kiwi-proxy-gui                 # "Kiwi Proxy" in the app grid
+kiwi-proxy check client-a      # was die Welt darüber sieht
+kiwi-proxy up client-a         # sein Gateway starten und laufen lassen
+kiwi-proxy down client-a       # es beenden, samt allem, was daran hängt
+kiwi-proxy ps                  # laufende Gateways, egal welche App sie gestartet hat
+kiwi-proxy reap                # Gateways beenden, die niemand nutzt
+kiwi-proxy-gui                 # "Kiwi Proxy" in der Anwendungsübersicht
 ```
 
-Endpunkte sind `socks5://user:pass@host:port`, `http://…`, `https://…` oder das
-Herstellerformat `host:port:user:pass`. `kiwi-proxy test ENDPOINT` prüft einen,
-ohne etwas anzulegen.
+Ein Endpunkt ist die Adresse eines Upstream. Du kannst ihn als
+`socks5://user:pass@host:port`, `http://…` oder `https://…` schreiben oder im
+Format der Anbieter, `host:port:user:pass`. `kiwi-proxy test ENDPOINT` testet
+einen Endpunkt, ohne einen Exit anzulegen.
 
-### Ausgänge für Host-Anwendungen { #exits-for-host-applications }
+### Exits für Programme auf dem Host { #exits-for-host-applications }
 
-Jedes Programm auf dem Host kann einen Ausgang über einen veröffentlichten
-SOCKS5-Port nutzen, ein Port pro Ausgang:
+Ein Programm auf dem Host muss nicht in einem Container laufen, um einen Exit
+zu nutzen. kiwi-proxy kann einen Exit als SOCKS5-Port auf dem Host anbieten,
+mit einem eigenen Port pro Exit:
 
 ```bash
 kiwi-proxy add se socks5://10.64.0.1:1080 --expose 1081
@@ -66,46 +84,59 @@ kiwi-proxy up se && kiwi-proxy up nl
 curl --proxy socks5h://127.0.0.1:1082 https://ifconfig.co/json
 ```
 
-Der Port lauscht standardmäßig auf `127.0.0.1`. Eine andere Adresse braucht einen
-Benutzernamen (`--expose-user`) oder ein ausdrückliches `--expose-open`.
-`systemctl --user enable --now kiwi-proxy@NAME` hält einen Ausgang ab der Anmeldung
-oben.
+Standardmäßig lauscht der Port nur auf `127.0.0.1`. Soll er auf einer anderen
+Adresse lauschen, musst du entweder mit `--expose-user` einen Benutzernamen
+setzen oder mit `--expose-open` ausdrücklich offenen Zugang erlauben. Soll ein
+Exit ab der Anmeldung laufen, führe
+`systemctl --user enable --now kiwi-proxy@NAME` aus.
 
 ### DNS { #dns }
 
-- **Resolver-Modus** (der Standard): dnscrypt-proxy löst per DoH über den Ausgang
-  auf (Google, Cloudflare, Quad9 oder Mullvad als Upstream), mit Blocklisten (OISD),
-  die täglich aktualisiert werden.
-- **Remote-Modus** (`--dns remote`): Namen gehen an den Upstream selbst, für Tor und
-  `.onion`-Namen. Die Blocklisten gelten weiterhin.
+- Der **Resolver-Modus** ist voreingestellt. dnscrypt-proxy löst Namen per DNS
+  over HTTPS (DoH) auf und schickt diese Anfragen über den Exit. Als
+  DoH-Resolver lassen sich Google, Cloudflare, Quad9 oder Mullvad verwenden.
+  Blocklisten (OISD) werden angewendet und täglich aktualisiert.
+- Der **Remote-Modus** (`--dns remote`) reicht die Namen an den Upstream
+  weiter, der sie selbst auflöst. Dieser Modus ist für Tor und `.onion`-Namen
+  gedacht. Die Blocklisten gelten auch hier.
 
 ### Regeln des Gateways { #rules-of-the-gateway }
 
-- UDP kommt nirgendwo hinaus: kein QUIC, keine WebRTC-Medien, kein DNS im Klartext.
-- Nach außen ist ein Ausgang IPv4. Ein Name ohne IPv4-Adresse wird abgelehnt.
-- Ein Gateway, das ein Nutzer hochgefahren hat, verschwindet, wenn sein letztes
-  Mitglied geht. Eines, das mit `kiwi-proxy up` hochgefahren wurde, bleibt bis
-  `kiwi-proxy down`.
-- Ein Ausgang, ein Gateway, beliebig viele Mitglieder. Mitglieder, die getrennt
-  bleiben müssen, nutzen verschiedene Ausgänge.
+- UDP wird nicht weitergeleitet. Es gibt also kein QUIC, keine WebRTC-Medien
+  und kein unverschlüsseltes DNS.
+- Ein Exit erreicht die Außenwelt nur über IPv4. Ein Name ohne IPv4-Adresse
+  wird abgewiesen.
+- Ein Gateway, das eine andere App gestartet hat, etwa kiwi-fox oder
+  kiwi-custodia, wird entfernt, sobald sein letztes Mitglied weg ist. Ein
+  Gateway, das du mit `kiwi-proxy up` gestartet hast, läuft weiter, bis du
+  `kiwi-proxy down` ausführst.
+- Jeder Exit hat genau ein Gateway, und beliebig viele Mitglieder können daran
+  hängen. Mitglieder, die voneinander getrennt bleiben müssen, nutzen
+  verschiedene Exits.
 
 ## Die App { #the-app }
 
-**Kiwi Proxy** legt Ausgänge an und bearbeitet sie (ein SOCKS5, das du bekommen
-hast, oder ein Provider-Modul, mit einer durchsuchbaren Länderliste oder
-Node-Auswahl), fährt sie hoch und herunter, bietet einen als SOCKS5-Port auf diesem
-Computer an und kopiert seine Adresse, prüft, was die Welt sieht, zeigt, wer einem
-Gateway beigetreten ist, samt deren Logs, und richtet Provider-Module ein und
-konfiguriert sie.
+In der App **Kiwi Proxy** legst du Exits an und bearbeitest sie, entweder aus
+einem SOCKS5-Proxy, den du bekommen hast, oder aus einem Provider-Modul. Bei
+einem Exit aus einem Modul wählst du aus einer durchsuchbaren Länderliste oder
+aus einer Liste von Knoten. Du kannst Exits starten und stoppen, einen Exit als
+SOCKS5-Port auf diesem Rechner anbieten und dessen Adresse kopieren. Außerdem
+prüfst du dort, was die Außenwelt sieht, wenn du dich über einen Exit
+verbindest. Die App zeigt auch,
+welche Mitglieder an einem Gateway hängen, samt ihren Logs, und sie richtet
+Provider-Module ein und konfiguriert sie.
 
-## Auf einer kiwi-server-Maschine { #on-a-kiwi-server-machine }
+## Auf einer Maschine mit kiwi-server { #on-a-kiwi-server-machine }
 
-kiwi-proxy bringt außerdem ein kiwi-server-Modul mit, das Ausgänge für das ganze
-Mesh bereitstellt (ein Gateway pro Ausgang, veröffentlicht auf der Mesh-Adresse des
-Hosts). Es ist noch nicht im Baum von kiwi-server und ist noch auf keiner Maschine
-gelaufen, wie seine Dokumentation sagt. Provider-Module sind ein Mechanismus für
-den Desktop und laufen dort nicht.
+Das Repository von kiwi-proxy enthält auch ein Modul für kiwi-server. Damit
+stellt eine Maschine, die du mit kiwi-server betreibst, Exits für das ganze
+Mesh bereit, also für
+das private WireGuard-Netzwerk, in dem deine Maschinen hängen. Das Modul
+betreibt ein Gateway pro Exit und bietet es auf der Mesh-Adresse des Hosts an.
+Laut seiner Dokumentation ist das Modul noch nicht im Quellbaum von kiwi-server
+und wurde noch auf keiner Maschine ausgeführt. Provider-Module funktionieren
+nur auf dem Desktop und laufen nicht auf einer solchen Maschine.
 
 Weiterlesen: [Architektur](https://github.com/derlocke-ng/kiwi-proxy/blob/main/docs/architecture.md),
-[Nutzer](https://github.com/derlocke-ng/kiwi-proxy/blob/main/docs/consumers.md),
+[Nutzer eines Exits](https://github.com/derlocke-ng/kiwi-proxy/blob/main/docs/consumers.md),
 [Plugin-System](https://github.com/derlocke-ng/kiwi-proxy/blob/main/docs/plugin-system.md).

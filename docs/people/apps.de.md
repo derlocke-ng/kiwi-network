@@ -7,7 +7,7 @@ Marktplatz, ein Feed für die Community, ein Chat und der Dateiaustausch.
 Im Framework tragen die Apps schlichte Namen wie `market`. Eine Distribution,
 also ein bestimmter Hub, der mit dem Framework gebaut wurde, **bindet** die
 Apps **ein**, die sie haben will. Eine App einzubinden heißt, sie für einen
-Space zu verwenden und ihr einen eigenen Namen des Hubs zu geben. Ein Space ist
+Space zu verwenden und ihr auf dem Hub einen eigenen Namen zu geben. Ein Space ist
 eine Community mit eigenen Moderatoren und eigenen Relays. Dieselbe App kann
 beliebig oft eingebunden werden. Eine Samenbank und ein Edelsteinladen zum
 Beispiel sind derselbe `market`-Code für zwei Spaces. Jeder der beiden hat
@@ -18,7 +18,7 @@ Kacheln.
 |---|---|---|
 | `market` | **Ein offener Marktplatz** für die Community, für die der Mount eingerichtet ist. Ein Inserat hat Fotos, einen Preis und entweder die Angabe, von wo und wohin versendet wird, oder das Angebot zur Abholung. Käufer finden Inserate über die Kategorie und über ihren eigenen Standort. Die Suche arbeitet mit Labels, die ein Relay vergleichen, aber nicht lesen kann. Dem Verkäufer schreibt ein Käufer im Chat, wo schon eine Nachricht zum Inserat vorformuliert ist. Ein Inserat lässt sich reservieren, als verkauft markieren, verlängern und melden, und nach 30 bis 90 Tagen läuft es ab. Ein Mount kann verlangen, dass Verkäufer vorher in einem Feed aktiv waren oder von einem Moderator freigeschaltet wurden. | Trading Post |
 | `feed` | **Ein Feed für die Community.** Leute veröffentlichen Einträge mit Fotos und Hashtags, andere können sie liken und kommentieren. Ein Eintrag kann für den ganzen Space bestimmt sein, für deine Freunde, für einen Kreis (eine Gruppe deiner Freunde) oder nur für dich. Ein Tagebuch ist eine Reihe von Einträgen mit einem Titelbild. Einträge können als 18+ oder als Werbung markiert werden. | Outpost |
-| `chat` | **Nachrichten.** Du schickst Freunden private Nachrichten und Dateien (NIP-17). Gruppen bestehen, bis ihr Gastgeber sie schließt, und Live-Räume verschwinden, sobald die letzte Person gegangen ist. Im Chat kannst du antworten, reagieren, Nachrichten bearbeiten und anheften, auf dem Gerät suchen und Nachrichten nach einer Weile verschwinden lassen. Sprach- und Videoanrufe sind mit bis zu sechs Personen möglich. | Uplink |
+| `chat` | **Nachrichten.** Du schickst Freunden private Nachrichten und Dateien (NIP-17). Gruppen bestehen, bis ihr Gastgeber sie schließt, und Live-Räume verschwinden, sobald die letzte Person gegangen ist. Der Chat kennt Antworten, Reaktionen, nachträgliches Bearbeiten, angeheftete Nachrichten, eine Suche auf dem Gerät und verschwindende Nachrichten. Sprach- und Videoanrufe sind mit bis zu sechs Personen möglich. | Uplink |
 | `notices` | **Ein Schwarzes Brett** für öffentliche Notizen. Jede Notiz ist von ihrem Autor signiert und braucht einen Proof of Work, eine kleine Rechenaufgabe, die massenhaftes Posten teuer macht. Über Notizen kann abgestimmt werden, sie lassen sich melden, und sie laufen ab. | DevBoard |
 | `boards` | **Geteilte Listen und Notizen.** Das sind Checklisten, Inventare mit Stückzahlen und Markdown-Notizen. Sie sind Ende-zu-Ende verschlüsselt. Geteilt werden sie über Links, die entweder das Bearbeiten oder nur das Ansehen erlauben. | Loadout |
 | `payload` | **Dateien teilen**, auf drei Wegen: als Link zu Dateien, die verschlüsselt auf deinen Medienservern liegen, als Dateien an Freunde und Gruppen oder direkt von einem Browser zum anderen. | Payload |

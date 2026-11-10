@@ -1,54 +1,66 @@
 # kiwi-cli-tools-desktop
 
-Vier kleine Kommandozeilen-Helfer für einen Linux-Desktop.
+kiwi-cli-tools-desktop ist ein Paket mit vier kleinen Kommandozeilenwerkzeugen
+für einen Linux-Desktop. Mit `torlink` erreichst du einen Dienst auf einem
+anderen Rechner über Tor, `pweb` gibt einen Ordner über HTTPS frei, mit
+`select-server` wählst du einen SSH-Host aus einem Menü, und `tethering` passt
+die TTL des Verkehrs von angebundenen Geräten an.
 
 - Repository: [derlocke-ng/kiwi-cli-tools-desktop](https://github.com/derlocke-ng/kiwi-cli-tools-desktop), GPL-3.0-or-later
-- Aktuelles Release: **v1.2.1**. Es steht im [Kiwi-Katalog](catalogs.md), Benutzerbereich.
+- Aktuelles Release: **v1.2.1**. Es steht im [Kiwi-Katalog](catalogs.md), Scope user.
 
 ```bash
 kiwi install kiwi-cli-tools-desktop   # oder ./install.sh install, nach ~/.local/bin
 ```
 
-## `torlink`: eine Maschine über Tor erreichen { #torlink-reach-a-machine-over-tor }
+## `torlink`: einen Rechner über Tor erreichen { #torlink-reach-a-machine-over-tor }
 
-Ein VPN für Arme: Erreiche jeden TCP-Dienst (SSH, eine Web-Oberfläche, eine
-Datenbank) auf einer anderen Maschine über Tor, ohne offene Ports, ohne Konten und
-ohne Server. Tor und socat laufen in einem rootless Podman-Container, also ist
-Podman alles, was du brauchst.
+Mit `torlink` erreichst du jeden TCP-Dienst auf einem anderen Rechner, etwa
+SSH, eine Weboberfläche oder eine Datenbank, über das Tor-Netzwerk. Es ist ein
+schlichter Ersatz für ein VPN: Keiner der beiden Rechner braucht einen offenen
+Port, du brauchst kein Konto, und du musst keinen Server betreiben. Tor und
+socat laufen gemeinsam in einem Rootless-Container von Podman. Du brauchst also
+nur Podman.
 
-Eine Onion-Adresse ist die Identität. Die anbietende Seite erstellt einen
-**Einladungscode** für einen Peer, und die andere Seite nimmt ihn an. Der Code
-enthält einen Tor-Client-Autorisierungsschlüssel, sodass der Dienst für alle ohne
-ihn unsichtbar ist: Behandle den Code wie ein Passwort.
+Ein Rechner, der Dienste anbietet, ist über seine Onion-Adresse erreichbar,
+eine Adresse innerhalb des Tor-Netzwerks. Auf diesem Rechner erzeugst du einen
+**Einladungscode** für einen Peer, also für die Gegenstelle, die Zugriff
+bekommen soll. Der Peer nimmt den Code auf dem anderen Rechner an. Der Code
+enthält einen Schlüssel für die Client-Autorisierung von Tor. Wer diesen
+Schlüssel nicht hat, kann nicht einmal sehen, dass es den Dienst gibt. Behandle
+den Code deshalb wie ein Passwort.
 
 ```bash
-# machine A: offer SSH and a web UI to "bob"
+# Rechner A: SSH und eine Weboberfläche für "bob" anbieten
 torlink add-service ssh 22
 torlink add-service web 8080
-torlink invite bob ssh web          # prints torlink1:…  (secret!)
+torlink invite bob ssh web          # gibt torlink1:… aus  (geheim!)
 
-# machine B: use them
+# Rechner B: die Dienste nutzen
 torlink accept torlink1:… alice
 torlink up
-torlink ssh alice                   # SSH over Tor
-torlink connect alice web           # 127.0.0.1:2200 → alice's web UI
-torlink ssh-config >> ~/.ssh/config # then `ssh alice-tor`; `select-server tor` lists them
+torlink ssh alice                   # SSH über Tor
+torlink connect alice web           # 127.0.0.1:2200 → Weboberfläche von alice
+torlink ssh-config >> ~/.ssh/config # danach `ssh alice-tor`; `select-server tor` listet sie auf
 ```
 
-Jede Einladung ist ein eigener Onion-Dienst mit nur den Diensten, die du
-aufgeführt hast, daher entfernt `torlink revoke bob` diesen Zugang endgültig.
-`torlink ls` zeigt Dienste, Peers und Weiterleitungen. Tor kann nur TCP, und die
-erste Verbindung dauert eine Weile. Der SOCKS-Port des Containers (19050) lauscht
-nur auf Loopback. Der Zustand, einschließlich deiner Onion-Schlüssel, liegt in
+Jede Einladung ist ein eigener Onion-Dienst, der nur die Dienste enthält, die
+du in ihr aufgeführt hast. Deshalb entzieht `torlink revoke bob` diesen Zugriff
+endgültig. `torlink ls` zeigt deine Dienste, deine Peers und deine
+Weiterleitungen, also die lokalen Ports, die zu den Diensten eines Peers
+führen. Tor überträgt nur TCP, und die erste Verbindung dauert eine Weile. Der
+SOCKS-Port des Containers (19050) lauscht nur auf der Loopback-Schnittstelle.
+Der Zustand von `torlink`, einschließlich deiner Onion-Schlüssel, liegt in
 `~/.local/share/torlink`, und `torlink purge` löscht ihn.
 
-## `pweb`: einen Ordner über HTTPS teilen { #pweb-share-a-folder-over-https }
+## `pweb`: einen Ordner über HTTPS freigeben { #pweb-share-a-folder-over-https }
 
-Liefert das **aktuelle Verzeichnis** über HTTPS auf einem zufälligen freien Port
-aus, um einer anderen Maschine im selben Netzwerk eine Datei zu geben. Beim ersten
-Start wird ein selbstsigniertes Zertifikat erstellt und danach wiederverwendet. Es
-liefert an das ganze LAN aus, also starte es in dem Ordner, den du teilen willst,
-und beende es mit Strg+C.
+`pweb` liefert das **aktuelle Verzeichnis** über HTTPS auf einem zufälligen
+freien Port aus. Damit gibst du eine Datei an einen anderen Rechner im selben
+Netz weiter. Beim ersten Start erzeugt `pweb` ein selbstsigniertes Zertifikat
+und verwendet es danach wieder. Solange `pweb` läuft, kann jeder Rechner im
+lokalen Netz auf den Ordner zugreifen. Starte es in dem Ordner, den du
+wirklich freigeben willst, und beende es mit Strg+C.
 
 ```
 $ cd ~/Downloads && pweb
@@ -58,25 +70,32 @@ on https://yourhost:40123  (also https://localhost:40123)
 
 ## `select-server`: einen SSH-Host auswählen { #select-server-pick-an-ssh-host }
 
-Ein nummeriertes Menü aller konkreten `Host`-Aliase in deiner `~/.ssh/config`. Wähl
-einen aus, und es verbindet sich. Markiere Hosts mit einem Kommentar
-`# tags: work prod` im `Host`-Block, um zu filtern:
+`select-server` zeigt ein nummeriertes Menü mit jedem konkreten `Host`-Alias
+aus deiner `~/.ssh/config`, also mit jedem Alias, der kein Platzhaltermuster
+ist. Du wählst einen aus, und `select-server` verbindet sich mit diesem Host.
+Um das Menü zu filtern, versiehst du deine Hosts mit Tags. Schreib dazu einen
+Kommentar wie `# tags: work prod` in den `Host`-Block und gib auf der
+Kommandozeile ein Tag an:
 
 ```
-$ select-server work            # only hosts tagged "work"
-$ select-server --tags          # the tags you have
-$ select-server -f other.conf   # another config file
+$ select-server work            # nur Hosts mit dem Tag "work"
+$ select-server --tags          # die Tags, die du vergeben hast
+$ select-server -f other.conf   # eine andere Konfigurationsdatei
 ```
 
-## `tethering`: der TTL-Fix { #tethering-the-ttl-fix }
+## `tethering`: die TTL für angebundene Geräte setzen { #tethering-the-ttl-fix }
 
-Setzt TTL 64 auf den Verkehr, der von einer Schnittstelle ankommt, damit Geräte,
-die über diese Maschine getethert sind, für einen Mobilfunkanbieter, der Hops
-zählt, wie der eigene Verkehr der Maschine aussehen. Es fragt nach sudo, fügt eine
-`iptables`-Mangle-Regel hinzu, und die Regel übersteht einen Neustart **nicht**.
+`tethering` ist für den Fall gedacht, dass andere Geräte die
+Internetverbindung dieses Rechners mitbenutzen, was man Tethering nennt.
+Manche Mobilfunkanbieter zählen die Netzwerk-Hops des Verkehrs und können so
+angebundene Geräte vom Rechner selbst unterscheiden. `tethering` setzt die TTL
+für den gesamten Verkehr, der über eine bestimmte Schnittstelle hereinkommt,
+auf 64. Für den Anbieter sieht der Verkehr der angebundenen Geräte dann aus
+wie der eigene Verkehr des Rechners. Das Werkzeug fragt nach sudo und fügt eine
+`iptables`-Mangle-Regel hinzu. Die Regel übersteht einen Neustart **nicht**.
 
 ```
-tethering            # die Schnittstelle wählen, die Regel setzen
+tethering            # Schnittstelle auswählen, Regel setzen
 tethering --status
 tethering --off
 ```

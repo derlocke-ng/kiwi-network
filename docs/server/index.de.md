@@ -1,22 +1,33 @@
 # kiwi-server
 
-kiwi-server legt ein Kiwi Network an und verwaltet es. Du beschreibst jede Maschine
-in einer einzigen `fleet.yaml`. kiwi-server erstellt für jeden Host eine
-**unbeaufsichtigte Installations-ISO**, die Fedora CoreOS, uCore oder Debian
-installiert und die Maschine ausschaltet. Dann **wendet** es die Rolle über SSH
-**an** und macht aus der Maschine einen `kiwi-master` oder einen `kiwi-node`. Danach
-arbeitet es weiter mit der Fleet: Es nimmt WireGuard-Clients auf, liest den Zustand
-jeder Maschine, verwahrt die Secrets, sichert die Fleet und entsperrt verschlüsselte
-Festplatten.
+kiwi-server ist das Werkzeug, mit dem du ein Kiwi Network aufbaust und
+verwaltest. Du beschreibst alle Maschinen in einer einzigen Datei, `fleet.yaml`,
+und kiwi-server richtet sie danach ein. Du musst also nicht jede Maschine von
+Hand installieren und konfigurieren.
 
-Es hat eine CLI, `kiwi-server`, und eine GTK4-App, **Kiwi Server**. Beide werden nach
-`~/.local` installiert und brauchen kein root.
+Für jeden Host erzeugt kiwi-server ein **Installations-ISO**, das Fedora CoreOS,
+uCore oder Debian installiert, ohne eine einzige Frage zu stellen, und die
+Maschine danach ausschaltet. Anschließend richtet kiwi-server die Maschine per
+SSH für ihre Rolle ein und macht sie so zum `kiwi-master` oder zum `kiwi-node`.
+Auch danach arbeitet kiwi-server mit deinen Maschinen weiter: Es nimmt
+WireGuard-Clients ins Netzwerk auf, fragt den Zustand jeder Maschine ab,
+verwahrt die Secrets (Passwörter und Schlüssel), sichert die Fleet-Datei samt
+Secrets und entsperrt verschlüsselte Festplatten.
 
-- Repository: [derlocke-ng/kiwi-server](https://github.com/derlocke-ng/kiwi-server), GPL-3.0-or-later
-- Aktuelles Release: **v2.42.0**. Es steht im [Kiwi-Katalog](../desktop/catalogs.md).
-- Gebaut auf [kiwi-modules](single.md) v0.23.0 (die Module und ihr Renderer) und
-  [kiwi-stack](single.md) v0.5.0 (die Maschinenseite), mitgeliefert und per Tag
-  festgelegt.
+kiwi-server gibt es als Kommandozeilenwerkzeug (CLI), `kiwi-server`, und als
+GTK4-App, **Kiwi Server**. Beide werden nach `~/.local` installiert und brauchen
+keine Root-Rechte.
+
+- Repository:
+  [derlocke-ng/kiwi-server](https://github.com/derlocke-ng/kiwi-server),
+  GPL-3.0-or-later
+- Aktuelles Release: **v2.42.0**. Es steht im
+  [Kiwi-Katalog](../desktop/catalogs.md).
+- kiwi-server baut auf zwei Teilen auf: auf [kiwi-modules](single.md) v0.23.0
+  mit den Modulen und dem Programm, das aus ihnen die Konfiguration erzeugt, und
+  auf [kiwi-stack](single.md) v0.5.0, dem Teil, der auf jeder Maschine läuft.
+  Beide sind vendored: kiwi-server enthält von jedem eine Kopie, festgelegt auf
+  ein bestimmtes Tag.
 
 ```
 fleet.yaml + secrets/
@@ -36,34 +47,39 @@ kiwi-modules renders each host's stack  →  compose file, podman quadlets, conf
 kiwi install kiwi-server        # mit kiwi-updater
 ```
 
-Oder aus einem Checkout: `./install.sh install`, dann `kiwi-server doctor`.
+Du kannst es auch aus einem Checkout des Repositorys installieren: Führe
+`./install.sh install` aus und danach `kiwi-server doctor`.
 
-Es braucht Python 3.9+ mit PyYAML und Jinja2, `openssl` und `ssh`. Der
-Secret-Speicher braucht `age`. Zum Bauen von ISOs braucht es `butane`,
-`coreos-installer` und `xorriso` (dazu `cpio`, `gzip` und `curl` für Debian). Auf
-Silverblue oder Bluefin baust du sie als ein Container-Image, statt Pakete zu
-schichten:
+kiwi-server braucht Python 3.9+ mit PyYAML und Jinja2 sowie die Programme
+`openssl` und `ssh`. Für den Secret-Speicher wird `age` gebraucht. Um ISOs zu
+bauen, brauchst du `butane`, `coreos-installer` und `xorriso`, für Debian
+außerdem `cpio`, `gzip` und `curl`. Auf Silverblue oder Bluefin solltest du
+diese Pakete nicht ins System layern. Bau die ISO-Werkzeuge stattdessen als ein
+einziges Container-Image:
 
 ```bash
-kiwi-server toolchain build     # wird automatisch benutzt, wenn die Werkzeuge fehlen
+kiwi-server toolchain build     # wird automatisch genutzt, wenn die Werkzeuge fehlen
 ```
 
 `qrencode` (für `enroll --qr`), `shellcheck` und `docker compose` sind optional.
 
-## Vom Nichts zum laufenden Netzwerk { #from-nothing-to-a-running-network }
+## Vom leeren Verzeichnis zum laufenden Netzwerk { #from-nothing-to-a-running-network }
+
+Mit den folgenden Befehlen kommst du von einem leeren Verzeichnis zu einem
+laufenden Netzwerk mit einem Master, einem Node und deinen eigenen Geräten:
 
 ```bash
 kiwi-server init                          # eine kommentierte fleet.yaml
-$EDITOR fleet.yaml                        # Hosts, Rollen, dein SSH-Schlüssel, die Installationsfestplatte
+$EDITOR fleet.yaml                        # Hosts, Rollen, dein SSH-Schlüssel, die Zielfestplatte
 kiwi-server secrets init fleet.yaml       # optional: secrets/ als ein mit age verschlüsselter Speicher
 kiwi-server validate fleet.yaml
 
 # der Master
 kiwi-server build fleet.yaml sorbet         # → output/sorbet/sorbet.iso
-#   davon booten; sie installiert und schaltet aus; wieder einschalten
+#   davon booten; die Maschine installiert sich und schaltet sich aus; dann wieder einschalten
 kiwi-server apply fleet.yaml sorbet --ssh core@203.0.113.5
 
-# jeder Node: zuerst sein WireGuard-Client, dann das Medium, dann die Rolle
+# jeder Node: zuerst sein WireGuard-Client, dann das Installationsmedium, dann die Rolle
 kiwi-server enroll fleet.yaml papaya         # → secrets/papaya.home.conf
 kiwi-server build fleet.yaml papaya
 kiwi-server apply fleet.yaml papaya --ssh core@192.168.1.25
@@ -73,96 +89,109 @@ kiwi-server enroll fleet.yaml laptop --group devices
 kiwi-server status fleet.yaml             # was jede Maschine meldet
 ```
 
-Medien tragen standardmäßig **keines der Secrets des Stacks**: nur das Basissystem.
-Die Rolle und ihr Stack kommen mit `apply`. Ist eine Maschine nicht über SSH
-erreichbar, legt `build --offline` stattdessen die ganze Rolle samt ihren Secrets
-auf die ISO. Halte eine solche ISO vom ISO-Speicher eines Providers fern und lösche
-sie nach der Installation.
+Standardmäßig enthält ein Installations-ISO **keines der Secrets des Stacks**,
+sondern nur das Grundsystem. Die Rolle und ihren Stack schickt erst `apply` auf
+die Maschine. Ist eine Maschine per SSH nicht erreichbar, packt
+`build --offline` stattdessen die ganze Rolle samt Secrets auf das ISO. Lade ein
+solches ISO nicht in den ISO-Speicher eines Hosters hoch, und lösche es nach der
+Installation.
 
-**Gar keine ISO?** `kiwi-server script fleet.yaml papaya` gibt das Skript für eine
-Maschine aus, die du selbst installiert hast (`--offline` für die ganze Rolle).
+**Wenn du gar kein ISO verwenden willst,** gibt
+`kiwi-server script fleet.yaml papaya` das Skript für eine Maschine aus, die du
+selbst installiert hast. Mit `--offline` enthält das Skript die ganze Rolle.
 
-Auf einem netcup-VPS löscht `kiwi-server vps install fleet.yaml sorbet` den Server
-und installiert die ISO über die API von netcup, ohne dass jemand an einer
-Konsole sitzt. netcup ist bisher der einzige Hoster; weitere sind
-[geplant](roadmap.md#more-hosters-and-network-boot).
+Auf einem VPS von netcup löscht `kiwi-server vps install fleet.yaml sorbet` den
+Server und installiert das ISO über die API von netcup. Niemand muss dafür an
+einer Konsole sitzen. netcup ist bisher der einzige unterstützte Hoster, weitere
+sind [geplant](roadmap.md#more-hosters-and-network-boot).
 
 ## Befehle { #commands }
 
 | Befehl | Was er tut |
 |---|---|
-| `init [fleet.yaml]` | die Beispiel-Fleet-Datei schreiben (`--domain`, Standard `home`) |
-| `validate fleet.yaml [host…]` | sie prüfen und dabei jeden Stack rendern, um Modulfehler zu finden |
-| `list` / `show fleet.yaml <host>` | die Hosts und was erzeugt wurde / die wirksame Konfiguration eines Hosts, Secrets maskiert |
-| `render fleet.yaml [host…]` | Rollenskripte, Stacks und Installationskonfigurationen nach `output/<host>/` |
-| `build fleet.yaml [host…]` | rendern, dann die ISO: standardmäßig das Basissystem, `--offline` für die ganze Rolle |
-| `script fleet.yaml <host>` | das Skript für jede beliebige Maschine (`--offline` für die ganze Rolle) |
-| `apply fleet.yaml <host…>` | neu rendern, die Rolle über SSH schicken und ausführen (`--ssh USER@ADDR`, `--no-run`) |
-| `status fleet.yaml [host…]` | was die Maschinen melden: Rolle, Stack, Probleme, Festplatten, Backups, Zertifikate |
-| `enroll fleet.yaml <host\|name>` | einen WireGuard-Client auf dem Master anlegen oder abholen (`--group`, `--split`, `--qr`, `--address`, `--existing`) |
-| `secrets init\|unlock\|lock\|status` | `secrets/` als eine mit age verschlüsselte Datei, in den Speicher geöffnet (`--for 8h`) |
-| `secrets show fleet.yaml <host> [setting]` | die erzeugten Passwörter eines Hosts |
-| `ca fleet.yaml` | die CA der Fleet |
-| `mtu fleet.yaml <node\|device\|address>` | die echte MTU eines Tunnels messen und sagen, was einzustellen ist (`--write`) |
-| `openwrt fleet.yaml` | ein Skript, das einen OpenWrt-Router ins Mesh bringt ([Router](../network/routers.md)) |
-| `backup` / `restore` / `prune` | das Fleet-Verzeichnis auf Nodes und zurück; alte Maschinen-Backups entfernt ([Betrieb](operations.md)) |
-| `unlock fleet.yaml <host>` | einen Tang-Ring an eine Maschine weiterreichen, die beim Booten wartet ([Betrieb](operations.md)) |
-| `vps login\|list\|probe\|install` | die Server-Control-Panel-API von netcup |
-| `roles [-v]`, `modules [-v]`, `targets` | was verfügbar ist, mit jeder Einstellung und ihrem Standardwert |
-| `toolchain [status\|build]`, `doctor` | die ISO-Werkzeuge; diese Maschine prüfen |
+| `init [fleet.yaml]` | Schreibt die Beispiel-Fleet-Datei. `--domain` legt die Domain fest, Standard ist `home`. |
+| `validate fleet.yaml [host…]` | Prüft die Fleet-Datei. Dabei erzeugt er jeden Stack, sodass auch Fehler in Modulen auffallen. |
+| `list` / `show fleet.yaml <host>` | Der erste listet die Hosts auf und was für sie schon erzeugt wurde. Der zweite zeigt die tatsächlich wirksame Konfiguration eines Hosts, mit verdeckten Secrets. |
+| `render fleet.yaml [host…]` | Schreibt die Rollenskripte, Stacks und Installationskonfigurationen nach `output/<host>/`. |
+| `build fleet.yaml [host…]` | Erzeugt die Konfiguration und baut dann das ISO. Standardmäßig enthält das ISO nur das Grundsystem, mit `--offline` die ganze Rolle. |
+| `script fleet.yaml <host>` | Gibt das Skript für eine beliebige Maschine aus. Mit `--offline` enthält das Skript die ganze Rolle. |
+| `apply fleet.yaml <host…>` | Erzeugt die Konfiguration neu, schickt die Rolle per SSH auf die Maschine und führt sie dort aus (`--ssh USER@ADDR`, `--no-run`). |
+| `status fleet.yaml [host…]` | Zeigt, was die Maschinen melden: Rolle, Stack, Probleme, Festplatten, Backups und Zertifikate. |
+| `enroll fleet.yaml <host\|name>` | Legt auf dem Master einen WireGuard-Client an oder holt einen, den es schon gibt (`--group`, `--split`, `--qr`, `--address`, `--existing`). |
+| `secrets init\|unlock\|lock\|status` | Verwaltet `secrets/` als eine mit age verschlüsselte Datei, die beim Entsperren in den Arbeitsspeicher geöffnet wird (`--for 8h`). |
+| `secrets show fleet.yaml <host> [setting]` | Zeigt die erzeugten Passwörter eines Hosts. |
+| `ca fleet.yaml` | Zeigt die CA der Fleet. |
+| `mtu fleet.yaml <node\|device\|address>` | Misst die tatsächliche MTU eines Tunnels und sagt dir, welchen Wert du einstellen solltest (`--write`). |
+| `openwrt fleet.yaml` | Schreibt ein Skript, das einen OpenWrt-Router ins Mesh holt ([Router](../network/routers.md)). |
+| `backup` / `restore` / `prune` | Sichern das Fleet-Verzeichnis auf Nodes, holen es von dort zurück und löschen alte Backups der Maschinen ([Betrieb](operations.md)). |
+| `unlock fleet.yaml <host>` | Leitet einen Tang-Ring an eine Maschine weiter, die beim Start darauf wartet, dass ihre verschlüsselte Festplatte entsperrt wird ([Betrieb](operations.md)). |
+| `vps login\|list\|probe\|install` | Arbeiten mit der API des Server Control Panels von netcup. |
+| `roles [-v]`, `modules [-v]`, `targets` | Zeigen, was verfügbar ist, mit jeder Einstellung und ihrem Standardwert. |
+| `toolchain [status\|build]`, `doctor` | Verwalten die ISO-Werkzeuge und prüfen diesen Rechner. |
 
-Jeder Befehl nimmt `--porcelain` (JSON), `-o/--output-dir`, `--quiet` und `-v`.
-`kiwi-server <command> -h` erklärt einen Befehl.
+Jeder Befehl versteht `--porcelain` (Ausgabe als JSON), `-o/--output-dir`,
+`--quiet` und `-v`. `kiwi-server <command> -h` erklärt einen einzelnen Befehl.
 
 ## Die App { #the-app }
 
-**Kiwi Server** öffnet deine letzte Fleet. Die Seitenleiste hat eine Übersicht, eine
-Zeile pro Host und die Standardwerte. Die *Overview* eines Hosts zeigt Live-Daten aus
-`kiwi-server status` (einmal pro Minute abgefragt, solange das Fenster den Fokus hat,
-nur lesend über SSH). Seine *Settings* sind ein Formular, das aus den Rollen und
-Modulen gebaut wird. *Apply*, *Build* und *Render* führen die CLI aus und zeigen
-laufend ihre Ausgabe, und *Build* listet die Festplatten, die es löschen wird, bevor
-es startet. *Unlock* und *Lock* öffnen und schließen den Secret-Speicher. Die App
-schreibt einfaches YAML, daher gehen Kommentare in einer von Hand geschriebenen
-Fleet-Datei beim Speichern verloren.
+Die App **Kiwi Server** öffnet die Fleet, an der du zuletzt gearbeitet hast. In
+ihrer Seitenleiste stehen eine Übersicht, eine Zeile pro Host und die
+Standardwerte. Die Seite *Overview* eines Hosts zeigt aktuelle Angaben aus
+`kiwi-server status`. Die App holt sie einmal pro Minute, solange das Fenster im
+Vordergrund ist, per SSH und nur lesend. Die Seite *Settings* eines Hosts ist
+ein Formular, das aus den Rollen und Modulen aufgebaut wird. *Apply*, *Build*
+und *Render* starten das Kommandozeilenwerkzeug und zeigen seine Ausgabe laufend
+an. Bevor *Build* loslegt, listet es die Festplatten auf, die es löschen wird.
+*Unlock* und *Lock* öffnen und schließen den Secret-Speicher. Die App schreibt
+schlichtes YAML. Kommentare in einer Fleet-Datei, die du von Hand geschrieben
+hast, gehen deshalb verloren, sobald die App sie speichert.
 
-## Vorsicht { #mind }
+## Worauf du achten solltest { #mind }
 
-!!! danger "Die ISOs löschen die Festplatte, die man ihnen nennt"
-    Beim Booten, ohne Rückfrage. Beschrifte sie. `disk:` ist genau deshalb für
-    `build` erforderlich.
+!!! danger "Die ISOs löschen die Festplatte, für die sie gebaut sind"
+    Ein Installations-ISO löscht ohne Nachfrage die Festplatte, für die es
+    gebaut wurde, sobald eine Maschine davon bootet. Beschrifte deine ISOs.
+    Genau deshalb verlangt `build` die Einstellung `disk:`.
 
-- **Die Ausgabe enthält Secrets**: Passwort-Hashes, WireGuard-Schlüssel,
-  TLS-Schlüssel, LUKS-Schlüssel. Dateien werden mit 0600 geschrieben, und `output/`
-  wird von git ignoriert. Behandle mit `--offline` erstellte ISOs genauso.
-- **Dienstpasswörter werden erzeugt**, aus `secrets/seed`, wenn du sie in der
-  Fleet-Datei weglässt. `validate` warnt vor Passwörtern, die darin stehen.
-  `kiwi-server secrets show` gibt sie aus. Eine Maschine verweigert ein Apply, das
-  mit einem anderen Seed erstellt wurde.
-- **SSH-Host-Schlüssel** werden beim ersten Kontakt in `secrets/known_hosts`
-  festgehalten, und ein geänderter Schlüssel wird abgelehnt (nach einer
-  Neuinstallation die Zeile löschen).
-- **Ein Rollenskript läuft als root.** Lies `kiwi-server script fleet.yaml <host>
-  --offline`, bevor du einer Rolle vertraust, die du nicht selbst geschrieben hast.
-- **Eine gescheiterte Rolle sagt es.** Die Maschine behält
-  `/var/lib/kiwi-server/role.failed` (den Schritt und den Befehl), und `status`
-  zeigt es an.
+- **Die Ausgabe enthält Secrets**, nämlich Passwort-Hashes, WireGuard-Schlüssel,
+  TLS-Schlüssel und LUKS-Schlüssel. Die Dateien werden mit den Rechten 0600
+  geschrieben, und git ignoriert `output/`. Geh mit ISOs, die mit `--offline`
+  gebaut wurden, genauso sorgfältig um.
+- **Passwörter für Dienste werden erzeugt**, und zwar aus `secrets/seed`, wenn
+  du sie in der Fleet-Datei weglässt. `validate` warnt dich vor Passwörtern, die
+  in der Fleet-Datei stehen, und `kiwi-server secrets show` gibt die erzeugten
+  aus. Eine Maschine verweigert ein `apply`, das mit einem anderen Seed erzeugt
+  wurde.
+- **SSH-Hostschlüssel** werden in `secrets/known_hosts` eingetragen, wenn
+  kiwi-server sich zum ersten Mal mit einer Maschine verbindet. Ändert sich der
+  Schlüssel einer Maschine später, wird die Verbindung abgelehnt. Wenn du eine
+  Maschine neu installiert hast, lösch ihre Zeile aus dieser Datei.
+- **Ein Rollenskript läuft als root.** Bevor du einer Rolle vertraust, die du
+  nicht selbst geschrieben hast, lies die Ausgabe von
+  `kiwi-server script fleet.yaml <host>
+  --offline`.
+- **Eine fehlgeschlagene Rolle wird gemeldet.** Die Maschine behält die Datei
+  `/var/lib/kiwi-server/role.failed`, in der der Schritt und der Befehl stehen,
+  die fehlgeschlagen sind, und `status` zeigt sie an.
 
-## Status { #status }
+## Stand { #status }
 
-Die Pipeline wurde im Oktober und November 2026 auf Hardware erprobt. Debian, uCore
-und Fedora CoreOS wurden auf zwei VPSes, einem Mini-PC und einer VM Ende-zu-Ende
-gebootet, und eine Übung mit einem ausgefallenen Node baute eine verschlüsselte
-Debian-Maschine in etwa 14 Minuten neu auf. Node-Backups wurden von einem Node auf
-einem anderen wiederhergestellt (papaya auf lychee), und die Tunnel-MTU wurde auf
-echten Wegen gemessen und abgestimmt, mobile eingeschlossen. Die CI rendert jede
-Rolle, prüft jedes Skript mit shellcheck, validiert jede Butane-Konfiguration und
-hält vier Referenz-Stacks Byte für Byte fest.
+Der ganze Ablauf, von der Fleet-Datei bis zur laufenden Maschine, wurde im
+Oktober und November 2026 auf echter Hardware getestet. Debian, uCore und Fedora
+CoreOS haben ihn auf zwei VPS, einem Mini-PC und einer VM vollständig
+durchlaufen. In einer Übung, in der der Ausfall eines Nodes nachgestellt wurde,
+wurde eine verschlüsselte Debian-Maschine in etwa 14 Minuten neu aufgesetzt.
+Backups eines Nodes wurden auf einem anderen wiederhergestellt (von papaya auf
+lychee). Die Tunnel-MTU wurde auf echten Verbindungen gemessen und angepasst,
+auch auf Mobilfunkverbindungen. Die automatischen Tests (CI) erzeugen jede
+Rolle, prüfen jedes Skript mit shellcheck und validieren jede
+Butane-Konfiguration. Außerdem vergleichen sie vier Referenz-Stacks, die
+sogenannten Golden Stacks, Byte für Byte mit ihrer gespeicherten Ausgabe.
 
-Noch nicht erprobt: Föderation zwischen Netzwerken. Alles ist IPv4. Die Debian-ISO
-gibt es nur für amd64. Eine geplante Control Plane (`kiwi-server serve`) ist
-entworfen, aber nicht gebaut.
+Die Föderation zwischen Netzwerken ist noch nicht getestet. Alles läuft über
+IPv4. Das Debian-ISO gibt es nur für amd64. Eine Control Plane
+(`kiwi-server serve`) ist geplant und entworfen, aber noch nicht umgesetzt.
 
-Weiterlesen: [Die Fleet-Datei](fleet.md) · [Rollen](roles.md) · [Module](modules.md) ·
-[Maschinen](machines.md) · [Betrieb](operations.md) ·
+Weiterlesen: [Die Fleet-Datei](fleet.md) · [Rollen](roles.md) ·
+[Module](modules.md) · [Maschinen](machines.md) · [Betrieb](operations.md) ·
 [Eine Maschine ohne Fleet](single.md)

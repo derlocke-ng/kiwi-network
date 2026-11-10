@@ -101,8 +101,8 @@ heißt das: Anmeldung nur mit Schlüsseln. kiwi-server selbst nutzt SSH für
 
 ## Client-Gruppen { #client-groups }
 
-Die Clients des WireGuard-Servers (wg-easy) werden anhand ihrer Adresse
-in **Gruppen** eingeteilt. Die Gruppe legt fest, was ihre Mitglieder erreichen
+Die Clients des WireGuard-Servers (wg-easy) werden anhand ihrer Adresse in
+**Gruppen** eingeteilt. Die Gruppe legt fest, was ihre Mitglieder erreichen
 dürfen:
 
 | Gruppe | Subnetz | Erreicht | Sieht andere Clients | Admin-Seiten |
@@ -153,8 +153,8 @@ Nodes können außerdem Backups, einen Backup-Server und Tang übernehmen.
 OpenCloud, Immich und Paperless-ngx sind zum Ausprobieren dabei. Alle Module
 stehen in der [Modulliste](../server/modules.md).
 
-Die Dienste eines Nodes erreichst du aus seinem LAN und unter
-seiner **Mesh-Adresse** (zum Beispiel `10.8.0.25`). Verkehr aus dem Mesh, der an diese
+Die Dienste eines Nodes erreichst du aus seinem LAN und unter seiner
+**Mesh-Adresse** (zum Beispiel `10.8.0.25`). Verkehr aus dem Mesh, der an diese
 Adresse auf Port 80 oder 443 geht, wird an den Reverse-Proxy des Nodes
 weitergeleitet.
 
@@ -179,7 +179,7 @@ Arten:
 |---|---|---|
 | **provider** | Über einen kommerziellen VPN-Anbieter (gluetun). Das ist der Double Hop, und so richtet ihn das Master-Preset ein. | umgesetzt |
 | **direct** | Direkt über den Internetanschluss des Masters. Dafür führst du die Module des Masters ohne `vpn-client` auf. | umgesetzt |
-| **master** | Über den *Master eines anderen Netzwerks*. Dein Master ist dort ein Client in einer Gruppe, die ins Internet darf und sonst nichts erreicht. Das nennt sich Multi-Hop. | entworfen; dafür müssen Maschinen über Netzwerkgrenzen hinweg aufgenommen werden können, und das ist Föderation |
+| **master** | Über den *Master eines anderen Netzwerks*. Dein Master ist dort ein Client in einer Gruppe, die ins Internet darf und sonst nichts erreicht. Das nennt sich Multi-Hop. | entworfen; setzt voraus, dass Geräte über Netzwerkgrenzen hinweg aufgenommen werden können, also Föderation |
 
 Unabhängig von der Ausgangsart stellt jeder Master dem Mesh außerdem den
 SOCKS5-Proxy von Tor bereit.
@@ -191,10 +191,10 @@ Standard ist `10.8.0.0/16`. Master und Nodes liegen in `10.8.0.0/24`, danach
 folgen die Gruppen: guests in `.1`, pentest in `.2`, devices in `.3` und routers
 in `.4`. Ein zweites Netzwerk bekommt einen anderen Bereich, zum Beispiel
 `10.9.0.0/16`, damit ein Gerät, das zu beiden Netzwerken gehört, sie
-auseinanderhalten kann. Bisher gibt es für den Bereich nicht eine einzige
-Einstellung, er verteilt sich auf mehrere: `mesh_subnet`, beim vpn-server
-`server_ip`, `wg_subnet`, `wg_default_address` und `groups` sowie bei Tor
-`socks_policy_accept`. Die Fleet-Datei setzt sie alle.
+auseinanderhalten kann. Bisher lässt sich der Bereich nicht an einer einzigen
+Stelle festlegen, sondern steckt in mehreren Einstellungen: `mesh_subnet`, beim
+vpn-server `server_ip`, `wg_subnet`, `wg_default_address` und `groups` sowie bei
+Tor `socks_policy_accept`. Die Fleet-Datei setzt sie alle.
 
 ## Adressen { #addressing }
 
@@ -207,17 +207,17 @@ Einstellung, er verteilt sich auf mehrere: `mesh_subnet`, beim vpn-server
 | WireGuard-MTU | `1376` (`wg_mtu`), gemessen mit [`kiwi-server mtu`](../server/operations.md#tunnel-mtu) |
 | MTU der Stack-Bridge | `1500` (`bridge_mtu`) |
 
-Der Stack einer Maschine sind die Container, in denen ihre Module laufen. Jede
-Maschine mit einem Stack routet den Adressbereich des Mesh über ihren
-VPN-Client, der Master über den WireGuard-Server. So erreichen die Maschine und
-ihre Container jeden Node.
+Der Stack einer Maschine besteht aus den Containern, in denen ihre Module
+laufen. Jede Maschine mit einem Stack routet den Adressbereich des Mesh über
+ihren VPN-Client, der Master über den WireGuard-Server. So erreichen die
+Maschine und ihre Container jeden Node.
 
 ## Automatische Neustarts und Updates { #keeping-it-fresh }
 
 Jede Maschine bekommt zwei Timer, die du in den Einstellungen ihres Stacks
 konfigurierst. Der erste startet **jeden Tag** um `07:00` das VPN neu, wodurch
-die Maschine eine neue Ausgangsadresse erhält. Der zweite ist
-ein **wöchentliches Update** am Sonntag um 00:00 Uhr: Er führt `podman auto-update`
+die Maschine eine neue Ausgangsadresse erhält. Der zweite ist ein
+**wöchentliches Update** am Sonntag um 00:00 Uhr: Er führt `podman auto-update`
 aus, sofern `auto_update: registry` gesetzt ist. Auch das Betriebssystem
 aktualisiert sich selbst. Neu gestartet wird die Maschine dafür nur in dem
 [Wartungsfenster, das du festgelegt hast](../server/machines.md#updates).

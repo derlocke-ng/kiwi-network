@@ -1,96 +1,118 @@
 # kiwi-updater
 
-`kiwi` installiert und aktualisiert Open-Source-Apps aus **Git-Katalogen** auf Fedora
-Silverblue, Bluefin und anderen ostree-Systemen. Eine App ist ein Git-Repository mit
-einem `kiwi.manifest` und einem `install.sh`. kiwi klont es, checkt seinen neuesten
-Release-Tag aus, führt seinen Installer aus und hält es im Hintergrund aktuell, sich
-selbst eingeschlossen.
+kiwi-updater installiert quelloffene Apps auf deinem Desktop und hält sie
+aktuell. Sein Befehl heißt `kiwi`. Die Apps holt es aus **git-Katalogen**, und
+es läuft auf Fedora Silverblue, Bluefin und anderen ostree-Systemen. Ein
+Katalog ist ein git-Repository, das Apps auflistet. Eine App ist ein
+git-Repository mit einer Datei `kiwi.manifest` und einem Skript `install.sh`.
+kiwi klont das Repository der App, checkt ihr neuestes Release-Tag aus und
+führt ihr Installationsskript aus. Danach aktualisiert es die App im
+Hintergrund, und sich selbst aktualisiert es auf dieselbe Weise.
 
-Es gibt keine Konten, keinen Store und keinen Anbieter. Ein Katalog ist ein
-Repository, das du lesen, forken und an das du einen Pull Request schicken kannst.
+Du brauchst kein Konto, es gibt keinen App-Store und keinen Hersteller. Ein
+Katalog ist ein Repository, das du lesen, forken und mit einem Pull Request
+ändern kannst.
 
 - Repository: [derlocke-ng/kiwi-updater](https://github.com/derlocke-ng/kiwi-updater), GPL-3.0-or-later
-- Aktuelles Release: **v2.4.0**, ein Sicherheits-Release
-- **`kiwi`** ist die CLI. Sie braucht `git`, coreutils, `util-linux` und `awk`, alles
-  im Basis-Image, dazu `ssh-keygen` für Signaturprüfungen.
-- **Kiwi Apps** (`kiwi-gui`) ist die GTK4-App: Suche, Filter, eine Detailansicht pro
-  App mit Icon, Screenshots und Abhängigkeiten. Sie zeigt den Installer und den Diff
-  eines Updates, bevor sie eines davon ausführt, und reiht deine Klicks in eine
-  Warteschlange ein. Ihre Daten kommen von der CLI; Icons und Screenshots werden aus
-  den Klonen der Apps gelesen, sodass dafür nichts heruntergeladen wird.
+- Aktuelles Release: **v2.4.0**, ein Sicherheitsrelease
+- **`kiwi`** ist das Kommandozeilenwerkzeug (CLI). Es braucht `git`,
+  coreutils, `util-linux` und `awk`, die alle zum Basis-Image gehören. Um
+  Signaturen zu prüfen, braucht es außerdem `ssh-keygen`.
+- **Kiwi Apps** (`kiwi-gui`) ist die Desktop-App, gebaut mit GTK4. Du kannst
+  die Apps durchsuchen und filtern, und jede App hat eine Detailansicht mit
+  Icon, Screenshots und Abhängigkeiten. Bevor Kiwi Apps eine App installiert,
+  zeigt es dir das Installationsskript, und bevor es eine App aktualisiert,
+  zeigt es dir, was sich ändert. Klickst du mehrere Aktionen nacheinander an,
+  stellt es sie in eine Warteschlange. Seine Daten bekommt es von der CLI.
+  Icons und Screenshots liest es aus den lokalen Klonen der Apps und muss dafür
+  nichts herunterladen.
 
 ## Installation { #install }
 
+kiwi arbeitet mit zwei Scopes, also zwei Bereichen, in die installiert wird.
+Der Scope user umfasst alles in deinem Home-Verzeichnis und braucht nie
+Root-Rechte. Der Scope system ist ein Bereich, der root gehört, für Apps, die
+Root-Rechte brauchen. Bei der Installation legst du fest, wie viel vom Scope
+system du haben willst:
+
 ```bash
-# empfohlen: Benutzerbereich plus der Systembereich, der root gehört, eine Passwortabfrage
+# empfohlen: Scope user plus der root gehörende Scope system, eine Passwortabfrage
 curl -fsSL https://raw.githubusercontent.com/derlocke-ng/kiwi-updater/main/get-kiwi.sh | bash
 
-# minimal: zu 100 % auf Benutzerebene, nur ~/.local, kein root und nie ein Passwort
+# minimal: 100 % auf Benutzerebene, nur ~/.local, nie root und nie ein Passwort
 curl -fsSL https://raw.githubusercontent.com/derlocke-ng/kiwi-updater/main/get-kiwi.sh | bash -s -- --minimal
 
-# überhaupt keine Aktion ohne Passwort: jede Systemänderung fragt nach einem Passwort
+# gar nichts ohne Passwort: jede Änderung am System fragt nach dem Passwort
 curl -fsSL https://raw.githubusercontent.com/derlocke-ng/kiwi-updater/main/get-kiwi.sh | bash -s -- --with-system=manual
 ```
 
-Der [Kiwi-Katalog](catalogs.md) wird bei der Installation registriert. Geh direkt zu
-`kiwi list` oder öffne **Kiwi Apps**.
+Die Installation trägt den [Kiwi-Katalog](catalogs.md) ein. Du kannst also
+sofort `kiwi list` ausführen oder **Kiwi Apps** öffnen.
 
-Apps, die nur aus Dateien in deinem Home-Verzeichnis bestehen (die CLI-Werkzeuge,
-ensconce, syncman), sind mit der minimalen Installation vollständig. Eine App mit
-einer Root-Hälfte, wie kiwi-killswitch, braucht den Systembereich. Bei einer
-minimalen Installation richtet `kiwi install kiwi-killswitch` ihn an Ort und Stelle
-mit einem Passwort ein.
+Manche Apps bestehen nur aus Dateien in deinem Home-Verzeichnis, zum Beispiel
+die CLI-Werkzeuge, ensconce und syncman. Diese Apps funktionieren auch bei der
+minimalen Installation vollständig. Eine App mit einem Teil, der als root
+läuft, etwa kiwi-killswitch, braucht den Scope system. Bei einer minimalen
+Installation richtet `kiwi install kiwi-killswitch` den Scope system in diesem
+Moment ein und fragt einmal nach deinem Passwort.
 
 ## Befehle { #commands }
 
 ```bash
-kiwi list [--check]          # jede App, die diese Maschine kennt
-kiwi search vpn              # eine App in jedem registrierten Katalog finden
+kiwi list [--check]          # alle Apps, die dieser Rechner kennt
+kiwi search vpn              # eine App in allen eingetragenen Katalogen suchen
 kiwi info kiwi-killswitch    # was sie ist, was sie installiert, ob sie root braucht
 kiwi install <app>           # ein Name oder ausdrücklich --all
 kiwi update [<app>]          # alles mit einem neuen Release
-kiwi uninstall <app>         # --purge entfernt auch ihre Konfiguration
-kiwi check                   # Exit-Code 10, wenn irgendetwas ein Update hat
+kiwi uninstall <app>         # --purge löscht auch die Konfiguration
+kiwi check                   # Exit-Code 10, wenn es irgendwo ein Update gibt
 
-kiwi add <https-url>         # ein Repository direkt verfolgen, ohne Katalog
+kiwi add <https-url>         # einem einzelnen Repository direkt folgen, ohne Katalog
 kiwi catalog add|list|remove # Kataloge verwalten
-kiwi sync                    # Kataloge jetzt aktualisieren
+kiwi sync                    # Kataloge sofort aktualisieren
 kiwi self-update
 kiwi trust --system <app>    # den für eine System-App festgelegten Signaturschlüssel vergessen
 ```
 
-Bevor du etwas ausführst, und wenn etwas schiefgeht:
+Mit den folgenden Befehlen siehst du, was eine App tun wird, bevor du sie
+ausführst. Sie helfen auch, wenn etwas schiefgeht:
 
 ```bash
-kiwi info --installer <app>  # das Skript, das eine Installation ausführen würde, bevor es läuft
-kiwi diff <app>              # was ein Update ändern würde, samt seinem Installer
-kiwi pin <app> v1.2.0        # dort bleiben; kiwi unpin <app>, um wieder den Releases zu folgen
-kiwi install <app> --dry-run # Bereich, URL, Ref, Pfad des Installers und sonst nichts
-kiwi doctor                  # veraltete Locks, Versionsabweichungen, fehlerhafte Listendateien, Timer
+kiwi info --installer <app>  # das Skript, das eine Installation ausführen würde, vorher ansehen
+kiwi diff <app>              # was ein Update ändern würde, samt Installationsskript
+kiwi pin <app> v1.2.0        # dort bleiben; mit kiwi unpin <app> wieder den Releases folgen
+kiwi install <app> --dry-run # Scope, URL, Ref, Pfad des Installationsskripts, sonst nichts
+kiwi doctor                  # veraltete Sperren, abweichende Versionen, fehlerhafte Listen, Timer
 ```
 
 ## Releases sind Tags { #releases-are-tags }
 
-Eine App folgt ihrem neuesten **Versions-Tag**, einem, der auf
-`^v?[0-9]+(\.[0-9]+){0,3}$` passt (`v1`, `v1.2`, `1.2.3`, `v1.2.3.4`). Pre-Releases
-und Wegwerf-Tags überholen nie ein Release. Ein Repository ohne Versions-Tag folgt
-seinem Standard-Branch. `ref=<tag>` in einer Listenzeile verlangt einen bestimmten.
+kiwi verwendet git-Tags als Releases. Eine App folgt ihrem neuesten
+**Versions-Tag**. Das ist ein Tag, das auf `^v?[0-9]+(\.[0-9]+){0,3}$` passt,
+zum Beispiel `v1`, `v1.2`, `1.2.3` oder `v1.2.3.4`. Tags für Vorabversionen und
+vorübergehende Tags passen nicht und werden deshalb nie anstelle eines Release
+verwendet. Ein Repository ohne Versions-Tag folgt seinem Standard-Branch. Willst
+du genau eine bestimmte Version, ergänze `ref=<tag>` in der Zeile der App in
+einer Liste.
 
 ## Abhängigkeiten { #dependencies }
 
-`DEPENDS=` in einem Manifest nennt, was eine App braucht. Ein Wort, das eine App in
-deinem eigenen Katalog oder deiner Liste ist, wird bei der Installation **zuerst**
-installiert, im selben Bereich. `kiwi install kiwi-plugin-tor` zum Beispiel bringt
-kiwi-proxy mit. Jedes andere Wort ist ein Programm und wird mit `command -v`
-geprüft.
+Die Zeile `DEPENDS=` im Manifest nennt, was eine App braucht. Ist ein Wort in
+dieser Zeile der Name einer App aus deinem eigenen Katalog oder deiner Liste,
+installiert kiwi diese App **zuerst**, im selben Scope, und zwar dann, wenn du
+die App installierst, die sie braucht. `kiwi install kiwi-plugin-tor`
+installiert zum Beispiel auch kiwi-proxy. Jedes andere Wort behandelt kiwi als
+Namen eines Programms und prüft mit `command -v`, ob es vorhanden ist.
 
-## Eine App, zwei Hälften { #one-app-two-halves }
+## Eine App, zwei Teile { #one-app-two-halves }
 
-Manche Apps sind nur ein Binary in `~/.local/bin`. Andere, wie ein
-VPN-Kill-Switch, sind ein Root-Daemon **und** eine Desktop-App **und** eine
-GNOME-Erweiterung. Die Hälften werden mit unterschiedlichen Rechten installiert,
-denn **root darf nie eine Datei ausführen, die der Benutzer schreiben kann**. Die App
-deklariert es:
+Manche Apps sind nur ein Programm in `~/.local/bin`. Andere, etwa ein
+VPN-Kill-Switch, bestehen aus einem Daemon, der als root läuft, **und** einer
+Desktop-App **und** einer GNOME-Erweiterung. So eine App hat zwei Teile, einen
+Benutzerteil und einen Systemteil, die mit unterschiedlichen Rechten
+installiert werden. Der Grund: **root darf nie eine Datei ausführen, die der
+Benutzer ändern kann.** Ihre Bestandteile und Scopes gibt die App in ihrem
+Manifest an:
 
 ```ini
 COMPONENTS=daemon cli gui gnome-extension
@@ -98,62 +120,81 @@ SCOPES=user system
 ROOT_REASON=installs a root firewall daemon, its D-Bus policy and two systemd units
 ```
 
-Ein Katalog listet diese App einmal, und kiwi installiert jede Hälfte richtig. Bevor
-es nach deinem Passwort fragt, zeigt es den `ROOT_REASON`.
+Ein Katalog führt so eine App nur einmal auf, und kiwi installiert jeden Teil
+im richtigen Scope. Bevor kiwi nach deinem Passwort fragt, zeigt es dir den
+`ROOT_REASON` an.
 
 | Teil | Wo | Warum |
 |---|---|---|
-| `kiwi`, Kiwi Apps, Benutzer-Apps | `~/.local` | kein root nötig; übersteht ein ostree-Rebase |
-| die eigene kiwi-Kopie von root | `/usr/local/bin`, geklont nach `/var/lib/kiwi-updater/repos/` | root führt nie eine Datei aus, die du schreiben kannst |
-| System-Apps | `/var/lib`, `/etc` | auf ostree beschreibbar, gehören root |
-| Listen | `~/.config/kiwi-updater/apps.list`, `/etc/kiwi-updater/apps.list` | die eigenen Einträge einer Maschine schlagen jeden Katalog |
-| festgelegte Signaturschlüssel | `/etc/kiwi-updater/signers/<app>` | siehe unten |
+| `kiwi`, Kiwi Apps, Benutzer-Apps | `~/.local` | braucht kein root und bleibt erhalten, wenn das System auf ein anderes ostree-Image umgestellt wird (Rebase) |
+| die eigene Kopie von kiwi für root | `/usr/local/bin`, geklont nach `/var/lib/kiwi-updater/repos/` | root führt nie eine Datei aus, die du ändern kannst |
+| System-Apps | `/var/lib`, `/etc` | diese Verzeichnisse sind auf ostree-Systemen beschreibbar und gehören root |
+| Listen | `~/.config/kiwi-updater/apps.list`, `/etc/kiwi-updater/apps.list` | die Einträge in der eigenen Liste eines Rechners haben Vorrang vor jedem Katalog |
+| festgelegte Signaturschlüssel | `/etc/kiwi-updater/signers/<app>` | siehe nächster Abschnitt |
 
-Das unveränderliche `/usr` wird nie angefasst.
+Am unveränderlichen `/usr` ändert kiwi nie etwas.
 
 ## Root, Passwörter und Signaturen { #root-passwords-and-signatures }
 
-| | Braucht root | Fragt nach einem Passwort |
+Die Tabelle zeigt, welche Aktionen Root-Rechte brauchen und welche nach einem
+Passwort fragen.
+
+| | Braucht root | Fragt nach Passwort |
 |---|---|---|
-| alles im Benutzerbereich | nein | nein |
-| eine System-App **aktualisieren** | ja | **nein** bei einem Release, das mit dem Schlüssel signiert ist, den root für diese App festgelegt hat. **Ja** bei einem unsignierten Release und immer im Modus `manual` |
+| alles im Scope user | nein | nein |
+| eine System-App **aktualisieren** | ja | **nein**, wenn das Release mit dem Schlüssel signiert ist, den root für diese App festgelegt hat. **Ja**, wenn das Release nicht signiert ist, und im Modus `manual` immer |
 | eine System-App **installieren** oder **deinstallieren** | ja | ja |
 
-Seit 2.4.0:
+Seit Version 2.4.0 gelten diese Regeln:
 
-- **Signierte Releases.** Root legt pro System-App einen SSH-Signaturschlüssel fest,
-  den ersten, den es sieht (Trust on First Use). Ein Release-Tag, der mit diesem
-  Schlüssel signiert ist, aktualisiert ohne Passwort. Ein unsigniertes Release fragt
-  nach einem und sagt, dass es nicht prüfen konnte. Ein Tag, der mit einem anderen
-  Schlüssel signiert ist, oder ein unsignierter Tag nach signierten wird abgelehnt,
-  bis du `kiwi trust --system <app>` ausführst. Das gilt für den Systembereich.
-- **Root installiert nur Quellen, die es selbst listet**:
-  `/etc/kiwi-updater/apps.list` und für root registrierte Kataloge. Für alles andere
-  installiert kiwi die Benutzer-Hälfte und nennt den auszuführenden Befehl
-  `kiwi add --system <https-url>`. Kiwi Apps bietet *Register and Install* an.
-- **Nur https.** `http://`-Quellen werden überall abgelehnt.
+- **Signierte Releases.** Für jede System-App legt root einen
+  SSH-Signaturschlüssel fest. Das heißt, root merkt sich den Schlüssel und
+  akzeptiert von da an nur noch ihn. Festgelegt wird der erste Schlüssel, den
+  root für die App sieht. Dieses Verfahren heißt Trust on First Use. Ist ein
+  Release-Tag mit dem festgelegten Schlüssel signiert, wird das Update ohne
+  Passwort installiert. Ist ein Release nicht signiert, fragt kiwi nach deinem
+  Passwort und weist darauf hin, dass es das Release nicht prüfen konnte. Ein
+  Tag, das mit einem anderen Schlüssel signiert ist, lehnt kiwi ab, ebenso ein
+  unsigniertes Tag, wenn frühere Tags signiert waren. Das bleibt so, bis du
+  `kiwi trust --system <app>` ausführst. Diese Regeln gelten für den Scope
+  system.
+- **root installiert nur aus Quellen, die es selbst auflistet.** Das sind
+  `/etc/kiwi-updater/apps.list` und die Kataloge, die für root eingetragen
+  sind. Kommt eine App aus einer anderen Quelle, installiert kiwi nur den
+  Benutzerteil und nennt dir den Befehl `kiwi add --system <https-url>`, den du
+  ausführen musst. Kiwi Apps bietet in diesem Fall *Register and Install* an,
+  also: Quelle eintragen und installieren.
+- **Nur https.** kiwi lehnt `http://`-Quellen überall ab.
 
-Updates des Systems ohne Passwort laufen über einen einzigen Helfer mit festem
-Zweck, `/usr/local/libexec/kiwi-system-update`. Eine polkit-Regel erlaubt ihn für
-aktive `wheel`-Sitzungen, und er nimmt App-Namen nur als Auswahl aus den eigenen
-Listen von root an.
+Updates von System-Apps ohne Passwort übernimmt ein einzelnes Hilfsprogramm,
+`/usr/local/libexec/kiwi-system-update`, das nur diesen einen Zweck hat. Eine
+polkit-Regel erlaubt Benutzern der Gruppe `wheel`, es auszuführen, solange ihre
+Sitzung aktiv ist. Das Hilfsprogramm nimmt nur App-Namen an, und ein Name kann
+nur eine App aus den eigenen Listen von root auswählen.
 
 ## Updates im Hintergrund { #background-updates }
 
-Es gibt einen Timer, und er gehört dir: `kiwi-updater.timer` führt
-`kiwi update --all` sechs Stunden nach dem letzten Lauf aus (zehn Minuten nach dem
-Booten, mit etwas zufälliger Verzögerung). Er aktualisiert Benutzer-Hälften direkt
-und System-Hälften über den Helfer oben. Es gibt keinen Root-Timer. Im Modus
-`manual` warten System-Hälften auf dein nächstes interaktives `kiwi update`.
+Für Updates im Hintergrund gibt es einen einzigen Timer. Er ist ein
+Benutzer-Timer, läuft also unter deinem Benutzer und nicht als root.
+`kiwi-updater.timer` startet `kiwi update --all` sechs Stunden nach dem letzten
+Lauf und zehn Minuten nach dem Hochfahren, jeweils mit einer zufälligen
+Verzögerung. Benutzerteile aktualisiert dieser Lauf direkt, Systemteile über
+das oben beschriebene Hilfsprogramm. Einen Timer für root gibt es nicht. Im
+Modus `manual` aktualisiert der Timer keine Systemteile. Sie warten, bis du
+selbst `kiwi update` ausführst.
 
 ## Vertrauen { #trust }
 
-Eine App zu installieren **führt das `install.sh` dieses Repositorys aus**, und eine
-App, die den Systembereich deklariert, führt es **als root** aus. Kataloge sind
-kuratiert, nicht geprüft. Füge die hinzu, denen du vertraust, so wie du ein
-Paket-Repository hinzufügen würdest, und nutze `kiwi info --installer`, `kiwi diff`
-und `kiwi pin`, um mit offenen Augen zu entscheiden. Eine Signatur grenzt ein, *wer
-veröffentlichen darf*. Sie sagt nichts darüber, *was das Veröffentlichte tut*.
+Wenn du eine App installierst, **führt kiwi das `install.sh` aus dem Repository
+dieser App aus**. Gibt die App den Scope system an, läuft dieses Skript **als
+root**. Kataloge sind kuratiert, aber nicht geprüft. Jemand hat die Apps also
+ausgewählt, aber ihr Code wurde nicht unbedingt durchgesehen. Trag nur
+Kataloge ein, denen du vertraust, so wie du es auch bei einer Paketquelle
+machen würdest. Mit `kiwi info --installer`, `kiwi diff` und `kiwi pin` siehst
+du, was eine App tut, bevor du dich entscheidest. Eine Signatur schränkt ein,
+*wer* ein Release veröffentlichen darf. Über das, *was das Release tut*, sagt
+sie nichts.
 
-Weiterhin geplant: ein gehostetes Verzeichnis vertrauenswürdiger Kataloge
-(`kiwi catalog browse`) mit Signer-Fingerabdrücken pro Eintrag.
+Geplant ist noch: ein gehostetes Verzeichnis vertrauenswürdiger Kataloge, mit
+dem Befehl `kiwi catalog browse` und mit den Fingerprints der Signaturschlüssel
+zu jedem Eintrag.
