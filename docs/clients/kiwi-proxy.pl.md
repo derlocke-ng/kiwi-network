@@ -2,7 +2,7 @@
 
 kiwi-proxy jest dla osób, które pracują w sieciach wielu klientów i łączą się
 z każdą z nich przez osobne połączenie VPN lub SOCKS. Każde połączenie
-zapisujesz jako **exit** z własną nazwą i uruchamiasz je tylko wtedy, gdy go
+zapisujesz jako **exit** z własną nazwą, który uruchamiasz tylko wtedy, gdy go
 potrzebujesz. Exity są od siebie odizolowane, a program, który korzysta
 z exitu, może łączyć się z siecią wyłącznie przez niego. Dziesięciu klientów
 nie oznacza więc dziesięciu połączeń VPN działających naraz na hoście.
@@ -31,8 +31,8 @@ gateway container   owns the network namespace
                     dnscrypt-proxy 127.0.0.2:53: DNS through the same exit, with blocklists
 ```
 
-Gateway tworzy sieciową przestrzeń nazw (network namespace), czyli osobny stos
-sieciowy z własnymi trasami i regułami zapory. Przeglądarka z kiwi-fox, box
+Do gatewaya należy sieciowa przestrzeń nazw (network namespace), czyli osobny
+stos sieciowy z własnymi trasami i regułami zapory. Przeglądarka z kiwi-fox, box
 z kiwi-custodia albo kontener z narzędziem dołącza do tej przestrzeni i staje
 się członkiem gatewaya. Od tej chwili jego jedyna trasa prowadzi do upstreamu
 exitu. Jeśli gateway przestanie działać, jego członkowie nie mają już żadnej

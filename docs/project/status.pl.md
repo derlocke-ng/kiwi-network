@@ -2,8 +2,8 @@
 
 Ta strona wymienia wszystkie repozytoria projektu Kiwi Network: czym jest każde
 z nich, jakie jest jego najnowsze wydanie i na jakiej licencji jest
-udostępnione. Na końcu znajdziesz listę tego, czego wiadomo, że brakuje albo co
-nie zostało jeszcze przetestowane.
+udostępnione. Na końcu znajdziesz listę znanych braków i rzeczy, których jeszcze nie
+przetestowano.
 
 Wszystkie repozytoria są na [github.com/derlocke-ng](https://github.com/derlocke-ng).
 „Wydane” oznacza, że repozytorium ma tag wersji, bo to właśnie tag wersji
@@ -81,7 +81,6 @@ Te braki wymieniają same repozytoria:
   z prawdziwym kontem. Moduł Mysterium sprawdzono 7 listopada 2026.
 - **kiwi-custodia**: Niektóre rzeczy trzeba jeszcze zmierzyć na prawdziwej
   maszynie: tun2socks w kontenerze gateway działającym bez roota (rootless)
-  i kompozytory inne niż
-  GNOME.
+  i kompozytory inne niż GNOME.
 - **Licencje**: kiwi-icons, kiwi-catalog i mullvad-socks5 nie mają pliku
   LICENSE, a kiwi-killswitch podaje licencję tylko w README i manifeście.

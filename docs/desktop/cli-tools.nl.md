@@ -48,9 +48,9 @@ hebt opgenomen. Daarom trekt `torlink revoke bob` die toegang definitief in.
 `torlink ls` toont je diensten, je peers en je doorverwijzingen: de lokale
 poorten die naar de diensten van een peer leiden. Tor vervoert alleen TCP, en
 de eerste verbinding duurt even. De SOCKS-poort van de container (19050)
-luistert alleen op de loopback-interface. De toestand van `torlink`, inclusief
-je onion-sleutels, staat in `~/.local/share/torlink`, en `torlink purge` wist
-die.
+luistert alleen op de loopback-interface. Alles wat `torlink` bewaart,
+inclusief je onion-sleutels, staat in `~/.local/share/torlink`, en
+`torlink purge` wist het.
 
 ## `pweb`: een map delen via HTTPS { #pweb-share-a-folder-over-https }
 
@@ -85,12 +85,12 @@ $ select-server -f other.conf   # een ander configuratiebestand
 
 `tethering` is bedoeld voor als andere apparaten de internetverbinding van deze
 machine gebruiken, wat tethering heet. Sommige providers tellen hoeveel
-netwerksprongen het verkeer heeft gemaakt, en kunnen zo apparaten die
-meeliften onderscheiden van de machine zelf. `tethering` zet de TTL op 64 voor
+hops het verkeer heeft gemaakt, en zien daaraan welk verkeer van meeliftende
+apparaten komt en welk van de machine zelf. `tethering` zet de TTL op 64 voor
 al het verkeer dat via één interface binnenkomt. Voor de provider ziet het
 verkeer van de meeliftende apparaten er dan uit als verkeer van de machine
 zelf. Het programma vraagt om sudo en voegt één mangle-regel aan `iptables`
-toe. De regel blijft **niet** bewaard na een herstart.
+toe. Na een herstart is de regel **niet** meer aanwezig.
 
 ```
 tethering            # interface kiezen, regel instellen

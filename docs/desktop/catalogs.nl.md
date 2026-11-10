@@ -137,14 +137,14 @@ git tag -s v1.3.0 -m v1.3.0 && git push origin v1.3.0
 kiwi-updater levert een release-workflow mee, `templates/release.yml`. Die
 publiceert alleen een GitHub-release voor een tag die is ondertekend met een
 sleutel uit `.github/allowed_signers`, en maakt zelf nooit tags aan. Open tot
-slot een pull request dat je URL aan de catalogus toevoegt. Elke app is welkom
-die opensource is en echt te gebruiken is zonder account, abonnement of
-tracker.
+slot een pull request dat je URL aan de catalogus toevoegt. Elke app die
+opensource is en echt zonder account, abonnement of tracker te gebruiken is,
+is welkom.
 
 ## Vertrouwen { #trust }
 
 De catalogus is **samengesteld, niet gecontroleerd**. Een app staat erin omdat
 iemand hem de moeite waard vond. Dat betekent niet dat de code is nagekeken.
-Lees voordat je een app installeert die je niet kent de uitvoer van
-`kiwi info <app>`. Met `kiwi info --installer <app>` zie je precies wat er wordt
+Lees de uitvoer van `kiwi info <app>` voordat je een app installeert die
+je niet kent. Met `kiwi info --installer <app>` zie je precies wat er wordt
 uitgevoerd.

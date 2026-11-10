@@ -2,7 +2,7 @@
 
 Ta strona opisuje pracę, która zaczyna się, gdy maszyny są już zainstalowane
 i działają: sprawdzanie ich stanu, bezpieczne przechowywanie sekretów, kopie
-zapasowe plików sieci i danych na maszynach, odblokowywanie zaszyfrowanych
+zapasowe pliku fleet i danych na maszynach, odblokowywanie zaszyfrowanych
 dysków, dostrajanie MTU tunelu i instalację na serwerze w netcup. Wszystko to
 robisz narzędziem kiwi-server z twojego własnego komputera (*komputera
 administratora*), na którym znajdują się plik fleet i sekrety.
@@ -46,18 +46,18 @@ Keyring i pokazuje ci **klucz odzyskiwania**. Klucz odzyskiwania jest
 wyświetlany tylko raz. Dopóki magazyn jest otwarty, może go odczytać każdy
 program działający na twoim koncie użytkownika.
 
-## Kopia zapasowa plików sieci { #backing-up-the-fleet-itself }
+## Kopia zapasowa pliku fleet i sekretów { #backing-up-the-fleet-itself }
 
-Katalog sieci zawiera plik fleet i `secrets/`, a kiwi-server sam robi jego
-kopię zapasową. Po każdym udanym `render` albo `build` (dwóch krokach, które
-generują konfigurację hostów i ich instalacyjne obrazy ISO) szyfruje katalog
-sieci (AES-256 z PBKDF2, 600 000 iteracji) i kopiuje go na node’y wymienione
+Katalog z plikiem fleet zawiera ten plik oraz `secrets/`, a kiwi-server sam
+robi jego kopię zapasową. Po każdym udanym `render` albo `build` (dwóch krokach, które
+generują konfigurację hostów i ich instalacyjne obrazy ISO) szyfruje ten
+katalog (AES-256 z PBKDF2, 600 000 iteracji) i kopiuje go na node’y wymienione
 w `backup.hosts`. Każdy z tych node’ów przechowuje dziesięć najnowszych kopii.
-Na nowym komputerze odzyskujesz katalog sieci z jednego z tych node’ów.
+Na nowym komputerze przywracasz ten katalog z jednego z tych node’ów.
 W dowolnej chwili możesz też zapisać kopię w wybranym katalogu:
 
 ```bash
-kiwi-server restore --from core@lychee.home  # przywróć katalog sieci
+kiwi-server restore --from core@lychee.home  # przywróć katalog z plikiem fleet
 kiwi-server backup fleet.yaml --local /mnt/usb   # albo zapisz kopię w katalogu, w dowolnej chwili
 ```
 
@@ -105,27 +105,27 @@ przywrócono na lychee.
 
 - **Kilka serwerów kopii zapasowych.** `backup.servers` przyjmuje listę
   serwerów, a każdy serwer dostaje własną, pełną kopię. Gdy jeden serwer
-  ulegnie awarii, dotyczy to tylko jego kopii. Przywracanie bierze najnowszą
-  kopię z tego serwera, który ją ma, a `kiwi-stack snapshots` wypisuje
+  ulegnie awarii, dotyczy to tylko jego kopii. Przy przywracaniu brana jest
+  najnowsza kopia, niezależnie od tego, który serwer ją ma, a `kiwi-stack snapshots` wypisuje
   snapshoty osobno dla każdego serwera. Pojedyncze ustawienie `server` nadal
   działa.
-- **Odbudowana maszyna sama przywraca swoje dane.** Odbudowana maszyna znajduje
-  na serwerze kopie zapasowe samej siebie, choć sama żadnej z nich nie zrobiła.
-  Wtedy, zanim zrobi pierwszą kopię, sama przywraca dane każdego modułu,
-  a potem robi kopie tak jak wcześniej. Tak jest domyślnie,
-  `backup.restore: auto`. Przy `hold` maszyna czeka, aż uruchomisz
+- **Odbudowana maszyna sama przywraca swoje dane.** Po odbudowie maszyna
+  znajduje na serwerze kopie zapasowe samej siebie, choć sama nie zrobiła
+  jeszcze żadnej. W takiej sytuacji, zanim zrobi pierwszą kopię, przywraca
+  dane wszystkich modułów, a potem robi kopie tak jak wcześniej. To zachowanie
+  domyślne (`backup.restore: auto`). Przy `hold` maszyna czeka, aż uruchomisz
   `kiwi-stack restore` albo `kiwi-stack backup --new`.
 - **Usuwanie starych snapshotów według harmonogramu.**
   `kiwi-server prune fleet.yaml --every week` (albo `day`) instaluje na twoim
   komputerze timer użytkownika systemd. Twój komputer to jedyne miejsce, gdzie
-  są klucze uprawnione do usuwania. Jeśli jakiś przebieg zostanie pominięty,
-  zostanie nadrobiony przy następnym logowaniu. `kiwi-server status` pokazuje
+  są klucze uprawnione do usuwania. Pominięte uruchomienie zostanie nadrobione
+  przy następnym logowaniu. `kiwi-server status` pokazuje
   każdą kopię zapasową i ostrzega, gdy na nodzie z kopiami od trzech tygodni
   nie usuwano starych snapshotów.
 - **Zawieszone połączenie z komercyjnym dostawcą VPN samo wraca do
   działania.** gluetun, kontener klienta VPN, dostaje kontrolę stanu (health
-  check), która co jakiś czas sprawdza, czy połączenie nadal działa. Gdy przez
-  pięć minut wynik jest negatywny, kontener zostaje zabity, a przy następnym
+  check), która co jakiś czas sprawdza, czy połączenie nadal działa. Jeśli przez
+  pięć minut wypada źle, kontener zostaje zatrzymany siłą (kill), a przy następnym
   starcie wybiera inny serwer.
 
 ## Zaszyfrowane dyski i ich odblokowywanie { #encrypted-disks-and-unlocking }
@@ -140,7 +140,8 @@ bez niego.
   w `secrets/luks/<host>.once`. Pierwsze `apply` zastępuje go kluczem
   `secrets/luks/<host>.key`, a master dostaje wtedy dodatkowo nowy klucz
   woluminu. Jeśli stracisz ten plik z kluczem, dysk pozostanie zablokowany,
-  więc pilnuj kopii zapasowej plików sieci.
+  więc pilnuj kopii zapasowej pliku fleet
+  i sekretów.
 - **CoreOS / uCore** szyfrują dysk w ramach instalacji przez Ignition,
   narzędzie, które konfiguruje maszynę z CoreOS przy pierwszym uruchomieniu.
   Maszyna potrzebuje do tego przy pierwszym uruchomieniu około 4 GiB RAM.
@@ -216,8 +217,8 @@ Pomiar podpowiada też, co ustawić. Dla **urządzenia** jest to linia `MTU =`
 we własnej konfiguracji WireGuard tego urządzenia i nikogo innego to nie
 dotyczy. Dla **node’a** jest to `wg_mtu` na tym nodzie i na jego masterze.
 Z opcją `--write` pomiar wpisuje wartość do pliku fleet i zmienia tylko te
-linie. Jednej rzeczy nie widać z tej strony: pakietu, który został podzielony
-tylko w drodze w jedną stronę i złożony z powrotem przez drugą stronę.
+linie. Jednej rzeczy pomiar ze swojej strony nie zobaczy: pakietu podzielonego
+tylko w drodze tam i złożonego z powrotem przez drugą stronę.
 
 Wartości domyślne zmierzono na sieci testowej. Telefon w sieci komórkowej
 wymaga własnego pomiaru, bo trasy komórkowe często działają wyłącznie po IPv6

@@ -3,8 +3,8 @@
 W [kiwi-proxy](kiwi-proxy.md) exit to zapisane pod nazwą połączenie
 z upstreamem, przez które twoje boxy i przeglądarki wysyłają ruch. Zwykle jest
 to połączenie, które ci przekazano, np. proxy SOCKS5 prowadzące do sieci
-klienta. Moduł dostawcy jest na drugi przypadek: sam tworzy exit, przez Tor,
-subskrypcję VPN, 9proxy albo Mysterium. Zwłaszcza Tor i Mysterium służą do
+klienta. Moduł dostawcy służy do drugiej sytuacji: tworzy exit samodzielnie,
+korzystając z Tora, subskrypcji VPN, 9proxy albo Mysterium. Zwłaszcza Tor i Mysterium służą do
 tego, żeby mieć więcej adresów IP do testów.
 
 Każdy moduł ma własne repozytorium. kiwi-updater instaluje go do folderu
@@ -39,8 +39,8 @@ kiwi-fox new test --exit tor-de                  # profil przeglądarki na nim
 ```
 
 W przypadku exitu przez Tor kraj jest wymuszany opcją Tora `StrictNodes`.
-Obwód, który nie może wyjść w tym kraju, kończy się błędem i nigdy nie
-wychodzi w innym kraju. Exity z modułu tor przekazują dalej dane logowania
+Jeśli nie da się zbudować obwodu z węzłem wyjściowym w tym kraju, połączenie
+kończy się błędem. Ruch nigdy nie wychodzi przez inny kraj. Exity z modułu tor przekazują dalej dane logowania
 SOCKS, które Tor Browser wysyła osobno dla każdej strony. Takie jest ich
 ustawienie domyślne (`--socks-auth passthrough`).
 
@@ -71,8 +71,8 @@ SOCKS5 only
 Jeden kontener dostawcy obsługuje wszystkie exity korzystające z tego samego
 modułu i tej samej dzierżawy (lease). Dzierżawa to jeden z exitów do wyboru,
 które oferuje moduł, np. kraj serwera VPN albo węzeł Mysterium. Jeśli tunel
-straci sesję, działa w trybie fail-closed, czyli żaden ruch nie wychodzi,
-a tunel jest uruchamiany ponownie.
+straci sesję, obowiązuje zasada fail-closed: żaden ruch nie wychodzi, a tunel
+jest uruchamiany ponownie.
 
 ## Konfiguracja { #configuration }
 

@@ -61,7 +61,7 @@ kiwi-server toolchain build     # używany automatycznie, gdy brakuje narzędzi
 
 ## Od zera do działającej sieci { #from-nothing-to-a-running-network }
 
-Poniższe polecenia prowadzą od pustego katalogu do działającej sieci
+Poniższe polecenia prowadzą od pustego folderu do działającej sieci
 z masterem, jednym node’em i twoimi urządzeniami:
 
 ```bash

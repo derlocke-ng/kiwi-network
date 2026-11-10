@@ -82,10 +82,10 @@ ondertekende berichten die op relays staan. Ze horen niet bij een hub.
 - De eerste keer dat je een hub op een apparaat opent, maakt de browser een
   sleutel voor dat apparaat aan en bewaart die.
 - Een **account** is een gebruikersnaam met een wachtwoord. Het is opgebouwd uit
-  gewone nostr-events, en er is geen register van accounts. Je wachtwoord wordt
-  met scrypt opgerekt, een functie die met opzet traag rekent, en het resultaat
+  gewone nostr-events, en er is geen register van accounts. Je wachtwoord gaat
+  door scrypt, een functie die met opzet traag rekent, en het resultaat
   ontgrendelt je sleutel. Zonder het wachtwoord kan niemand een account
-  overnemen of overschrijven. Je wachtwoord herstellen kan **niet**.
+  overnemen of overschrijven. Een vergeten wachtwoord kan **niet** opnieuw worden ingesteld.
 - Je kunt ook inloggen met een nostr-sleutel die je al hebt, als `nsec`, hex of
   `ncryptsec`. Inloggen via een browserextensie (NIP-07) of een signer op
   afstand (NIP-46) is gepland, maar nog niet gebouwd.
@@ -117,8 +117,8 @@ geen back-up is.
 - Relays zien metadata: wie naar welke adressen schrijft, wanneer, hoeveel en
   vanaf welk IP-adres. Gebruik een VPN of Tor als dat voor jou belangrijk is.
 - De sleutel van een space is geen geheim. Hij zorgt er alleen voor dat de
-  berichten van een community niet openlijk te lezen zijn. Relays kunnen likes,
-  meldingen en wie waarop reageerde wel zien.
+  berichten van een community niet openlijk te lezen zijn. Relays zien wel likes
+  en meldingen, en wie op wat heeft gereageerd.
 - Briefjes op DevBoard en meldingen voor moderatie zijn bewust openbaar.
 - Je sleutel staat in de opslag van de browser. Alle GitHub Pages-sites van één
   account hebben dezelfde origin, en browsers scheiden de opslag van websites
@@ -148,4 +148,4 @@ met een account.
 - [Armory en zijn apps](armory.md)
 - [Je eigen hub draaien](hubs.md)
 - De eigen documentatie van het framework over de [architectuur](https://github.com/derlocke-ng/kiwi-framework/blob/main/docs/architecture.md)
-  en het [protocol](https://github.com/derlocke-ng/kiwi-framework/blob/main/docs/protocol.md)
+  en het [berichtenprotocol](https://github.com/derlocke-ng/kiwi-framework/blob/main/docs/protocol.md)

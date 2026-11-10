@@ -12,7 +12,7 @@ w repozytorium, którego dotyczą. Lista repozytoriów jest na stronie
   Zobacz [Publikowanie aplikacji](../desktop/catalogs.md#publishing-an-app).
 - **Moduł.** Moduły są rozwijane w repozytorium
   [kiwi-modules](https://github.com/derlocke-ng/kiwi-modules). Moduł to
-  katalog z plikiem `module.yaml` i szablonami Jinja. Zobacz
+  folder z plikiem `module.yaml` i szablonami Jinja. Zobacz
   [Własny moduł](../server/modules.md#writing-a-module).
 - **Hub albo aplikacja dla huba.** Zrób fork
   [Armory](https://github.com/derlocke-ng/armory), utwórz szkielet aplikacji
@@ -25,7 +25,7 @@ w repozytorium, którego dotyczą. Lista repozytoriów jest na stronie
   przestrzegać, opisuje
   [docs/plugin-system.md](https://github.com/derlocke-ng/kiwi-proxy/blob/main/docs/plugin-system.md)
   w repozytorium kiwi-proxy.
-- **Ta strona i ta dokumentacja** są w repozytorium
+- **Strona internetowa projektu i ta dokumentacja** są w repozytorium
   [kiwi-network](https://github.com/derlocke-ng/kiwi-network).
 
 ## To repozytorium { #this-repository }

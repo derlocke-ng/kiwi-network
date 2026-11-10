@@ -40,7 +40,7 @@ hide:
 
 <a href="people/">
 <strong>Hubs</strong>
-<span>Met kiwi-framework heeft een community haar eigen hub, met een open markt, een feed en chat, en zonder centraal platform.</span>
+<span>Met kiwi-framework draait een community haar eigen hub, met een open markt, een feed en chat, en zonder centraal platform.</span>
 <em>Hubs voor community’s →</em>
 </a>
 
@@ -73,7 +73,7 @@ schijven en kwijtgeraakte machines is vanaf het begin rekening gehouden.
 - **Automatische updates.** Updates worden automatisch geïnstalleerd. Een
   machine herstart alleen in de uren die je daarvoor hebt vrijgegeven.
 - **Elke nacht een back-up.** Elke machine stuurt een versleutelde back-up naar
-  een back-upserver van jezelf. Ze kan back-ups alleen toevoegen, niet
+  een eigen back-upserver. Ze kan back-ups alleen toevoegen, niet
   verwijderen, dus een indringer kan ze niet wissen. Ook van het fleetbestand
   en de secrets wordt een back-up gemaakt.
 - **Herstel als het erop aankomt.** De schijven zijn versleuteld. Bij het

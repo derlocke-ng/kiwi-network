@@ -61,16 +61,17 @@ kiwi install kiwi-custodia && kiwi-custodia setup
 Apps installeren kan ook zonder terminal. Met **Kiwi Apps** (`kiwi-gui`) in het
 overzicht van apps installeer je een app met één klik.
 
-## Je netwerk binnenhalen { #joining-your-network }
+## Aansluiten op je netwerk { #joining-your-network }
 
-Een desktop komt op dezelfde manier in de mesh als elk ander apparaat. De mesh
+Een desktop wordt op dezelfde manier aan de mesh toegevoegd als elk ander
+apparaat. De mesh
 is het besloten WireGuard-netwerk waarin al je servers en apparaten zitten.
 Het commando `kiwi-server enroll fleet.yaml laptop --group devices` schrijft een
-WireGuard-configuratiebestand, en dat bestand importeer je in Instellingen van
-GNOME. Importeer ook de certificaatautoriteit (CA) van je netwerk, `kiwiCA.pem`,
+WireGuard-configuratiebestand, en dat bestand importeer je in de Instellingen
+van GNOME. Importeer ook de certificaatautoriteit (CA) van je netwerk, `kiwiCA.pem`,
 zodat de desktop de HTTPS-certificaten van de namen in je netwerk vertrouwt.
-ensconce installeert elk `.pem`-bestand uit zijn map `certs/` voor het hele
-systeem.
+ensconce installeert elk `.pem`-bestand uit zijn map `certs/`
+systeembreed.
 
 Daarna beschermt [kiwi-killswitch](kiwi-killswitch.md) die verbinding en houdt
 de machine fail-closed. Verkeer dat niet via de verbinding gaat, wordt dus

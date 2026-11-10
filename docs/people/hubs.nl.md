@@ -70,10 +70,10 @@ browser nodig hebben, draaien in Playwright.
 ## De hub-container { #the-hub-container }
 
 Armory is ook beschikbaar als container-image, `ghcr.io/derlocke-ng/armory`. Het
-image wordt gebouwd uit `container/Dockerfile` van het framework en levert de
-hub met nginx. Bij het starten van de container schrijft het entrypoint-script
+image wordt gebouwd uit `container/Dockerfile` van het framework en biedt de
+hub aan via nginx. Bij het starten van de container schrijft het entrypoint-script
 het bestand `hub.local.json` op basis van de `HUB_*`-variabelen, en de pagina
-leest dat bestand voordat ze verbinding maakt. Zo kan een installatie relays en
+leest dat bestand voordat ze verbinding maakt. Wie de hub draait, kan zo relays en
 beleid kiezen, maar geen code toevoegen. Zijn er geen variabelen gezet, dan
 draait de hub zoals hij gebouwd is.
 
@@ -99,7 +99,7 @@ docker run --rm -p 8080:80 \
 | `HUB_ACCOUNT_MOUNTS` | De mounts die om een account vragen. |
 | `HUB_REQUIRE_ACCOUNT` | Met `true` vraagt elke mount om een account. |
 | `HUB_SPACE_RELAYS` | De relays per space, geschreven als `jobs=wss://…;gems=wss://a,wss://b`. |
-| `HUB_MODERATORS` | De sleutels van de mensen die elke space modereren die de hub definieert. |
+| `HUB_MODERATORS` | De sleutels van de moderatoren van alle spaces die de hub zelf definieert. |
 | `HUB_REGISTER_POW` | Het aantal bits proof of work dat een nieuw account nodig heeft. Dit is voor relays die alleen leden toelaten. |
 | `HUB_CALDAV` | Een Nextcloud-server. nginx stuurt `/remote.php/dav/` naar die server door, zodat de agenda geen CORS nodig heeft. |
 | `HUB_ICE`, `HUB_ICE_USERNAME`, `HUB_ICE_CREDENTIAL` | De STUN/TURN-servers voor gesprekken en rechtstreekse overdrachten. Ze helpen twee browsers om met elkaar verbinding te maken. De TURN-login is zichtbaar in de pagina, dus maak een TURN-login aan die alleen deze hub gebruikt. |
@@ -115,7 +115,7 @@ en stopt ze.
 
 ### Een hub op je Kiwi Network { #on-a-kiwi-network }
 
-Een kiwi-master is de ene server van een Kiwi Network die bereikbaar is vanaf
+Een kiwi-master is de enige server van een Kiwi Network die bereikbaar is vanaf
 internet. Hij kan een eigen relay en een eigen hub draaien, met twee modules.
 De module `nostr-relay` draait de relaysoftware strfry op `relay.<host>`. De
 module `hub` draait dit container-image, standaard met Armory, op `hub.<host>`.
@@ -127,8 +127,8 @@ gebruiken het certificaat van je netwerk. Voor een half openbare hub voeg je
 
 De relay van een openbare hub accepteert berichten vanuit de mesh. Vanaf
 internet accepteert hij alleen berichten van leden die aantonen dat ze hun
-sleutel hebben (NIP-42). Leden zijn de mensen op de lijst die de beheerders
-(`write_pubkeys`) ondertekenen. Met `members: registered` is iedereen met een
+sleutel hebben (NIP-42). Leden zijn de mensen op een lijst die de beheerders
+(`write_pubkeys`) hebben ondertekend. Met `members: registered` is iedereen met een
 account op de hub lid. Zie het [overzicht van de modules](../server/modules.md#people).
 
 ## kiwi-web-catalog { #kiwi-web-catalog }
@@ -157,6 +157,6 @@ Deze punten staan op de eigen roadmap van het framework en bestaan nog niet:
 - Goedkeuringen bij moderatie (NIP-72 kind 4550).
 - Een space volgen die niet bij je hub hoort.
 - Inloggen via een browserextensie (NIP-07) of een signer op afstand (NIP-46).
-- Een TURN-server in de kiwi-stack. Het werk daarvoor ligt klaar in
-  kiwi-modules. Zonder TURN vinden twee telefoons op mobiele data vaak geen
+- Een TURN-server in de kiwi-stack. Het werk daarvoor staat in
+  kiwi-modules te wachten. Zonder TURN vinden twee telefoons op mobiele data vaak geen
   rechtstreekse verbinding.

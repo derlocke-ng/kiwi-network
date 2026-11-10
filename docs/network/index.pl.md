@@ -170,7 +170,7 @@ trafia do internetu. Wyjście ma trzy tryby:
 |---|---|---|
 | **provider** | Przez komercyjnego dostawcę VPN (gluetun). To właśnie podwójny przeskok i tak konfiguruje mastera jego preset. | zrealizowane |
 | **direct** | Bezpośrednio przez łącze internetowe mastera. Żeby uzyskać ten tryb, wypisz moduły mastera bez `vpn-client`. | zrealizowane |
-| **master** | Przez *mastera innej sieci*. Twój master jest tam klientem w jednej z grup, które mają dostęp do internetu i do niczego więcej. Nazywa się to multi-hop. | zaprojektowane; wymaga dodawania maszyn między sieciami, czyli federacji |
+| **master** | Przez *mastera innej sieci*. Twój master jest tam klientem w jednej z grup, które mają dostęp do internetu i do niczego więcej. Nazywa się to multi-hop. | zaprojektowane; wymaga dodawania klientów z innych sieci, czyli federacji |
 
 Niezależnie od trybu wyjścia każdy master udostępnia sieci mesh także proxy
 SOCKS5 Tora.

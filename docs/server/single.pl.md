@@ -1,7 +1,7 @@
 # Jedna maszyna bez pliku fleet
 
 kiwi-server zarządza całą siecią maszyn. Jeśli chcesz uruchomić stack tylko na
-jednej maszynie, nie jest ci potrzebny. Stack to wszystkie kontenery i usługi,
+jednej maszynie, kiwi-server nie jest ci potrzebny. Stack to wszystkie kontenery i usługi,
 które uruchamia maszyna. kiwi-server składa się z dwóch mniejszych narzędzi
 i możesz używać ich osobno:
 
@@ -13,10 +13,10 @@ i możesz używać ich osobno:
 Te dwa narzędzia przydają się, gdy chcesz mieć stack na jednej maszynie bez
 reszty kiwi-server. Może to być node konfigurowany ręcznie, moduł, który
 właśnie rozwijasz, albo maszyna, która sama generuje swój stack. kiwi-server
-zawiera kopie obu narzędzi, każde przypięte do tagu wydania. Maszyna wygląda
-dokładnie tak samo niezależnie od tego, czy skonfigurujesz ją narzędziem
-kiwi-server, czy tymi dwoma narzędziami, a w obu przypadkach z tego samego
-seeda powstają te same sekrety.
+zawiera kopie obu narzędzi, każde przypięte do tagu wydania. Maszyna
+skonfigurowana narzędziem kiwi-server i maszyna skonfigurowana tymi dwoma
+narzędziami są identyczne, a w obu przypadkach z tego samego seeda powstają
+te same sekrety.
 
 ```
 machine.yaml ──kiwi-modules render──▶ bundle/ ──copy──▶ sudo kiwi-stack apply bundle/
@@ -70,8 +70,8 @@ seed: secrets/seed              # z niego powstają generowane hasła
 
 kiwi-modules nie ma własnego urzędu certyfikacji. Jeśli generujesz
 konfigurację maszyny bez kiwi-server, pliki certyfikatu i klucza TLS musisz
-więc dostarczyć samodzielnie. Jeśli plik maszyny nie wskazuje konfiguracji WireGuard,
-kiwi-modules szuka jej w `secrets/<hostname>.conf`.
+więc dostarczyć samodzielnie. Jeśli plik maszyny nie wskazuje konfiguracji
+WireGuard, kiwi-modules szuka jej w `secrets/<hostname>.conf`.
 
 ## Instalacja na maszynie { #put-it-on-the-machine }
 
@@ -90,7 +90,7 @@ z wtyczką compose. Na Debianie kiwi-stack sam instaluje podmana.
 
 `apply` robi ze stackiem to samo co rola kiwi-server (zobacz
 [Maszyny](machines.md#apply)), tylko nie ustawia nazwy hosta ani strefy
-czasowej. Można je powtarzać: ponowne zastosowanie tej samej paczki niczego
+czasowej. Polecenie można powtarzać: ponowne zastosowanie tej samej paczki niczego
 nie zmienia. Nie ma wycofywania zmian. Dane przywrócisz poleceniem
 `kiwi-stack restore` z modułu backup, a starszą konfigurację, stosując starszą
 paczkę.

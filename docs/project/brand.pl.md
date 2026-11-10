@@ -47,7 +47,7 @@ Większość aplikacji Kiwi zawiera identyczną co do bajtu kopię ikony SVG
 w stylu classic i wskazuje ten plik wpisem `ICON=` w swoim `kiwi.manifest`.
 gnome-monitor używa ikony `kiwi-os`, a syncman ikony `kiwi-cloud`.
 kiwi-custodia ma własną ikonę. kiwi-updater od wersji 2.2 bierze ikonę
-z własnego klonu aplikacji, więc przy instalacji niczego nie pobiera.
+ze sklonowanego repozytorium aplikacji, więc przy instalacji niczego nie pobiera.
 Aplikacja z plikiem uruchamiającym `.desktop` instaluje też ikonę w motywie
 ikon hicolor.
 

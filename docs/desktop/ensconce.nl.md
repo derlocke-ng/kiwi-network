@@ -47,7 +47,7 @@ de stappen lopen in deze volgorde:
 | 12 | `ssh` | richt de gesynchroniseerde SSH-configuratie in, met Bitwarden of GNOME als SSH-agent |
 | 13 | `kiwi` | installeert kiwi-updater op de manier die `KIWI_INSTALL=recommended\|manual\|minimal` kiest, en daarna elke app uit `kiwi-apps.list` |
 | 14 | `sysctl` | installeert de bestanden met kernelinstellingen uit `sysctl.d/`. Een voorbeeldbestand beperkt hoeveel nog niet weggeschreven gegevens de kernel in het geheugen houdt, wat helpt bij trage SSD’s |
-| 15 | `power` | maskeert met `SYSTEM_SLEEP=off` de slaapdoelen van systemd, zodat de machine niet in slaapstand kan gaan |
+| 15 | `power` | maskeert met `SYSTEM_SLEEP=off` de systemd-targets voor slaapstand, zodat de machine niet in slaapstand kan gaan |
 
 Voordat ensconce begint, controleert het de omgeving. Het systeem moet een
 Bluefin-image zijn, en `rpm-ostree`, `flatpak`, `dconf`, `jq` en `curl` moeten
@@ -55,7 +55,7 @@ beschikbaar zijn. ensconce houdt bij hoe ver het is, dus na een herstart gaat he
 verder waar het was gebleven. Tijdens de hele uitvoering houdt het de machine
 wakker, en daarna zet het je energie-instellingen terug.
 
-Met deze opties stuur je een uitvoering:
+Met deze opties bepaal je hoe ensconce draait:
 
 ```bash
 ensconce --dry-run                  # vooraf bekijken zonder iets te veranderen
@@ -106,11 +106,11 @@ cp -rT ./my-setup "$(ensconce --config-dir)"
 ensconce --dry-run && ensconce
 ```
 
-De export bevat alleen wat je zelf aan het systeem hebt toegevoegd. Er staan de
-pakketten in die je hebt aangevraagd, niet het hele image. Er staan alleen
-extensies in die echt van extensions.gnome.org komen. Je eigen
-repositorybestanden zitten erin, en in plaats van een volledige dump een
-selectie van dconf-subtrees. Beschouw de export als vertrekpunt. `certs/` en
+De export bevat alleen wat je zelf aan het systeem hebt toegevoegd. Ze noemt de
+pakketten die je hebt aangevraagd, niet het hele image. Er staan alleen
+extensies in die echt van extensions.gnome.org komen. Ook je eigen
+repositorybestanden zitten erin, en van dconf alleen gekozen subtrees in plaats
+van een volledige dump. Beschouw de export als vertrekpunt. `certs/` en
 `nextcloud/` kunnen vertrouwelijke gegevens bevatten.
 
 ensconce is een app voor de **user-scope**. De stappen die root nodig hebben,

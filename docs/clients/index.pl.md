@@ -11,13 +11,13 @@ Aplikacje desktopowe Kiwi pozwalają pracować w sieci każdego klienta
 w izolacji. Host nie jest zaśmiecany tunelami i trasami, a ty nie masz
 dziesięciu połączeń VPN działających naraz. Każde połączenie trafia do
 osobnego kontenera, a jedyna trasa wychodząca z tego kontenera prowadzi do
-tego jednego klienta. Takie połączenie nazywa się **exitem**. Twoje narzędzia
-działają w kontenerze albo w profilu przeglądarki, który korzysta z exitu,
-jakiego potrzebują, a poza tym nic na hoście się nie zmienia.
+tego jednego klienta. Takie połączenie nazywa się **exitem**. Swoje narzędzia
+uruchamiasz w kontenerze albo w profilu przeglądarki, który korzysta
+z potrzebnego exitu. Poza tym nic na hoście się nie zmienia.
 
 | Aplikacja | Co robi |
 |---|---|
-| [**kiwi-proxy**](kiwi-proxy.md) | Silnik, na którym opierają się pozostałe aplikacje. **Exit** to jedno połączenie z upstreamem, zapisane pod wybraną nazwą. Upstream to proxy, do którego wysyłany jest twój ruch: albo proxy SOCKS5, które ci przekazano, albo takie, które tworzy moduł dostawcy. Gdy uruchamiasz exit, kiwi-proxy tworzy dla niego **gateway**. Gateway to sieciowa przestrzeń nazw (network namespace), czyli osobny stos sieciowy z własnymi trasami i zaporą, której jedyna trasa prowadzi do tego upstreamu. Programy na hoście mogą korzystać z exitu przez lokalny port SOCKS5 |
+| [**kiwi-proxy**](kiwi-proxy.md) | Silnik, na którym opierają się pozostałe aplikacje. **Exit** to jedno połączenie z upstreamem, zapisane pod wybraną nazwą. Upstream to proxy, do którego wysyłany jest twój ruch: albo proxy SOCKS5, które ci przekazano, albo takie, które tworzy moduł dostawcy. Gdy uruchamiasz exit, kiwi-proxy tworzy dla niego **gateway**. Gateway to sieciowa przestrzeń nazw (network namespace), czyli osobny stos sieciowy z własnymi trasami i zaporą. Jedyna trasa z gatewaya prowadzi do tego upstreamu. Programy na hoście mogą korzystać z exitu przez lokalny port SOCKS5 |
 | [**kiwi-custodia**](kiwi-custodia.md) | **Dystrybucje Linuksa w boxach, które korzystają z exitu.** Box to kontener rootless (działający bez uprawnień roota) z Fedorą, Ubuntu, Debianem, Kali, Archem, openSUSE, Rocky albo Alpine i z własnym folderem domowym. *Cały* ruch sieciowy z boxa przechodzi przez exit. Dotyczy to także menedżerów pakietów, gier i programów linkowanych statycznie, które ignorują ustawienia proxy |
 | [**kiwi-fox**](kiwi-fox.md) | **Profile przeglądarki, które korzystają z exitu.** Każdy profil uruchamia Camoufox, Firefoksa albo Tor Browser i ma własne dane |
 | [**Moduły dostawców**](providers.md) | Moduły, które tworzą exity przez Tor, VPN (z gluetun), 9proxy albo Mysterium. Tor i Mysterium to szybki sposób na zdobycie dodatkowych adresów IP, przydatnych przy testach |
@@ -50,10 +50,10 @@ jakiego potrzebują, a poza tym nic na hoście się nie zmienia.
   Podmanie, który uruchamia kontenery jako twój własny użytkownik. Sieć samego
   hosta pozostaje bez zmian.
 - **Zapytania DNS też idą przez exit.** Domyślnie nazwy są rozwiązywane przez
-  DNS over HTTPS (DoH) przez exit, a listy domen reklamowych są blokowane.
+  DNS over HTTPS (DoH) przez exit, a domeny reklamowe z list blokowania są odrzucane.
   Żeby rozwiązywać **wewnętrzne nazwy hostów** klienta, użyj zamiast tego
-  `--dns remote`. Nazwy są wtedy przekazywane na stronę klienta i tam
-  rozwiązywane. Tego trybu wymagają też Tor i nazwy `.onion`.
+  `--dns remote`. Nazwy są wtedy przekazywane dalej i rozwiązywane
+  po stronie klienta. Tego trybu wymagają też Tor i nazwy `.onion`.
 
 ## Ograniczenia { #limits }
 
@@ -67,7 +67,7 @@ Te ograniczenia podają same repozytoria:
   potrzebujesz jednocześnie własnych VPN-ów kilku klientów, obecnie da się to
   zrobić tylko przez osobny punkt końcowy SOCKS5 dla każdego klienta.
 - **Box ogranicza sieć, ale nie jest piaskownicą.** Tak jak kontener
-  distrobox współdzieli twój ekran, magistralę sesji i schowek. Nie może
+  distrobox, współdzieli twój ekran, magistralę sesji i schowek. Nie może
   jedynie łączyć się z siecią inaczej niż przez swój exit.
 - **Mysterium:** jedna tożsamość może mieć naraz tylko jedno połączenie.
 

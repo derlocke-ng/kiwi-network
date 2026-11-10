@@ -6,7 +6,7 @@ monitor de resolutie vast, de verversingsfrequentie (ook variabele
 verversingsfrequentie, VRR), de positie en de schaal, en welke monitor het
 hoofdscherm is. gnome-monitor kan ook één monitor **uit- en aanzetten**. Dat is
 handig als een andere computer op dezelfde monitor is aangesloten en hem nodig
-heeft. Er is een opdrachtregeltool en een GTK4-paneel.
+heeft. gnome-monitor heeft een opdrachtregeltool en een GTK4-paneel.
 
 - Repository: [derlocke-ng/gnome-monitor](https://github.com/derlocke-ng/gnome-monitor), GPL-3.0-or-later
 - Nieuwste release: **v0.3.2**. Staat in de [Kiwi-catalogus](catalogs.md), scope user.
@@ -41,8 +41,8 @@ vensterbeheerder van GNOME. Het werkt op Wayland en op X11, en heeft geen
 rootrechten en geen GNOME-extensie nodig. Profielen zijn JSON-bestanden in
 `~/.config/gnome-monitor/profiles/`. Een monitor wordt herkend aan zijn EDID,
 de identificatiegegevens die de monitor zelf doorgeeft. Een nieuwe
-schermindeling wordt zonder bevestigingsvenster toegepast. Wil je dat liever
-wel, dan kun je een optie aanzetten die vraagt of je de nieuwe indeling wilt
+schermindeling wordt zonder bevestigingsvenster toegepast. Wil je liever een
+bevestiging, dan kun je een optie aanzetten die vraagt of je de nieuwe indeling wilt
 houden. Bij het inloggen wordt de schermindeling hersteld. Met `--dry-run`
 vraagt gnome-monitor aan Mutter of een indeling geldig is, zonder haar toe te
 passen.

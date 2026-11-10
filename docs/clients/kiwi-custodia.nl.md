@@ -12,7 +12,7 @@ kan de container het netwerk alleen via zijn exit bereiken.*
 
 - Repository: [derlocke-ng/kiwi-custodia](https://github.com/derlocke-ng/kiwi-custodia), GPL-3.0-or-later
 - Nieuwste release: **v0.2.3**. Staat in de [Kiwi-catalogus](../desktop/catalogs.md), scope user.
-- Er is een opdrachtregeltool (`kiwi-custodia`) en een GTK4-app (**Kiwi Custodia**).
+- Heeft een opdrachtregeltool (`kiwi-custodia`) en een GTK4-app (**Kiwi Custodia**).
 
 Een **box** is één Linux-distributie in een rootless Podman-container, dus een
 container die zonder rootrechten als je eigen gebruiker draait. De box heeft een
