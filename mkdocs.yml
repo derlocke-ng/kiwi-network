@@ -132,9 +132,9 @@ plugins:
           The fleet file: El archivo fleet
           Modules: Módulos
           Machines: Máquinas
-          Operations: Operaciones
+          Operations: Administración
           Roadmap: Hacia dónde va
-          One machine without a fleet: Una máquina sin fleet
+          One machine without a fleet: Una sola máquina, sin fleet
           Hubs, not platforms: Hubs, no plataformas
           The framework's apps: Las apps del framework
           Armory, a distribution: Armory, una distribución
@@ -142,11 +142,11 @@ plugins:
           Desktop: Escritorio
           Catalogs & publishing: Catálogos y publicación
           Client networks: Redes de clientes
-          Provider modules: Módulos de proveedores
+          Provider modules: Módulos de proveedor
           Project: Proyecto
           Repositories & status: Repositorios y estado
           Icons & colours: Iconos y colores
-          Contributing: Contribuir
+          Contributing: Cómo contribuir
       - locale: it
         name: Italiano
         build: true
