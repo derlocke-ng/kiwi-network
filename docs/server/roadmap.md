@@ -82,6 +82,17 @@ control node at home keeps their network. The host of the master cannot read
 it, and runs one VM per tenant. kiwi-server's netcup support (`kiwi-server
 vps`, *built*) is the first piece of its provider driver.
 
+## More hosters, and network boot
+
+*Planned.* The aim is a fully automated install wherever a machine lives.
+
+- **Hosters as plugins.** netcup is built in today. The plan is a repository of
+  its own for hoster APIs, so anyone can add AWS, Hetzner and the rest
+  the way netcup works now: create or wipe a server, put the install on it,
+  and boot it.
+- **Wake-on-LAN and PXE boot** for machines at home: a node wakes and installs
+  over the network, with no USB stick.
+
 ## Also on the list
 
 A standby master, rootless podman, IPv6 end to end, ARM boards, port ranges

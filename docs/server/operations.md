@@ -163,6 +163,10 @@ phone itself and lower its own `MTU =` if the probe says so.
 
 ## netcup VPSes
 
+netcup is the hoster kiwi-server can install on by itself today, through its
+Server Control Panel API. Other hosters are
+[planned](roadmap.md#more-hosters-and-network-boot) as plugins.
+
 ```bash
 kiwi-server vps login fleet.yaml         # device-flow login; the token goes to secrets/
 kiwi-server vps list fleet.yaml

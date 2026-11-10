@@ -80,7 +80,8 @@ Keep such an ISO off a provider's ISO store and delete it after the install.
 machine you installed yourself (`--offline` for the whole role).
 
 On a netcup VPS, `kiwi-server vps install fleet.yaml sorbet` wipes the server and
-installs the ISO through netcup's API.
+installs the ISO through netcup's API, with nobody at a console. netcup is the
+only hoster so far; others are [planned](roadmap.md#more-hosters-and-network-boot).
 
 ## Commands
 
