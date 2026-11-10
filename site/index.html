@@ -157,7 +157,7 @@
           </article>
           <article class="fact">
             <h3>Nothing lost</h3>
-            <p>Every node's data goes to a backup node each night, append-only. The fleet itself is backed up, encrypted, to the nodes you name.</p>
+            <p>Every node's data goes to a backup node each night, append-only, and restores onto another node (tested). The fleet itself is backed up, encrypted, to the nodes you name.</p>
             <a href="docs/server/operations/#backing-up-the-machines-data">Backups →</a>
           </article>
           <article class="fact">
@@ -365,7 +365,7 @@ kiwi-server status fleet.yaml</code></pre>
           <table class="status">
             <thead><tr><th>Repository</th><th>Release</th><th>Notes</th></tr></thead>
             <tbody>
-              <tr><td><a href="https://github.com/derlocke-ng/kiwi-server">kiwi-server</a></td><td><span class="tag tag--rel">v2.42.0</span></td><td>Proven on hardware. Federation, 5G phones and restoring a node's data are not yet; the control plane is designed.</td></tr>
+              <tr><td><a href="https://github.com/derlocke-ng/kiwi-server">kiwi-server</a></td><td><span class="tag tag--rel">v2.42.0</span></td><td>Proven on hardware, node backups restored across nodes, MTU tuned for mobile paths. Federation and the control plane are designed.</td></tr>
               <tr><td><a href="https://github.com/derlocke-ng/kiwi-modules">kiwi-modules</a> · <a href="https://github.com/derlocke-ng/kiwi-stack">kiwi-stack</a></td><td><span class="tag tag--rel">v0.23.0 · v0.5.0</span></td><td>The 20 modules and their renderer, and the machine side; usable without a fleet.</td></tr>
               <tr><td><a href="https://github.com/derlocke-ng/kiwi-framework">kiwi-framework</a></td><td><span class="tag tag--rel">v0.32.1</span></td><td>Discovery between hubs, approvals and NIP-07/46 signers still to come.</td></tr>
               <tr><td><a href="https://github.com/derlocke-ng/armory">Armory</a></td><td><span class="tag tag--main">main</span></td><td>Live on <a href="https://derlocke-ng.github.io/armory/">GitHub Pages</a> and as a container image.</td></tr>

@@ -47,9 +47,10 @@ are as of November 2026.
 
 From the repositories themselves:
 
-- **kiwi-server**: proven on hardware in October–November 2026, but federation,
-  a phone on 5G and restoring a node's data are not proven yet. IPv4 only, and
-  the Debian ISO is amd64 only. The control plane is designed, not built.
+- **kiwi-server**: proven on hardware in October–November 2026, with node
+  backups restored across nodes and the tunnel MTU tuned, mobile paths
+  included. Federation between networks is not proven yet. IPv4 only, and the
+  Debian ISO is amd64 only. The control plane is designed, not built.
 - **kiwi-modules**: OpenCloud, Immich and Paperless-ngx are "to try out". A TURN
   server for calls is waiting to be merged.
 - **kiwi-stack**: no rollback beyond restoring data and re-applying an older

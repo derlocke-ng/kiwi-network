@@ -145,11 +145,12 @@ hand-written fleet file are lost when it saves.
 The pipeline was proven on hardware in October and November 2026. Debian,
 uCore and Fedora CoreOS were booted end to end on two VPSes, a mini PC and a
 VM, and a dead-node drill rebuilt an encrypted Debian machine in about 14
-minutes. CI renders every role, shellchecks every script, validates every Butane
-config, and pins four golden stacks byte for byte.
+minutes. Node backups were restored from one node onto another (papaya to
+lychee), and the tunnel MTU was measured and tuned on real paths, mobile ones
+included. CI renders every role, shellchecks every script, validates every
+Butane config, and pins four golden stacks byte for byte.
 
-Not proven yet, as the repository says: federation, a phone on 5G, and restoring
-a node's data. Everything is IPv4. The Debian ISO is amd64 only. A planned
+Not proven yet: federation between networks. Everything is IPv4. The Debian ISO is amd64 only. A planned
 control plane (`kiwi-server serve`) is designed but not built.
 
 Read on: [The fleet file](fleet.md) · [Roles](roles.md) · [Modules](modules.md) ·

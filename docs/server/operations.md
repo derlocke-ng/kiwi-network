@@ -68,6 +68,8 @@ sudo kiwi-stack backup | snapshots | restore [--at TIME] MODULE...   # on the ma
 kiwi-server prune fleet.yaml            # keep 7 daily, 4 weekly, 6 monthly
 ```
 
+A restore was tested node to node: papaya's backups onto lychee.
+
 ## Encrypted disks and unlocking
 
 - **Debian** (`debian.encrypt: true`) installs with a one-time key you type at
@@ -93,6 +95,9 @@ kiwi-server prune fleet.yaml            # keep 7 daily, 4 weekly, 6 monthly
 ```bash
 kiwi-server mtu fleet.yaml papaya --write   # measure with don't-fragment pings, write wg_mtu
 ```
+
+The default `wg_mtu` of 1376 was measured on real paths. Run `mtu` for a path
+of your own, such as a phone on mobile data.
 
 ## netcup VPSes
 
