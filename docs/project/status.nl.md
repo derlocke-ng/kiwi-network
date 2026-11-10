@@ -46,7 +46,7 @@ versietags. De versies zijn die van november 2026.
 | [kiwi-cli-tools-desktop](https://github.com/derlocke-ng/kiwi-cli-tools-desktop) | `pweb`, `select-server`, `tethering`, `torlink` | v1.2.1 | ja | GPL-3.0+ |
 | [kiwi-gen](https://github.com/derlocke-ng/kiwi-gen) | maakt offline in de browser SSH- en TLS-sleutels en certificaten aan ([live](https://derlocke-ng.github.io/kiwi-gen/)) | webpagina | nee | MIT |
 | [kiwi-icons](https://github.com/derlocke-ng/kiwi-icons) | de iconen van de apps ([voorbeeld](https://derlocke-ng.github.io/kiwi-icons/)) | geen tags | nee | niet vermeld |
-| [kiwi-network](https://github.com/derlocke-ng/kiwi-network) | deze website en documentatie | n.v.t. | n.v.t. | AGPL-3.0 |
+| [kiwi-network](https://github.com/derlocke-ng/kiwi-network) | deze website en documentatie | n.v.t. | n.v.t. | GPL-3.0-or-later, CC BY-SA 4.0 |
 
 ## Bekende hiaten { #known-gaps }
 

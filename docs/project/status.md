@@ -45,7 +45,7 @@ what kiwi-updater installs. The versions are as of November 2026.
 | [kiwi-cli-tools-desktop](https://github.com/derlocke-ng/kiwi-cli-tools-desktop) | `pweb`, `select-server`, `tethering`, `torlink` | v1.2.1 | yes | GPL-3.0+ |
 | [kiwi-gen](https://github.com/derlocke-ng/kiwi-gen) | creates SSH and TLS keys and certificates offline in the browser ([live](https://derlocke-ng.github.io/kiwi-gen/)) | web page | no | MIT |
 | [kiwi-icons](https://github.com/derlocke-ng/kiwi-icons) | the app icons ([preview](https://derlocke-ng.github.io/kiwi-icons/)) | no tags | no | none stated |
-| [kiwi-network](https://github.com/derlocke-ng/kiwi-network) | this website and documentation | n/a | n/a | AGPL-3.0 |
+| [kiwi-network](https://github.com/derlocke-ng/kiwi-network) | this website and documentation | n/a | n/a | GPL-3.0-or-later, CC BY-SA 4.0 |
 
 ## Known gaps
 

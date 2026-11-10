@@ -46,7 +46,7 @@ novembro de 2026.
 | [kiwi-cli-tools-desktop](https://github.com/derlocke-ng/kiwi-cli-tools-desktop) | `pweb`, `select-server`, `tethering`, `torlink` | v1.2.1 | sim | GPL-3.0+ |
 | [kiwi-gen](https://github.com/derlocke-ng/kiwi-gen) | cria chaves e certificados SSH e TLS no navegador, sem ligação à rede ([ao vivo](https://derlocke-ng.github.io/kiwi-gen/)) | página web | não | MIT |
 | [kiwi-icons](https://github.com/derlocke-ng/kiwi-icons) | os ícones das aplicações ([pré-visualização](https://derlocke-ng.github.io/kiwi-icons/)) | sem tags | não | não indicada |
-| [kiwi-network](https://github.com/derlocke-ng/kiwi-network) | este site e esta documentação | n/a | n/a | AGPL-3.0 |
+| [kiwi-network](https://github.com/derlocke-ng/kiwi-network) | este site e esta documentação | n/a | n/a | GPL-3.0-or-later, CC BY-SA 4.0 |
 
 ## Lacunas conhecidas { #known-gaps }
 

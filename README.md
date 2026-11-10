@@ -23,7 +23,6 @@ Every repository, with its release and known gaps, is on the
 
 ```
 site/              the homepage: plain HTML, CSS and JS; no build step, no third-party requests
-site/icons/        app icons, copied from kiwi-icons
 docs/              the documentation (MkDocs Material): page.md in English, page.de.md, page.fr.md … beside it
 mkdocs.yml         docs configuration (builds into build/docs)
 .github/workflows/pages.yml   builds the docs, puts site/ at / and the docs at /docs/, deploys to GitHub Pages
@@ -51,8 +50,20 @@ the same section, and a missing translation falls back to English.
 
 ## License
 
-AGPL-3.0 (see `LICENSE`). Each tool carries its own license; most are
-GPL-3.0-or-later, and kiwi-gen is MIT. The icons in `site/icons/` and
-`docs/assets/icons/` come from
-[kiwi-icons](https://github.com/derlocke-ng/kiwi-icons), and the Armory app icons
-from [Armory](https://github.com/derlocke-ng/armory).
+The repository has two licenses, one for the words and one for the code:
+
+- **Text: [CC BY-SA 4.0](LICENSE-CC-BY-SA-4.0).** The documentation in `docs/`
+  and the text of the homepage. You may copy, translate and adapt it, also
+  commercially, if you name Kiwi Network as the source and share your version
+  under the same license.
+- **Code: [GPL-3.0-or-later](LICENSE).** The homepage's HTML, CSS and JS, the
+  docs' stylesheet, `mkdocs.yml` and the workflow.
+
+The logo and the app icons (`site/logo.svg`, `docs/assets/logo.svg`,
+`docs/assets/icons/`) are copies from
+[kiwi-icons](https://github.com/derlocke-ng/kiwi-icons) and some apps' own
+repositories, and they are under the terms of those repositories, not the two
+licenses above.
+
+Each Kiwi tool carries its own license. Most are GPL-3.0-or-later, and kiwi-gen
+is MIT.
