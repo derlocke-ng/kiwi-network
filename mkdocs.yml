@@ -1,5 +1,5 @@
 site_name: Kiwi Network
-site_description: Open-source tools to connect what is yours — a private WireGuard mesh built from one file, peer-to-peer tools over nostr, and apps for Fedora Atomic desktops.
+site_description: Kiwi Network is an open-source Linux environment you run yourself. Your servers, devices and desktop in one private network that installs, updates, backs up and recovers on its own.
 site_url: https://kiwi-network.eu/docs/
 
 site_dir: build/docs

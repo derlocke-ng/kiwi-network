@@ -1,7 +1,9 @@
 # kiwi-network
 
-The website and documentation of **Kiwi Network**: open-source tools for
-connecting what is yours, meaning your machines, your people and your desktop.
+The website and documentation of **Kiwi Network**, an open-source Linux
+environment that you run yourself: your servers, your devices and your desktop,
+connected in one private network. It installs itself, keeps itself up to date,
+makes a backup every night and can be rebuilt when something breaks.
 
 - **Homepage:** <https://kiwi-network.eu> (`site/`)
 - **Documentation:** <https://kiwi-network.eu/docs/> (`docs/`, MkDocs Material)
@@ -10,9 +12,9 @@ connecting what is yours, meaning your machines, your people and your desktop.
 
 | | Tools |
 |---|---|
-| **Network**: a private WireGuard mesh with its own DNS, CA, services and backups, built from one file | [kiwi-server](https://github.com/derlocke-ng/kiwi-server) (fleet file → install ISOs → apply over SSH), with [kiwi-modules](https://github.com/derlocke-ng/kiwi-modules) (20 modules, the renderer) and [kiwi-stack](https://github.com/derlocke-ng/kiwi-stack) (the machine side) |
-| **People**: peer-to-peer web tools over nostr, sealed in the browser | [kiwi-framework](https://github.com/derlocke-ng/kiwi-framework), [Armory](https://github.com/derlocke-ng/armory) ([live](https://derlocke-ng.github.io/armory/)), [kiwi-web-catalog](https://github.com/derlocke-ng/kiwi-web-catalog) |
-| **Desktop**: apps for Fedora Atomic, installed from git catalogs | [kiwi-updater](https://github.com/derlocke-ng/kiwi-updater) and the [kiwi-catalog](https://github.com/derlocke-ng/kiwi-catalog): kiwi-killswitch, ensconce, kiwi-proxy, kiwi-custodia, kiwi-fox and its provider modules, gnome-monitor, syncman, kiwi-cli-tools-desktop |
+| **The network**: your servers and devices in one private WireGuard network, with its own DNS, certificates, services and backups. One file describes all of it, and the machines are installed and maintained automatically | [kiwi-server](https://github.com/derlocke-ng/kiwi-server) builds and runs the network. [kiwi-modules](https://github.com/derlocke-ng/kiwi-modules) holds the 20 modules and generates their configuration, and [kiwi-stack](https://github.com/derlocke-ng/kiwi-stack) runs them on each machine |
+| **Hubs**: software for communities to run their own hub (an open marketplace, feed, chat, file sharing) in the browser, synchronised over nostr, with no central platform | [kiwi-framework](https://github.com/derlocke-ng/kiwi-framework), [Armory](https://github.com/derlocke-ng/armory) ([live](https://derlocke-ng.github.io/armory/)), [kiwi-web-catalog](https://github.com/derlocke-ng/kiwi-web-catalog) |
+| **The desktop**: a Fedora Atomic workstation that is set up automatically and gets its apps from git catalogs | [kiwi-updater](https://github.com/derlocke-ng/kiwi-updater) and the [kiwi-catalog](https://github.com/derlocke-ng/kiwi-catalog): kiwi-killswitch, ensconce, kiwi-proxy, kiwi-custodia, kiwi-fox and its provider modules, gnome-monitor, syncman, kiwi-cli-tools-desktop |
 
 Every repository, with its release and known gaps, is on the
 [status page](https://kiwi-network.eu/docs/project/status/).
