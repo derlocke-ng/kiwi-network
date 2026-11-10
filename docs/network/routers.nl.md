@@ -1,42 +1,49 @@
 # Routers: een heel LAN in de mesh
 
-Een apparaat in de mesh kan elke fleet-naam opzoeken en elke node bereiken. Een
-LAN achter een router kan hetzelfde zonder dat elk apparaat WireGuard draait, op
-een van twee manieren:
+Op deze pagina lees je hoe je een heel lokaal netwerk (LAN), bijvoorbeeld je
+thuis- of kantoornetwerk, via de router met je Kiwi Network verbindt. Een
+apparaat in de mesh, het besloten WireGuard-netwerk waarin al je machines
+zitten, kan elke naam in de fleet opzoeken en bij elke node. De apparaten in
+een LAN achter een router kunnen dat ook, zonder dat op elk ervan WireGuard
+hoeft te draaien. Dat regel je op een van deze twee manieren:
 
-- **De router is een mesh-client.** Hij draait WireGuard met een configuratie
-  die wg-easy op de master heeft uitgegeven (`kiwi-server enroll fleet.yaml router --group routers`)
-  en routeert het mesh-subnet (`10.8.0.0/16`) de tunnel in.
-  Dat is de *split*-tunnel: alleen mesh-verkeer gaat erdoorheen. De *full*-tunnel
-  stuurt alles, zodat het hele LAN het internet bereikt via de exit van de
-  master.
-- **Een statische route naar een gateway-node.** De router heeft geen tunnel. Hij
-  stuurt het mesh-subnet naar een node op het LAN die de module `gateway` draait,
-  en die stuurt het door via zijn VPN-client.
+- **De router is een client in de mesh.** Op de router draait WireGuard met een
+  configuratie die is uitgegeven door wg-easy, de WireGuard-server van de master
+  (`kiwi-server enroll fleet.yaml router --group routers`). De router stuurt
+  verkeer voor het mesh-subnet (`10.8.0.0/16`) de tunnel in. Dit heet een
+  *split*-tunnel, omdat alleen verkeer voor de mesh erdoor gaat. Bij een
+  *full*-tunnel gaat al het verkeer erdoor. Het hele LAN komt dan op internet
+  via de uitgang van de master, de verbinding van de master met internet.
+- **De router heeft een statische route naar een gateway-node.** De router
+  heeft zelf geen tunnel. Hij stuurt verkeer voor het mesh-subnet naar een node
+  in het LAN waarop de module `gateway` draait, en die node stuurt het verkeer
+  via zijn VPN-client verder.
 
-Hoe dan ook vervangt één DNS-regel de overrides per host: het domein van de fleet
-(`*.home`) wordt doorgestuurd naar de Pi-hole van de master, die elke host- en
+In beide gevallen heb je genoeg aan één DNS-regel en hoef je geen afzonderlijke
+hosts in te voeren. De regel stuurt verzoeken voor het domein van de fleet
+(`*.home`) door naar de Pi-hole van de master, die elke hostnaam en elke
 dienstnaam kent. Verder verandert er niets aan de DNS van de router.
 
-Wat het LAN niet kan, is een apparaat *achter een andere router* bereiken via
-zijn LAN-adres. De mesh vervoert alleen mesh-adressen, en dat is zo bedoeld.
+Eén ding werkt niet: een apparaat in het LAN kan een apparaat *achter een
+andere router* niet bereiken op het LAN-adres van dat apparaat. Over de mesh
+gaat alleen verkeer voor mesh-adressen, en dat is zo bedoeld.
 
 ## OpenWrt { #openwrt }
 
-kiwi-server schrijft de hele configuratie als een `uci`-script:
+Voor OpenWrt schrijft kiwi-server de hele configuratie als een `uci`-script:
 
 ```bash
-# de router als mesh-client, met de configuratie die wg-easy op de master heeft uitgegeven
+# de router als client in de mesh, met de configuratie die wg-easy op de master heeft uitgegeven
 kiwi-server openwrt fleet.yaml --wireguard secrets/router.conf          # split: alleen de mesh
 kiwi-server openwrt fleet.yaml --wireguard secrets/router.conf --full   # full: alles
 
 # geen tunnel op de router: een statische route naar de gateway-node lychee
-# (lychee heeft een statisch LAN-adres nodig in de fleet: network.dhcp false + address)
+# (lychee heeft in het fleetbestand een vast LAN-adres nodig: network.dhcp false + address)
 kiwi-server openwrt fleet.yaml --via lychee
 kiwi-server openwrt fleet.yaml --via 192.168.1.5
 ```
 
-Kopieer de uitvoer naar de router en voer die uit:
+Kopieer de uitvoer naar de router en voer het script daar uit:
 
 ```bash
 kiwi-server openwrt fleet.yaml --wireguard secrets/router.conf > kiwi.sh
@@ -44,38 +51,47 @@ scp kiwi.sh root@192.168.1.1:/tmp/ && ssh root@192.168.1.1 sh /tmp/kiwi.sh
 ```
 
 Het script installeert het WireGuard-pakket als dat ontbreekt. Het maakt een
-interface `kiwi` aan (wijzig de naam met `--name`), met de `wg_mtu` van de fleet
-als MTU en één peer voor de master
-en `route_allowed_ips`, een firewallzone waarin het LAN mag doorsturen (met
-masquerading en MSS-clamping), en de dnsmasq-doorverwijzing voor het domein van
-de fleet (`server=/home/10.8.0.1`). Met `--full` stuurt dnsmasq elke opzoeking
-naar de Pi-hole van de master. Elke sectie heeft een naam, dus als je het script
-opnieuw draait, vervangt het wat het eerder schreef.
+interface aan met de naam `kiwi`; met `--name` kies je een andere naam. De
+interface krijgt de `wg_mtu` van de fleet als MTU en heeft één peer, de master.
+Die peer wordt aangemaakt met `route_allowed_ips`, zodat OpenWrt de routes zelf
+toevoegt. Daarnaast maakt het script een firewallzone aan waar het LAN verkeer
+naartoe mag doorsturen, met masquerading en MSS-clamping. Tot slot voegt het de
+dnsmasq-regel toe die het domein van de fleet doorstuurt naar de master
+(`server=/home/10.8.0.1`). Met `--full` stuurt dnsmasq elk DNS-verzoek naar de
+Pi-hole van de master. Elke sectie die het script schrijft, heeft een naam.
+Voer je het script opnieuw uit, dan vervangt het dus wat het eerder heeft
+geschreven.
 
 ## FritzBox { #fritzbox }
 
-Fritz!OS heeft een WireGuard-client en statische routes, maar geen DNS-doorverwijzing
-per domein, dus de DNS-regel verhuist naar een node:
+Fritz!OS heeft een WireGuard-client en statische routes, maar kan
+DNS-verzoeken voor één enkel domein niet doorsturen. De DNS-regel moet daarom
+door een node worden afgehandeld:
 
-1. **Tunnel:** Internet → Permit Access → VPN (WireGuard) → Add Connection →
-   verbinden met een andere WireGuard-dienst → importeer de configuratie die de
-   master heeft uitgegeven. De `AllowedIPs` daarin bepalen split of full.
-2. **Of een statische route:** Home Network → Network → Network Settings → IPv4
-   Routes. Bestemming `10.8.0.0`, subnetmasker `255.255.0.0`, gateway het
-   LAN-adres van de gateway-node.
-3. **DNS:** laat het LAN naar een Pi-hole wijzen. Stel de gateway-node in als
-   lokale DNS-server, of laat de Pi-hole van de node de DHCP-server van het LAN
-   zijn (instellingen `dns.dhcp_*` plus de module dhcp-relay). De Pi-hole van de
-   node kent de namen van de fleet en stuurt de rest door naar de master.
+1. **Tunnel:** ga naar Internet → Toegang verlenen → VPN (WireGuard) →
+   Verbinding toevoegen, kies voor een verbinding met een andere
+   WireGuard-dienst en importeer de configuratie die de master heeft
+   uitgegeven. De regel `AllowedIPs` in die configuratie bepaalt of de tunnel
+   split of full is.
+2. **Of een statische route:** ga naar Thuisnetwerk → Netwerk →
+   Netwerkinstellingen → IPv4-routes. Vul `10.8.0.0` in als doelnetwerk,
+   `255.255.0.0` als subnetmasker en het LAN-adres van de gateway-node als
+   gateway.
+3. **DNS:** laat het LAN een Pi-hole als DNS-server gebruiken. Stel de
+   gateway-node in als lokale DNS-server, of laat de Pi-hole van de node de
+   DHCP-server van het LAN zijn (de instellingen `dns.dhcp_*` samen met de
+   module dhcp-relay). De Pi-hole van de node kent de namen van de fleet en
+   stuurt alle andere verzoeken door naar de master.
 
-De tunnel en statische routes kunnen naast elkaar bestaan. Voor de mesh wint de
-tunnel.
+Je kunt de tunnel en statische routes tegelijk gebruiken. Verkeer voor de mesh
+gaat dan door de tunnel.
 
 ## Elke andere router { #any-other-router }
 
-Drie feiten zijn genoeg. Geef de router een WireGuard-clientconfiguratie, of voeg
-een statische route voor `10.8.0.0/16` toe naar het LAN-adres van de gateway-node.
-Laat daarna de DNS van het LAN wijzen naar een Pi-hole die de fleet kent, en dat
-is elke node die de module `dns` draait. Routers met dnsmasq eronder (DD-WRT,
-Tomato, de forwarder van pfSense) accepteren ook de doorverwijzing van één regel
+Bij elke andere router heb je aan drie dingen genoeg. Geef de router een
+WireGuard-clientconfiguratie, of voeg een statische route voor `10.8.0.0/16`
+toe die naar het LAN-adres van de gateway-node wijst. Laat het LAN daarna als
+DNS-server een Pi-hole gebruiken die de fleet kent. Elke node waarop de module
+`dns` draait, is zo’n Pi-hole. Routers op basis van dnsmasq (DD-WRT, Tomato, de
+forwarder in pfSense) accepteren ook de doorstuurregel van één regel:
 `server=/home/10.8.0.1`.

@@ -1,23 +1,37 @@
 # Huby, nie platformy
 
-Sieć łączy twoje maszyny. **Huby** łączą ludzi. Hub to zestaw aplikacji
-webowych (otwarty rynek, feed, czat, udostępnianie plików, wspólne listy,
-menedżer haseł, kalendarz), które działają w całości w przeglądarce i
-synchronizują się przez przekaźniki [nostr](https://nostr.com) wybrane przez
-społeczność. Nie ma serwera kont ani backendu pośrodku, a wszystko, co
-prywatne, jest szyfrowane na urządzeniu, zanim je opuści. Każdy może
-prowadzić hub dla dowolnej społeczności. Zobacz
-[aplikacje frameworka](apps.md).
+**kiwi-framework** to oprogramowanie, dzięki któremu każda społeczność może
+prowadzić własny **hub**. Hub to strona internetowa z zestawem aplikacji dla
+członków społeczności: otwartym rynkiem, kanałem, czatem, udostępnianiem
+plików, wspólnymi listami, menedżerem haseł i kalendarzem. Hub może uruchomić
+każdy i dla dowolnej społeczności, a ta nie zależy wtedy od centralnej
+platformy, która trzyma konta i dane wszystkich.
 
-Składają się na to trzy repozytoria:
+Aplikacje działają w całości w przeglądarce. Synchronizują się przez
+przekaźniki [nostr](https://nostr.com), czyli serwery, które przechowują
+podpisane wiadomości i przekazują je dalej. O tym, z których przekaźników
+korzysta hub, decyduje społeczność. Między przeglądarką a przekaźnikami nie ma
+serwera kont ani żadnego backendu, a wszystko, co prywatne, jest szyfrowane na
+urządzeniu przed wysłaniem. Pozostałe części Kiwi Network łączą twoje maszyny.
+Huby łączą ludzi. Poszczególne aplikacje opisuje strona
+[Aplikacje frameworka](apps.md).
 
-| Repozytorium | Co to jest |
+Armory to pierwszy hub zbudowany na tym frameworku. Jest jednym z możliwych
+przykładów, a zarazem szablonem, który inne społeczności kopiują, żeby zbudować
+własny hub.
+
+Oprogramowanie mieści się w trzech repozytoriach:
+
+| Repozytorium | Czym jest |
 |---|---|
-| [**kiwi-framework**](https://github.com/derlocke-ng/kiwi-framework) | Silnik: tożsamość i konta, przekaźniki i synchronizacja, ludzie i udostępnianie, moderacja, zestaw projektowy, strony huba i dziesięć aplikacji. Sam nie dostarcza niczego, co użytkownik otwiera. v0.32.1, GPL-3.0-or-later |
-| [**Armory**](armory.md) | Pierwsza **dystrybucja**: hub zbudowany na frameworku, z nazwą, domyślnymi przekaźnikami i wszystkimi dziesięcioma aplikacjami zamontowanymi pod własnymi nazwami. Szablon do sforkowania na własny hub. GPL-3.0-or-later. **Na żywo:** [derlocke-ng.github.io/armory](https://derlocke-ng.github.io/armory/) |
-| [**kiwi-web-catalog**](hubs.md#kiwi-web-catalog) | Katalog git hubów i ich aplikacji, w tym samym kształcie co desktopowy [kiwi-catalog](../desktop/catalogs.md) |
+| [**kiwi-framework**](https://github.com/derlocke-ng/kiwi-framework) | Ogólne oprogramowanie, z którego powstaje każdy hub. Zawiera tożsamość i konta, przekaźniki i synchronizację, znajomych i udostępnianie, moderację, zestaw komponentów interfejsu, strony huba oraz dziesięć aplikacji. Samego frameworka nie da się otworzyć jako strony internetowej. Hubem staje się dopiero w dystrybucji. Aktualna wersja to v0.32.1, a licencja to GPL-3.0-or-later. |
+| [**Armory**](armory.md) | Pierwsza **dystrybucja**, czyli konkretny hub zbudowany na frameworku. Dokłada nazwę, domyślne przekaźniki i wszystkie dziesięć aplikacji, każdą pod własną nazwą. To szablon, który forkujesz, żeby zrobić własny hub. Licencja: GPL-3.0-or-later. **Działa pod adresem:** [derlocke-ng.github.io/armory](https://derlocke-ng.github.io/armory/) |
+| [**kiwi-web-catalog**](hubs.md#kiwi-web-catalog) | Katalog, czyli repozytorium git z listą hubów i ich aplikacji. Ma ten sam format co [kiwi-catalog](../desktop/catalogs.md) dla desktopu. |
 
-## Jak to się łączy { #how-it-fits-together }
+## Jak to się składa w całość { #how-it-fits-together }
+
+Schemat pokazuje, jak z frameworka powstaje hub w twojej przeglądarce i z jakimi
+serwerami przeglądarka potem się łączy.
 
 ```
 kiwi-framework  (engine: shared data layer, React UI, hub pages, apps)
@@ -36,90 +50,106 @@ any static host (GitHub Pages)  or  the hub container (nginx + HUB_* settings)
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Pojęcia { #the-words }
+## Pojęcia używane na tej stronie { #the-words }
 
-- **Hub**: to, co daje dystrybucja. Pliki statyczne, więc hostowanie huba to
-  serwowanie folderu. Każdy hub ma stronę startową, ustawienia i stronę konta.
-- **Dystrybucja**: hub zbudowany na frameworku, z nazwą i wyglądem,
-  domyślnymi przekaźnikami oraz wybranym zestawem aplikacji w wybranych
-  przestrzeniach. Wszystko, co zmienia fork, leży w jednym pliku,
-  `distribution.js`, plus jego tłumaczenia.
-- **Aplikacja**: folder z manifestem, który podłącza się do dowolnej
-  dystrybucji. Aplikacje rozmawiają tylko z publicznym API frameworka i nigdy
-  nie dotykają bezpośrednio pamięci ani kluczy.
-- **Przestrzeń** (space): nazwana społeczność z właścicielem, z własnymi
-  moderatorami i opcjonalnie własnymi przekaźnikami (na wzór moderowanych
-  społeczności NIP-72). Inny hub może serwować tę samą przestrzeń, podając jej
-  adres.
-- **Montowanie** (mount): kod aplikacji w przestrzeni, z własną nazwą,
-  ścieżką i ikoną. Jedną aplikację można zamontować wiele razy. *Trading Post*
-  w Armory to aplikacja `market` frameworka zamontowana w przestrzeni
-  `tradingpost` Armory.
+- **Hub**: strona internetowa, z której korzysta społeczność. Hub powstaje,
+  gdy zbudujesz dystrybucję. Składa się wyłącznie z plików statycznych, więc
+  jego hosting sprowadza się do udostępnienia folderu z plikami. Każdy hub ma
+  stronę startową, stronę ustawień i stronę konta.
+- **Dystrybucja**: framework razem z decyzjami, które robią z niego jeden
+  konkretny hub. Są to nazwa i wygląd, domyślne przekaźniki oraz wybrany zestaw
+  aplikacji w wybranych przestrzeniach. Gdy forkujesz dystrybucję, wszystko, co
+  zmieniasz, znajduje się w jednym pliku `distribution.js` i w jego
+  tłumaczeniach.
+- **Aplikacja**: folder z plikiem manifestu. Można ją dodać do dowolnej
+  dystrybucji. Aplikacje korzystają wyłącznie z publicznego API frameworka
+  i nigdy nie sięgają bezpośrednio do pamięci przeglądarki ani do kluczy.
+- **Przestrzeń**: społeczność, która ma nazwę, właściciela, własnych
+  moderatorów i, jeśli chce, własne przekaźniki. Wzorem są moderowane
+  społeczności nostr (NIP-72). Inny hub może obsługiwać tę samą przestrzeń,
+  jeśli poda jej adres.
+- **Mount**: jedna aplikacja używana w jednej przestrzeni. Każdy mount ma
+  własną nazwę, własną ścieżkę (adres wewnątrz huba) i własną ikonę. Tę samą
+  aplikację można zamontować wiele razy. Na przykład *Trading Post* w Armory to
+  aplikacja `market` z frameworka zamontowana w przestrzeni `tradingpost`
+  należącej do Armory.
 
-Dwie osoby w różnych dystrybucjach są znajomymi, udostępniają i czatują
-dokładnie tak jak w jednej, bo tożsamość i dane to zdarzenia nostr, a nie
-własność huba.
+Dwie osoby, które korzystają z hubów z różnych dystrybucji, mogą być znajomymi,
+udostępniać sobie rzeczy i rozmawiać na czacie dokładnie tak, jakby korzystały
+z tego samego huba. Jest to możliwe, bo tożsamość i dane każdej osoby to
+zdarzenia nostr, czyli podpisane wiadomości przechowywane na przekaźnikach,
+i nie należą do żadnego huba.
 
 ## Konta i klucze { #accounts-and-keys }
 
-- Każde urządzenie dostaje klucz przy pierwszej wizycie, przechowywany w
-  przeglądarce.
-- **Konto** to nazwa użytkownika i hasło, zbudowane na zwykłych zdarzeniach
-  nostr bez żadnego rejestru: hasło jest wzmacniane przez scrypt i odblokowuje
-  twój klucz. Nikt nie może przejąć ani nadpisać konta bez hasła. **Nie ma
-  resetu hasła**.
-- Możesz też zalogować się istniejącym kluczem nostr (`nsec`, hex lub
-  `ncryptsec`). Podpisywanie przez rozszerzenie przeglądarki i zdalne (NIP-07,
-  NIP-46) jest zaplanowane, nie zbudowane.
-- Jedno konto działa we wszystkich aplikacjach huba i na każdym urządzeniu,
-  na którym się logujesz.
+- Gdy pierwszy raz otwierasz hub na jakimś urządzeniu, przeglądarka tworzy dla
+  tego urządzenia klucz i go zapisuje.
+- **Konto** to nazwa użytkownika i hasło. Opiera się na zwykłych zdarzeniach
+  nostr i nie istnieje żaden rejestr kont. Twoje hasło jest przetwarzane
+  funkcją scrypt, która celowo liczy się długo, a jej wynik odblokowuje twój
+  klucz. Bez hasła nikt nie przejmie konta ani go nie nadpisze. **Hasła nie da
+  się zresetować.**
+- Możesz też zalogować się kluczem nostr, który już masz, podanym jako `nsec`,
+  w zapisie szesnastkowym albo jako `ncryptsec`. Logowanie przez rozszerzenie
+  przeglądarki (NIP-07) lub zdalny program podpisujący (NIP-46) jest planowane,
+  ale jeszcze niezrealizowane.
+- Jedno konto działa we wszystkich aplikacjach huba i na każdym urządzeniu, na
+  którym się zalogujesz.
 
 ## Model prywatności { #privacy-model }
 
-**Co jest szyfrowane.** Treść jest pieczętowana w przeglądarce, zanim
-gdziekolwiek trafi: AES-256-GCM z kluczami wyprowadzanymi przez HKDF.
-Prywatne wiadomości to wiadomości NIP-17 w opakowaniach prezentowych NIP-59
-(gift wraps). Każdy plik dostaje losowy klucz AES-256-GCM, zanim trafi na
-serwer multimediów, a zdjęcia są ponownie kodowane, co usuwa metadane
-aparatu. Vault jest pieczętowany własną frazą dostępu (scrypt + AES-256-GCM).
-Rozmowy idą z przeglądarki do przeglądarki, szyfrowane przez WebRTC.
+**Co jest szyfrowane.** Przeglądarka szyfruje treści, zanim je dokądkolwiek
+wyśle. Używa do tego AES-256-GCM z kluczami wyprowadzanymi przez HKDF.
+Wiadomości prywatne to wiadomości NIP-17 zapakowane w gift wrap NIP-59. Gift
+wrap jest drugą warstwą szyfrowania, dzięki której przekaźnik widzi tylko tyle,
+że jakiś klucz dostał zapakowaną wiadomość. Każdy plik jest przed wysłaniem na
+serwer multimediów szyfrowany własnym, losowym kluczem AES-256-GCM. Zdjęcia są
+najpierw kodowane na nowo, co usuwa metadane dodawane przez aparaty. Vault jest
+szyfrowany osobną frazą dostępu (scrypt + AES-256-GCM). Rozmowy głosowe i wideo
+biegną bezpośrednio z przeglądarki do przeglądarki i szyfruje je WebRTC.
 
-**Najpierw lokalnie.** Każdy zapis trafia najpierw do własnej bazy danych
-przeglądarki, potem do przekaźników. Odczyty pochodzą z urządzenia, więc
-aplikacje działają offline. Gdy urządzenie znów się połączy, przywraca to, co
-przekaźnik zapomniał: dane giną tylko wtedy, gdy zniknie każde urządzenie,
-które je miało, *i* nie ma kopii zapasowej.
+**Najpierw lokalnie.** Wszystko, co piszesz, trafia najpierw do własnej bazy
+danych przeglądarki, a dopiero potem do przekaźników. Aplikacje czytają z tej
+bazy na urządzeniu, więc działają także offline. Gdy urządzenie odzyska
+połączenie, wysyła przekaźnikowi wszystkie dane, których ten już nie ma. Dane
+przepadają więc tylko wtedy, gdy zniknie każde urządzenie, które je miało,
+*a do tego* nie ma kopii zapasowej.
 
-**Co widzą inni.** Repozytoria jasno mówią o ograniczeniach:
+**Co widzą inni.** Ograniczenia opisują same repozytoria:
 
-- Przekaźniki widzą metadane: kto pisze pod które adresy, kiedy, ile i z
-  jakiego adresu IP. Jeśli to ma znaczenie, używaj VPN-a lub Tora.
-- Klucz przestrzeni nie jest tajemnicą. Chroni posty społeczności przed
-  odczytem na pierwszy rzut oka. Polubienia, zgłoszenia i to, kto co
-  skomentował, są widoczne dla przekaźników.
-- Notatki DevBoard i zgłoszenia moderacyjne są celowo publiczne.
-- Twój klucz leży w pamięci przeglądarki. Wszystkie strony GitHub Pages
-  jednego konta dzielą jeden origin, więc hub we własnej (sub)domenie to
-  mocniejsza konfiguracja.
-- Bezpośrednie transfery i rozmowy ujawniają adresy IP obu przeglądarek sobie
-  nawzajem i serwerom STUN (domyślnie Google i Cloudflare; hub może ustawić
-  własne).
-- „Bez naszego serwera” oznacza: żadnego na ścieżce krytycznej. Aplikacje
-  nadal korzystają z przekaźników, serwerów multimediów i, w przypadku
-  kalendarza, z serwera CalDAV, które wybierasz ty lub twój hub.
+- Przekaźniki widzą metadane: kto pisze pod jakie adresy, kiedy, ile i z jakiego
+  adresu IP. Jeśli ma to dla ciebie znaczenie, korzystaj z VPN-u albo Tora.
+- Klucz przestrzeni nie jest tajemnicą. Sprawia jedynie, że wpisów społeczności
+  nie da się czytać całkiem otwarcie. Przekaźniki widzą polubienia, zgłoszenia
+  i to, kto co skomentował.
+- Notki w DevBoard i zgłoszenia do moderacji są z założenia publiczne.
+- Twój klucz jest przechowywany w pamięci przeglądarki. Wszystkie strony GitHub
+  Pages jednego konta mają wspólny origin, a przeglądarki rozdzielają pamięć
+  stron właśnie według originu. Hub pod własną domeną lub subdomeną jest więc
+  mocniejszym rozwiązaniem.
+- Przy bezpośrednim przesyłaniu plików i w trakcie rozmowy obie przeglądarki
+  poznają nawzajem swoje adresy IP. Oba adresy widzą też serwery STUN, które
+  pomagają zestawić połączenie. Domyślnie są to serwery STUN firm Google
+  i Cloudflare. Hub może ustawić własne.
+- „Bez naszego serwera” oznacza, że aplikacje nie zależą od żadnego serwera
+  prowadzonego przez projekt. Nadal korzystają jednak z przekaźników, serwerów
+  multimediów, a w przypadku kalendarza także z serwera CalDAV. Które to będą
+  serwery, wybierasz ty albo twój hub.
 
 ## Moderacja { #moderation }
 
-Trzy warstwy: twoja własna lista blokowanych (zaszyfrowana, tylko ty możesz ją
-odczytać), zgłoszenia (publiczne, podpisane) i własna polityka przekaźników.
-Przestrzeń ma moderatorów. Zgłoszenie moderatora od razu zwija post. W
-przeciwnym razie potrzeba trzech zgłoszeń od osób, które nie są zablokowane.
-Posty mogą być oznaczone jako 18+ lub jako reklama i te widzą tylko osoby z
-kontem.
+Moderacja ma trzy warstwy. Pierwsza to twoja własna lista zablokowanych,
+zaszyfrowana tak, że tylko ty możesz ją odczytać. Druga to zgłoszenia, które są
+publiczne i podpisane. Trzecia to zasady poszczególnych przekaźników.
+
+Każda przestrzeń ma moderatorów. Wpis zgłoszony przez moderatora jest od razu
+zwijany. W pozostałych przypadkach wpis zostaje zwinięty po trzech zgłoszeniach
+od osób, które nie są zablokowane. Wpis można oznaczyć jako 18+ albo jako
+reklamę, a oznaczone wpisy widzą tylko osoby, które mają konto.
 
 ## Czytaj dalej { #read-on }
 
 - [Armory i jego aplikacje](armory.md)
 - [Własny hub](hubs.md)
 - Dokumentacja samego frameworka: [architektura](https://github.com/derlocke-ng/kiwi-framework/blob/main/docs/architecture.md)
-  i [protokół](https://github.com/derlocke-ng/kiwi-framework/blob/main/docs/protocol.md)
+  i [protokół komunikacji](https://github.com/derlocke-ng/kiwi-framework/blob/main/docs/protocol.md)

@@ -1,52 +1,70 @@
 # Le app del framework
 
-kiwi-framework fornisce le sue app con nomi semplici. Una distribuzione le **monta**
-su uno spazio e con un nome proprio. Un'app può essere montata molte
-volte: una banca dei semi e un negozio di pietre preziose sono lo stesso codice `market` su due spazi,
-ciascuno con i propri moderatori e relay, come due riquadri sullo stesso hub.
+kiwi-framework è il software con cui una comunità gestisce il proprio hub.
+Questa pagina descrive le dieci app che ne fanno parte, tra cui un mercato
+aperto, un feed per la comunità, una chat e la condivisione di file.
 
-| App | Cos'è | Armory la monta come |
+Nel framework le app hanno nomi semplici, come `market`. Una distribuzione, cioè
+un hub specifico costruito con il framework, **monta** le app che le servono.
+Montare un’app significa usarla per uno spazio, cioè per una comunità con i suoi
+moderatori e i suoi relay, e darle un nome scelto dall’hub. La stessa app si può
+montare più volte. Una banca dei semi e un negozio di pietre preziose, per
+esempio, sono lo stesso codice di `market` su due spazi diversi. Ciascuno ha i
+suoi moderatori e i suoi relay, e sullo stesso hub compaiono come due riquadri
+distinti.
+
+| App | Che cos’è | Nome in Armory |
 |---|---|---|
-| `market` | **Un mercato aperto** per la comunità servita da un mount. Gli annunci hanno foto, un prezzo, da dove e verso dove spediscono, oppure il ritiro di persona. Chi compra li trova per categoria e in base a dove si trova, tramite etichette di ricerca che i relay possono confrontare ma non leggere. Chi compra scrive al venditore nella chat, con un messaggio sull'annuncio già pronto. Gli annunci possono essere riservati, venduti, rinnovati e segnalati, e scadono dopo 30-90 giorni. Un mount può richiedere che i venditori si siano prima fatti vedere in un feed, o che siano stati approvati da un moderatore | Trading Post |
-| `feed` | **Un feed della comunità**: voci con foto, hashtag, mi piace e commenti per lo spazio, per gli amici, per una cerchia o solo per te, più i diari (una serie di voci con una copertina). Le voci possono essere segnate come 18+ o come pubblicità | Outpost |
-| `chat` | **Messaggi**: messaggi privati e file agli amici (NIP-17), gruppi che restano finché chi li ospita non li chiude, stanze dal vivo che spariscono quando si svuotano, risposte, reazioni, modifiche, messaggi fissati, ricerca sul dispositivo, messaggi effimeri, e chiamate vocali e video fino a sei persone | Uplink |
-| `notices` | **Una bacheca** di note firmate e pubbliche con proof of work, voti, segnalazioni e una scadenza | DevBoard |
-| `boards` | **Liste e note condivise**: checklist, inventari con quantità e note in Markdown, cifrate end-to-end, con link di modifica o di sola lettura | Loadout |
-| `payload` | **Condivisione di file**: un link che aspetta cifrato sui tuoi server multimediali; file ad amici e gruppi; o direttamente da browser a browser | Payload |
-| `vault` | **Un gestore di password**: accessi, note, carte, codici a due fattori, un generatore e un rapporto sulla salute, chiavi SSH, una CA SSH, una CA X.509 e certificati TLS. Sigillato da una frase segreta propria | Vault |
-| `authenticator` | **Codici a due fattori** (TOTP), conservati nello stesso vault sigillato | Authenticator |
-| `calendar` | **I tuoi calendari** da Nextcloud o da qualsiasi server CalDAV. Nulla va ai relay | Calendar |
-| `pong` | **Pong per due giocatori** tra browser | pongjs |
+| `market` | **Un mercato aperto** per la comunità a cui il mount è dedicato. Un annuncio ha delle foto, un prezzo e l’indicazione dei luoghi da cui e verso cui si spedisce, oppure la proposta di ritiro di persona. Chi compra trova gli annunci per categoria e in base a dove si trova. La ricerca usa etichette che i relay possono confrontare ma non leggere. Chi compra scrive al venditore nella chat, dove trova già pronta la bozza di un messaggio sull’annuncio. Un annuncio si può segnare come prenotato o come venduto, rinnovare e segnalare, e scade dopo un periodo compreso tra 30 e 90 giorni. Un mount può richiedere che i venditori siano prima stati attivi in un feed o siano stati approvati da un moderatore. | Trading Post |
+| `feed` | **Un feed per la comunità.** Le persone pubblicano voci con foto e hashtag, e gli altri possono mettere mi piace e commentare. Una voce può essere destinata a tutto lo spazio, ai tuoi amici, a una cerchia (un gruppo di tuoi amici) o soltanto a te. Un diario è una serie di voci con una copertina. Le voci si possono contrassegnare come 18+ o come pubblicità. | Outpost |
+| `chat` | **Messaggi.** Mandi messaggi privati e file agli amici (NIP-17). I gruppi esistono finché chi li ospita non li chiude, mentre le stanze dal vivo spariscono quando esce l’ultima persona. La chat ha risposte, reazioni, modifica dei messaggi, messaggi fissati, ricerca sul dispositivo e messaggi effimeri. Le chiamate vocali e le videochiamate funzionano fino a sei persone. | Uplink |
+| `notices` | **Una bacheca** per note pubbliche. Ogni nota è firmata dal suo autore e richiede una proof of work, cioè un piccolo calcolo che rende costoso pubblicare in massa. Le note si possono votare e segnalare, e hanno una scadenza. | DevBoard |
+| `boards` | **Liste condivise e note.** Sono liste di cose da spuntare, inventari con le quantità e note in Markdown. Sono cifrate end-to-end, e le condividi con link che consentono la modifica oppure la sola lettura. | Loadout |
+| `payload` | **Condivisione di file** in tre modi: con un link a file conservati cifrati sui tuoi server multimediali, con l’invio di file ad amici e gruppi, oppure direttamente da un browser all’altro. | Payload |
+| `vault` | **Un gestore di password** per accessi, note, carte e codici a due fattori. Ha un generatore di password e un rapporto sulla salute. Gestisce anche chiavi SSH, una CA SSH, una CA X.509 e certificati TLS. È cifrato con una frase segreta tutta sua. | Vault |
+| `authenticator` | **Codici a due fattori** (TOTP). Sono conservati nella stessa cassaforte cifrata che contiene le voci del gestore di password. | Authenticator |
+| `calendar` | **I tuoi calendari**, presi da Nextcloud o da qualsiasi altro server CalDAV. Ai relay non viene inviato nulla. | Calendar |
+| `pong` | **Pong per due giocatori**, tra due browser. | pongjs |
 
-Ogni hub ha anche una pagina iniziale, le impostazioni (il tuo account e i tuoi dispositivi, amici
-e cerchie, persone bloccate, relay, spazi, server multimediali, backup) e una
-pagina dell'account. Le notifiche stanno nell'hub stesso.
+Ogni hub ha inoltre una pagina iniziale, una pagina dell’account e una pagina
+delle impostazioni. Dalle impostazioni gestisci account e dispositivi, amici e
+cerchie, persone bloccate, relay, spazi, server multimediali e backup. Le
+notifiche non sono un’app a parte: fanno parte dell’hub stesso.
 
 ## Spazi e mount { #spaces-and-mounts }
 
-- Uno **spazio** è una comunità con un nome e un proprietario: un id, una chiave del proprietario, un nome,
-  i moderatori, i propri relay e un flag per contenuti per adulti. È modellato sulle
-  comunità moderate di nostr (NIP-72), quindi altri client nostr possono leggerlo. Ogni
-  post e ogni annuncio appartiene esattamente a uno spazio.
-- Un **mount** è il codice di un'app su uno spazio, con id, nome e icona propri. Importare
-  il negozio di un'altra comunità è una riga di mount.
-- **I link indicano l'app, lo spazio e l'elemento, mai l'host.** Un hub apre
-  un link con il proprio mount di quell'app e di quello spazio. Se non ne ha uno, dice di chi è
-  quello spazio e offre la strada per tornare indietro.
-- **Gli spazi sono federati.** Due hub possono servire lo stesso spazio, e i relay di uno spazio
-  trasportano solo i suoi contenuti.
+- Uno **spazio** è una comunità con un nome e un proprietario. Ha un
+  identificativo, la chiave del proprietario, un nome, dei moderatori, i suoi
+  relay e un indicatore che lo segnala come riservato agli adulti. Riprende il
+  modello delle comunità moderate di nostr (NIP-72), quindi anche altri client
+  nostr possono leggerlo. Ogni post e ogni annuncio appartiene a un solo spazio.
+- Un **mount** è un’app usata per uno spazio, con un identificativo, un nome e
+  un’icona tutti suoi. Per aggiungere al tuo hub il negozio di un’altra comunità
+  ti basta una riga, quella che definisce il mount.
+- **Un link indica l’app, lo spazio e l’elemento, ma mai l’host.** Un hub apre
+  un link del genere con il proprio mount di quell’app e di quello spazio. Se
+  non ne ha uno, ti dice a chi appartiene lo spazio e ti propone un modo per
+  tornare indietro.
+- **Gli spazi sono federati**, cioè uno spazio non è legato a un solo hub. Due
+  hub possono offrire lo stesso spazio. Sui relay di uno spazio passano soltanto
+  i contenuti di quello spazio.
 
-Pianificato: hub che si annunciano con un manifest firmato perché altri possano
-trovarli, approvazioni di moderazione, e persone che seguono uno spazio che il loro hub non
-include.
+Tre cose sono previste e non ancora realizzate. Gli hub si annunceranno con un
+manifest firmato, in modo che gli altri possano trovarli. Tra gli strumenti di
+moderazione arriveranno le approvazioni. E si potrà seguire uno spazio anche se
+il proprio hub non lo include.
 
-## Scrivere un'app { #writing-an-app }
+## Scrivere un’app { #writing-an-app }
+
+Questo comando crea lo scheletro di una nuova app nella tua distribuzione:
 
 ```bash
 npm run new-app -- <id> "<Name>" <icon>
 ```
 
-Questo crea lo scheletro di un'app React sul kit UI del framework, con una shell, una pagina home e
-una di impostazioni, le stringhe in ogni lingua, una voce nel registro e un mount. Le app
-parlano con il framework solo tramite la sua API pubblica e non toccano mai direttamente lo storage o
-le chiavi. Vedi [Gestire un proprio hub](hubs.md).
+Ne risulta un’app React che usa il kit di interfaccia del framework. Contiene
+una shell (la cornice attorno alle pagine dell’app), una pagina iniziale e una
+pagina delle impostazioni, i testi in tutte le lingue, una voce nel registro
+delle app e un mount. Le app usano soltanto l’API pubblica del framework e non
+accedono mai direttamente all’archivio dei dati o alle chiavi.
+[Gestire il proprio hub](hubs.md) spiega come compilare e pubblicare un hub.

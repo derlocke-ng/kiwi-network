@@ -1,23 +1,38 @@
 # Des hubs, pas des plateformes
 
-Le réseau relie vos machines. Les **hubs** relient les personnes. Un hub est un
-ensemble d’applications web (un marché ouvert, un fil, une messagerie, du partage
-de fichiers, des listes partagées, un gestionnaire de mots de passe, un agenda) qui
-tournent entièrement dans le navigateur et se synchronisent via des relais
-[nostr](https://nostr.com) que la communauté choisit. Il n’y a ni serveur de
-comptes ni backend au milieu, et tout ce qui est privé est chiffré sur l’appareil
-avant de le quitter. N’importe qui peut faire tourner un hub pour n’importe quelle
-communauté. Voir [les apps du framework](apps.md).
+**kiwi-framework** est un logiciel qui permet à n'importe quelle communauté de
+faire tourner son propre **hub**. Un hub est un site web qui réunit des
+applications pour les membres de la communauté : un marché ouvert, un fil, une
+messagerie, le partage de fichiers, des listes partagées, un gestionnaire de
+mots de passe et un agenda. N'importe qui peut faire tourner un hub, pour
+n'importe quelle communauté, et celle-ci ne dépend alors d'aucune plateforme
+centrale qui détiendrait les comptes et les données de tout le monde.
 
-Trois dépôts composent l’ensemble :
+Les applications tournent entièrement dans le navigateur. Elles se
+synchronisent par des relais [nostr](https://nostr.com), c'est-à-dire des
+serveurs qui stockent des messages signés et les retransmettent, et c'est la
+communauté qui choisit les relais de son hub. Il n'y a ni serveur de comptes ni
+backend entre le navigateur et les relais, et tout ce qui est privé est chiffré
+sur l'appareil avant d'être envoyé. Les autres parties de Kiwi Network relient
+vos machines. Les hubs, eux, relient des personnes. La page
+[Les applications du framework](apps.md) décrit chaque application.
 
-| Dépôt | Ce que c’est |
+Armory est le premier hub construit avec le framework. C'est un exemple parmi
+d'autres, et c'est aussi le modèle que les autres communautés copient pour
+créer leur propre hub.
+
+Le logiciel est réparti dans trois dépôts :
+
+| Dépôt | Ce que c'est |
 |---|---|
-| [**kiwi-framework**](https://github.com/derlocke-ng/kiwi-framework) | Le moteur : identité et comptes, relais et synchronisation, personnes et partage, modération, le kit de design, les pages du hub et dix applications. Il ne livre rien qu’un utilisateur ouvre tel quel. v0.32.1, GPL-3.0-or-later |
-| [**Armory**](armory.md) | La première **distribution** : un hub construit avec le framework, avec un nom, des relais par défaut et les dix applications montées sous ses propres noms. Le modèle à forker pour le vôtre. GPL-3.0-or-later. **En ligne :** [derlocke-ng.github.io/armory](https://derlocke-ng.github.io/armory/) |
-| [**kiwi-web-catalog**](hubs.md#kiwi-web-catalog) | Un catalogue git de hubs et de leurs applications, de même forme que le [kiwi-catalog](../desktop/catalogs.md) du bureau |
+| [**kiwi-framework**](https://github.com/derlocke-ng/kiwi-framework) | Le logiciel général à partir duquel chaque hub est construit. Il contient l'identité et les comptes, les relais et la synchronisation, les amis et le partage, la modération, le kit graphique, les pages du hub et dix applications. Le framework ne s'ouvre pas tel quel comme un site web : c'est une distribution qui en fait un hub. La version actuelle est la v0.32.1, sous licence GPL-3.0-or-later. |
+| [**Armory**](armory.md) | La première **distribution**, c'est-à-dire un hub construit avec le framework. Elle y ajoute un nom, des relais par défaut et les dix applications, chacune sous un nom propre à Armory. C'est le modèle à reprendre pour créer votre propre hub. Elle est sous licence GPL-3.0-or-later. **En ligne :** [derlocke-ng.github.io/armory](https://derlocke-ng.github.io/armory/) |
+| [**kiwi-web-catalog**](hubs.md#kiwi-web-catalog) | Un catalogue, c'est-à-dire un dépôt git qui répertorie des hubs et leurs applications. Il a le même format que le [kiwi-catalog](../desktop/catalogs.md) du poste de travail. |
 
-## Comment tout s’assemble { #how-it-fits-together }
+## Comment tout s'assemble { #how-it-fits-together }
+
+Le schéma montre comment le framework devient un hub dans votre navigateur, et
+avec quels serveurs le navigateur communique ensuite.
 
 ```
 kiwi-framework  (engine: shared data layer, React UI, hub pages, apps)
@@ -36,93 +51,115 @@ any static host (GitHub Pages)  or  the hub container (nginx + HUB_* settings)
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Le vocabulaire { #the-words }
+## Les termes employés ici { #the-words }
 
-- **Hub** : ce que produit une distribution. Des fichiers statiques, si bien
-  qu’héberger un hub revient à servir un dossier. Chaque hub a une page d’accueil,
-  des réglages et une page de compte.
-- **Distribution** : un hub construit sur le framework, avec un nom et une
-  apparence, des relais par défaut, et un ensemble choisi d’applications sur des
-  espaces choisis. Tout ce qu’un fork modifie se trouve dans un seul fichier,
-  `distribution.js`, plus ses traductions.
-- **App** : un dossier avec un manifeste, qui se branche sur n’importe quelle
-  distribution. Les apps ne parlent qu’à l’API publique du framework et ne touchent
-  jamais directement au stockage ni aux clés.
-- **Espace** (space) : une communauté nommée, qui a un propriétaire, avec ses
-  propres modérateurs et, en option, ses propres relais (sur le modèle des
-  communautés modérées de NIP-72). Un autre hub peut servir le même espace en
-  indiquant son adresse.
-- **Montage** (mount) : du code d’app sur un espace, avec son propre nom, sa propre
-  route et sa propre icône. Une app peut être montée de nombreuses fois. Le
-  *Trading Post* d’Armory est l’app `market` du framework montée sur l’espace
-  `tradingpost` d’Armory.
+- **Hub** : le site web qu'utilise une communauté. C'est ce que vous obtenez
+  quand vous construisez une distribution. Un hub n'est fait que de fichiers
+  statiques, si bien que l'héberger revient à servir un dossier de fichiers.
+  Chaque hub a une page d'accueil, une page de réglages et une page de compte.
+- **Distribution** : le framework, plus les choix qui en font un hub
+  particulier. Ces choix sont un nom et une apparence, des relais par défaut,
+  et une sélection d'applications montées sur les espaces voulus. Quand vous
+  faites un fork d'une distribution, tout ce que vous modifiez se trouve dans
+  un seul fichier, `distribution.js`, et dans ses traductions.
+- **Application** : un dossier accompagné d'un fichier manifeste. Elle peut
+  être ajoutée à n'importe quelle distribution. Les applications n'utilisent
+  que l'API publique du framework et n'accèdent jamais directement au stockage
+  ni aux clés.
+- **Espace** : une communauté qui a un nom, un propriétaire, ses propres
+  modérateurs et, si elle le souhaite, ses propres relais. Les espaces
+  reprennent le modèle des communautés modérées de nostr (NIP-72). Un autre hub
+  peut servir le même espace : il lui suffit d'en indiquer l'adresse.
+- **Montage** : une application utilisée pour un espace. Chaque montage a son
+  propre nom, sa propre route (son adresse à l'intérieur du hub) et sa propre
+  icône. Une même application peut être montée plusieurs fois. Par exemple, le
+  *Trading Post* d'Armory est l'application `market` du framework, montée sur
+  l'espace `tradingpost` d'Armory.
 
-Deux personnes sur des distributions différentes sont amies, partagent et
-discutent exactement comme sur une seule, car l’identité et les données sont des
-événements nostr, pas ceux du hub.
+Deux personnes qui utilisent des hubs issus de distributions différentes
+peuvent être amies, partager des contenus et discuter exactement comme si elles
+utilisaient le même hub. C'est possible parce que l'identité et les données
+d'une personne sont des événements nostr, c'est-à-dire des messages signés
+stockés sur des relais, et qu'elles n'appartiennent à aucun hub.
 
 ## Comptes et clés { #accounts-and-keys }
 
-- Chaque appareil reçoit une clé à sa première visite, conservée dans le
-  navigateur.
-- Un **compte** est un nom d’utilisateur et un mot de passe, construit sur de
-  simples événements nostr sans aucun registre : le mot de passe est étiré avec
-  scrypt et déverrouille votre clé. Personne ne peut prendre ni écraser un compte
-  sans le mot de passe. Il n’y a **pas de réinitialisation du mot de passe**.
-- Vous pouvez aussi vous connecter avec une clé nostr existante (`nsec`, hex ou
-  `ncryptsec`). Les signataires par extension de navigateur et à distance (NIP-07,
-  NIP-46) sont prévus, pas construits.
-- Un seul compte fonctionne dans toutes les apps du hub et sur chaque appareil où
-  vous vous connectez.
+- La première fois que vous ouvrez un hub sur un appareil, le navigateur crée
+  une clé pour cet appareil et la conserve.
+- Un **compte**, c'est un nom d'utilisateur et un mot de passe. Il repose sur
+  des événements nostr ordinaires, et il n'existe aucun registre des comptes.
+  Votre mot de passe est transformé par scrypt, une fonction volontairement
+  lente à calculer, et c'est le résultat qui déverrouille votre clé. Sans le
+  mot de passe, personne ne peut s'emparer d'un compte ni l'écraser. Il n'y a
+  **aucun moyen de réinitialiser le mot de passe**.
+- Vous pouvez aussi vous connecter avec une clé nostr que vous avez déjà, au
+  format `nsec`, hexadécimal ou `ncryptsec`. La connexion par une extension de
+  navigateur (NIP-07) ou par un signataire distant (NIP-46) est prévue, mais
+  pas encore réalisée.
+- Un seul compte sert pour toutes les applications du hub et sur chaque
+  appareil où vous vous connectez.
 
 ## Modèle de confidentialité { #privacy-model }
 
-**Ce qui est chiffré.** Le contenu est scellé dans le navigateur avant d’aller où
-que ce soit : AES-256-GCM avec des clés dérivées par HKDF. Les messages privés sont
-des messages NIP-17 dans des emballages cadeaux (gift wraps) NIP-59. Chaque fichier
-reçoit une clé AES-256-GCM aléatoire avant d’aller sur un serveur de médias, et les
-photos sont réencodées, ce qui supprime les métadonnées de l’appareil photo. Le
-Vault est scellé par sa propre phrase secrète (scrypt + AES-256-GCM). Les appels
-vont de navigateur à navigateur, chiffrés par WebRTC.
+**Ce qui est chiffré.** Le navigateur chiffre le contenu avant de l'envoyer où
+que ce soit. Il utilise AES-256-GCM, avec des clés dérivées par HKDF. Les
+messages privés sont des messages NIP-17 placés dans des « gift wraps » NIP-59.
+Un gift wrap est une seconde couche de chiffrement, grâce à laquelle un relais
+voit seulement qu'une clé a reçu un message emballé. Chaque fichier est chiffré
+avec sa propre clé AES-256-GCM, tirée au hasard, avant d'être envoyé sur un
+serveur de médias. Les photos sont d'abord réencodées, ce qui supprime les
+métadonnées ajoutées par les appareils photo. Le Vault est chiffré avec une
+phrase secrète qui lui est propre (scrypt + AES-256-GCM). Les appels passent
+directement d'un navigateur à l'autre et sont chiffrés par WebRTC.
 
-**Le local d’abord.** Chaque écriture va d’abord dans la base de données propre du
-navigateur, puis vers les relais. Les lectures viennent de l’appareil, si bien que
-les apps fonctionnent hors ligne. Quand un appareil se reconnecte, il remet en
-place ce qu’un relais a oublié : les données ne sont perdues que si chaque appareil
-qui les détenait a disparu *et* qu’il n’existe aucune sauvegarde.
+**Local d'abord.** Tout ce que vous écrivez est d'abord enregistré dans la base
+de données du navigateur, puis envoyé aux relais. Les applications lisent cette
+base, sur l'appareil, et fonctionnent donc aussi hors ligne. Quand un appareil
+se reconnecte, il renvoie au relais les données que celui-ci n'a plus. Des
+données ne sont donc perdues que si tous les appareils qui les détenaient ont
+disparu *et* qu'il n'existe aucune sauvegarde.
 
-**Ce que les autres peuvent voir.** Les dépôts sont explicites sur les limites :
+**Ce que les autres peuvent voir.** Les dépôts indiquent eux-mêmes les
+limites :
 
-- Les relais voient les métadonnées : qui écrit à quelles adresses, quand, combien,
-  et depuis quelle adresse IP. Utilisez un VPN ou Tor si cela compte pour vous.
-- La clé d’un espace n’est pas un secret. Elle tient les publications d’une
-  communauté à l’écart des regards directs. Les j’aime, les signalements et qui a
-  commenté quoi sont visibles des relais.
-- Les notes de DevBoard et les signalements de modération sont publics par
-  conception.
-- Votre clé se trouve dans le stockage du navigateur. Tous les sites GitHub Pages
-  d’un même compte partagent une origine, si bien qu’un hub sur son propre
-  (sous-)domaine est la configuration la plus solide.
-- Les transferts directs et les appels révèlent les adresses IP des deux
-  navigateurs l’un à l’autre et aux serveurs STUN (ceux de Google et de Cloudflare
-  par défaut ; un hub peut régler les siens).
-- « Pas de serveur chez nous » signifie aucun sur le chemin critique. Les apps
-  utilisent tout de même les relais, les serveurs de médias et, pour l’agenda, le
-  serveur CalDAV que vous ou votre hub choisissez.
+- Les relais voient les métadonnées : qui écrit à quelles adresses, quand, en
+  quelle quantité et depuis quelle adresse IP. Si cela compte pour vous,
+  utilisez un VPN ou Tor.
+- La clé d'un espace n'est pas un secret. Elle évite seulement que les
+  publications d'une communauté soient lisibles par tout le monde. Les relais
+  voient les j'aime, les signalements et qui a commenté quoi.
+- Les notes de DevBoard et les signalements de modération sont publics, et
+  c'est voulu.
+- Votre clé est conservée dans le stockage du navigateur. Or tous les sites
+  GitHub Pages d'un même compte partagent une seule origine, et c'est par
+  origine que les navigateurs séparent le stockage des sites web. Un hub sur
+  son propre domaine ou sous-domaine est donc mieux protégé.
+- Lors d'un transfert direct de fichiers ou d'un appel, chacun des deux
+  navigateurs apprend l'adresse IP de l'autre, et les serveurs STUN qui les
+  aident à se connecter voient eux aussi les deux adresses. Par défaut, ce sont
+  les serveurs STUN de Google et de Cloudflare. Un hub peut définir les siens.
+- « Pas de serveur chez nous » veut dire que les applications ne dépendent
+  d'aucun serveur exploité par le projet. Elles utilisent tout de même des
+  relais, des serveurs de médias et, pour l'agenda, un serveur CalDAV. C'est
+  vous, ou votre hub, qui choisissez lesquels.
 
 ## Modération { #moderation }
 
-Trois couches : votre propre liste de blocage (chiffrée, vous seul pouvez la lire),
-les signalements (publics, signés), et la politique propre aux relais. Un espace a
-des modérateurs. Le signalement d’un modérateur replie aussitôt une publication.
-Sinon, il faut trois signalements de personnes qui ne sont pas bloquées. Les
-publications peuvent être marquées 18+ ou comme publicité, et elles ne s’affichent
-alors qu’aux personnes ayant un compte.
+La modération se fait à trois niveaux. Le premier est votre propre liste de
+blocage, chiffrée de sorte que vous seul puissiez la lire. Le deuxième, ce sont
+les signalements, qui sont publics et signés. Le troisième est la politique de
+chaque relais.
+
+Chaque espace a ses modérateurs. Quand un modérateur signale une publication,
+elle est aussitôt repliée. Sinon, une publication est repliée au bout de trois
+signalements venant de personnes qui ne sont pas bloquées. Une publication peut
+être marquée 18+ ou comme publicité, et les publications marquées ne sont
+montrées qu'aux personnes qui ont un compte.
 
 ## Pour aller plus loin { #read-on }
 
 - [Armory et ses applications](armory.md)
-- [Héberger votre propre hub](hubs.md)
-- L’[architecture](https://github.com/derlocke-ng/kiwi-framework/blob/main/docs/architecture.md)
-  et le [protocole d’échange](https://github.com/derlocke-ng/kiwi-framework/blob/main/docs/protocol.md)
-  du framework lui-même
+- [Faire tourner son propre hub](hubs.md)
+- L'[architecture](https://github.com/derlocke-ng/kiwi-framework/blob/main/docs/architecture.md)
+  et le [protocole réseau](https://github.com/derlocke-ng/kiwi-framework/blob/main/docs/protocol.md)
+  du framework, décrits dans son dépôt

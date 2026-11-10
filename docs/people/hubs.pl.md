@@ -1,64 +1,84 @@
 # Własny hub
 
-Hub to pliki statyczne, więc hostowanie go to serwowanie folderu przez HTTPS.
-Są trzy sposoby, żeby go prowadzić:
+Ta strona wyjaśnia, jak uruchomić hub dla własnej społeczności. Hub to strona
+internetowa, którą społeczność dostaje dzięki kiwi-framework: otwarty rynek,
+kanał, czat i inne aplikacje działające w przeglądarce. Hub składa się
+wyłącznie z plików statycznych, więc do jego hostingu wystarczy udostępnić
+folder z plikami przez HTTPS. Możesz to zrobić na trzy sposoby:
 
-- **Używaj Armory takiego, jaki jest:** [derlocke-ng.github.io/armory](https://derlocke-ng.github.io/armory/).
-- **Zrób własną dystrybucję:** twoja nazwa, przekaźniki i aplikacje, na
-  dowolnym hostingu statycznym.
-- **Uruchom kontener huba:** na przykład wewnątrz własnej Kiwi Network, z
-  własnym przekaźnikiem, jako prywatny hub osiągalny tylko z sieci mesh.
+- **Korzystaj z Armory bez żadnych zmian.** Armory to pierwszy hub zbudowany
+  na frameworku. Jest otwarte dla wszystkich pod adresem
+  [derlocke-ng.github.io/armory](https://derlocke-ng.github.io/armory/).
+- **Zrób własną dystrybucję.** Dystrybucja to framework z twoją nazwą, twoimi
+  przekaźnikami i twoim wyborem aplikacji. Możesz ją opublikować na dowolnym
+  hostingu plików statycznych.
+- **Uruchom kontener huba.** Możesz to zrobić na przykład we własnej sieci
+  Kiwi Network, razem z własnym przekaźnikiem. Powstaje wtedy prywatny hub,
+  dostępny wyłącznie z sieci mesh, czyli prywatnej sieci, do której należą
+  twoje maszyny.
 
 ## Rodzaje hubów { #kinds-of-hub }
 
-| Rodzaj | Jak | Przykład |
+| Rodzaj | Jak działa | Przykład |
 |---|---|---|
-| **Publiczny** | Publiczne przekaźniki; każdy może go otworzyć | Armory |
-| **Prywatny** | Przekaźniki huba są zablokowane (`policy.relays: 'locked'`), a strony czekają, aż któryś z nich odpowie (`requireHub`), z przekaźnikami wewnątrz VPN | firmowy hub na jej kiwi-master |
-| **Półpubliczny** | Prywatny hub z publiczną strefą dla wybranych aplikacji (na przykład czatu) na publicznych przekaźnikach | |
+| **Publiczny** | Hub korzysta z publicznych przekaźników i każdy może go otworzyć. | Armory |
+| **Prywatny** | Przekaźników huba nie da się podmienić (`policy.relays: 'locked'`), a strony czekają, aż któryś z nich odpowie (`requireHub`). Przekaźniki znajdują się wewnątrz VPN-u. | hub firmy na jej kiwi-masterze |
+| **Półpubliczny** | Prywatny hub, który ma też strefę publiczną. Wybrane aplikacje, na przykład czat, korzystają w niej z publicznych przekaźników. | |
 
-Każde zdarzenie należy do jednej sieci (własnej sieci huba, strefy publicznej
-lub sieci przestrzeni) i nigdy nie przechodzi do innej.
+Przekaźniki huba tworzą osobne sieci: własną sieć huba, strefę publiczną oraz
+sieci jego przestrzeni. Każde zdarzenie, czyli podpisana wiadomość nostr,
+należy do jednej z tych sieci i nigdy nie trafia do innej.
 
 ## Własna dystrybucja { #your-own-distribution }
 
-Szablonem jest Armory (na GitHubie *Use this template* daje ci kopię bez
-historii):
+Zacznij od Armory, które służy za szablon. Przycisk *Use this template* na
+GitHubie tworzy kopię repozytorium bez jego historii. Potem wykonaj te kroki:
 
-1. Edytuj **`distribution.js`**: id, nazwę, znak, opis, stronę domową,
-   repozytorium, przekaźniki, serwery multimediów, przestrzenie, aplikacje i
-   montowania. Żeby serwować też przestrzenie Armory, skopiuj ich `owner` i
-   `id` z `hub.json` Armory.
-2. Edytuj **`locales/*.json`**: tytuł, wstęp i stopkę oraz jeden tekst karty
-   na montowanie. Angielski jest językiem zapasowym.
-3. Zaktualizuj **`kiwi.manifest`** i opcjonalnie dodaj swój hub do
-   [kiwi-web-catalog](#kiwi-web-catalog).
-4. Na GitHubie: *Settings → Pages → Source: GitHub Actions*, potem push.
+1. Zmień plik **`distribution.js`**. Ustawia on id, nazwę, znak graficzny,
+   opis, stronę domową, repozytorium, przekaźniki, serwery multimediów,
+   przestrzenie, aplikacje i mounty. Jeśli twój hub ma obsługiwać także
+   przestrzenie Armory, skopiuj ich `owner` i `id` z pliku `hub.json` w Armory.
+2. Zmień pliki **`locales/*.json`**. Zawierają tytuł, tekst wprowadzający
+   i stopkę oraz po jednym tekście karty dla każdego mountu. Gdy brakuje
+   tłumaczenia, używany jest angielski.
+3. Zaktualizuj **`kiwi.manifest`**. Jeśli chcesz, dodaj też swój hub do
+   katalogu [kiwi-web-catalog](#kiwi-web-catalog).
+4. Na GitHubie wybierz *Settings → Pages → Source: GitHub Actions*, a potem
+   wypchnij zmiany.
+
+Podczas pracy nad dystrybucją przydają się te polecenia:
 
 ```bash
 npm install
-npm run dev                  # hub z hot reload, http://localhost:5173
+npm run dev                  # hub z hot reloadem, http://localhost:5173
 npm test
 npm run build && npm run serve
-npm run relay:nostr          # lokalny testowy przekaźnik na ws://localhost:7777
+npm run relay:nostr          # lokalny przekaźnik testowy pod adresem ws://localhost:7777
 npm run new-app -- <id> "<Name>" <icon>   # szkielet nowej aplikacji
 ```
 
-Przypinaj kiwi-framework commitem lub tagiem, nigdy gałęzią. Build sprawdza
-twój `distribution.js` (na przykład publiczne montowanie wymaga publicznych
-przekaźników i na odwrót).
+Wersję kiwi-framework przypnij do commita albo tagu, nigdy do gałęzi. Podczas
+budowania sprawdzany jest twój plik `distribution.js`. Na przykład hub
+z publicznym mountem musi mieć publiczne przekaźniki, a hub z publicznymi
+przekaźnikami musi mieć publiczny mount.
 
-Stos technologiczny to TypeScript, React 19 i Vite dla wszystkiego, co
-widoczne. Warstwa danych w `shared/` to zwykły JavaScript z typami JSDoc.
-Testy działają w test runnerze node, a dla przeglądarki w Playwright.
+Wszystko, co widać w przeglądarce, jest napisane w TypeScripcie z Reactem 19
+i budowane narzędziem Vite. Warstwa danych w `shared/` to zwykły JavaScript
+z typami JSDoc. Testy uruchamia test runner wbudowany w Node.js, a te, które
+potrzebują przeglądarki, działają w Playwright.
 
 ## Kontener huba { #the-hub-container }
 
-Armory jest też obrazem kontenera, `ghcr.io/derlocke-ng/armory`, budowanym z
-`container/Dockerfile` frameworka (nginx). Przy starcie jego entrypoint
-zapisuje `hub.local.json` ze zmiennych `HUB_*`, a strona odczytuje go, zanim
-się połączy. Wdrożenie może w ten sposób wybrać przekaźniki i politykę, ale nie
-może dodać kodu. Bez ustawionych zmiennych hub działa tak, jak go zbudowano.
+Armory jest też dostępne jako obraz kontenera `ghcr.io/derlocke-ng/armory`.
+Obraz powstaje z pliku `container/Dockerfile` z frameworka i serwuje hub przez
+nginx. Przy starcie kontenera skrypt entrypoint zapisuje plik `hub.local.json`
+na podstawie zmiennych `HUB_*`, a strona wczytuje ten plik, zanim nawiąże
+jakiekolwiek połączenie. W ten sposób przy wdrożeniu można wybrać przekaźniki
+i zasady, ale nie da się dodać kodu. Jeśli nie ustawisz żadnej zmiennej, hub
+działa tak, jak został zbudowany.
+
+Ten przykład uruchamia hub z własnym przekaźnikiem, którego nie da się
+podmienić, i z jednym mountem korzystającym z przekaźnika publicznego:
 
 ```bash
 docker run --rm -p 8080:80 \
@@ -70,64 +90,76 @@ docker run --rm -p 8080:80 \
 
 | Zmienna | Znaczenie |
 |---|---|
-| `HUB_RELAYS` | własne przekaźniki huba |
-| `HUB_PUBLIC_RELAYS` | przekaźniki strefy publicznej (ustawiona i pusta: brak strefy publicznej) |
-| `HUB_DIRECTORY_RELAYS` | gdzie publikuje się i wyszukuje listy przekaźników |
-| `HUB_RELAYS_LOCKED` | `true`: ludzie nie mogą zastąpić przekaźników huba |
-| `HUB_REQUIRE_HUB` | `true`: strony czekają, dopóki żaden z przekaźników huba nie odpowiada |
-| `HUB_PUBLIC_MOUNTS` | montowania w strefie publicznej, według id |
-| `HUB_ACCOUNT_MOUNTS` | montowania, które wymagają konta |
-| `HUB_REQUIRE_ACCOUNT` | `true`: każde montowanie wymaga konta |
-| `HUB_SPACE_RELAYS` | przekaźniki dla każdej przestrzeni: `jobs=wss://…;gems=wss://a,wss://b` |
-| `HUB_MODERATORS` | klucze, które moderują każdą przestrzeń zdefiniowaną przez hub |
-| `HUB_REGISTER_POW` | bity proof of work dla nowego konta (przekaźniki tylko dla członków) |
-| `HUB_CALDAV` | Nextcloud; nginx przekazuje do niego `/remote.php/dav/`, więc kalendarz nie potrzebuje CORS |
-| `HUB_ICE`, `HUB_ICE_USERNAME`, `HUB_ICE_CREDENTIAL` | serwery STUN/TURN dla rozmów i bezpośrednich transferów. Login TURN jest widoczny na stronie, więc daj mu login tylko dla tego huba |
+| `HUB_RELAYS` | Własne przekaźniki huba. |
+| `HUB_PUBLIC_RELAYS` | Przekaźniki strefy publicznej. Jeśli zmienna jest ustawiona, ale pusta, strefy publicznej nie ma. |
+| `HUB_DIRECTORY_RELAYS` | Przekaźniki, na których publikuje się i wyszukuje listy przekaźników. |
+| `HUB_RELAYS_LOCKED` | Przy wartości `true` nikt nie może podmienić przekaźników huba. |
+| `HUB_REQUIRE_HUB` | Przy wartości `true` strony czekają tak długo, jak długo nie odpowiada żaden z przekaźników huba. |
+| `HUB_PUBLIC_MOUNTS` | Mounty korzystające ze strefy publicznej, podane przez id. |
+| `HUB_ACCOUNT_MOUNTS` | Mounty, które wymagają konta. |
+| `HUB_REQUIRE_ACCOUNT` | Przy wartości `true` konta wymaga każdy mount. |
+| `HUB_SPACE_RELAYS` | Przekaźniki poszczególnych przestrzeni, w zapisie `jobs=wss://…;gems=wss://a,wss://b`. |
+| `HUB_MODERATORS` | Klucze osób, które moderują każdą przestrzeń zdefiniowaną przez hub. |
+| `HUB_REGISTER_POW` | Liczba bitów proof of work, których wymaga założenie konta. Służy przekaźnikom, które przyjmują wyłącznie członków. |
+| `HUB_CALDAV` | Serwer Nextcloud. nginx przekazuje do niego ścieżkę `/remote.php/dav/`, więc kalendarz obywa się bez CORS. |
+| `HUB_ICE`, `HUB_ICE_USERNAME`, `HUB_ICE_CREDENTIAL` | Serwery STUN/TURN dla rozmów i bezpośredniego przesyłania plików. Pomagają dwóm przeglądarkom połączyć się ze sobą. Login do serwera TURN da się odczytać ze strony, dlatego załóż taki, którego używa tylko ten hub. |
 
-`HUB_USER_MOUNTS` jest odczytywana, ale jeszcze nic nie robi: obserwowanie
-przestrzeni, których hub nie dostarcza, dopiero nadejdzie.
+Zmienna `HUB_USER_MOUNTS` jest odczytywana, ale na razie niczego nie zmienia.
+Należy do funkcji, która dopiero powstanie: obserwowania przestrzeni, której
+hub nie zawiera.
 
-Hub musi być serwowany przez HTTPS (WebCrypto wymaga bezpiecznego kontekstu),
-a jego przekaźniki przez `wss://`. Przez zwykłe `http://` (poza localhost)
-strona to komunikuje i się zatrzymuje.
+Hub musi być serwowany przez HTTPS, bo WebCrypto wymaga bezpiecznego kontekstu.
+Jego przekaźniki muszą być dostępne przez `wss://`. Jeśli ktoś otworzy hub
+przez zwykłe `http://` pod adresem innym niż localhost, strona poinformuje
+o tym i przerwie działanie.
 
-### W Kiwi Network { #on-a-kiwi-network }
+### Hub we własnej sieci Kiwi Network { #on-a-kiwi-network }
 
-kiwi-master może mieć własny przekaźnik i hub: moduł `nostr-relay` (strfry
-pod `relay.<host>`) i moduł `hub` (ten obraz, domyślnie Armory, pod
-`hub.<host>`). Domyślnie są prywatne: osiągalne tylko z sieci mesh, z
-certyfikatem floty. Hub półpubliczny dodaje `public_relays` i
-`public_mounts`. Publiczny dodaje `reverse-proxy.public`, które dostaje
-certyfikaty Let's Encrypt. Przekaźnik przyjmuje wtedy posty z sieci mesh, a z
-Internetu tylko od członków, którzy udowodnią swój klucz (NIP-42): tych z
-listy podpisanej przez administratorów (`write_pubkeys`) albo, z
-`members: registered`, od każdego, kto ma konto w hubie. Zobacz
-[opis modułów](../server/modules.md#people).
+Kiwi-master to jedyny serwer sieci Kiwi Network, który jest dostępny
+z internetu. Może uruchamiać własny przekaźnik i własny hub, a odpowiadają za to
+dwa moduły. Moduł `nostr-relay` uruchamia przekaźnik strfry pod adresem
+`relay.<host>`. Moduł `hub` uruchamia opisany wyżej obraz kontenera, domyślnie
+z Armory, pod adresem `hub.<host>`.
+
+Oba są domyślnie prywatne. Są dostępne tylko z sieci mesh i korzystają
+z certyfikatu twojej sieci. Żeby hub był półpubliczny, dodaj `public_relays`
+i `public_mounts`. Żeby był publiczny, dodaj `reverse-proxy.public`, a hub
+dostanie certyfikaty Let's Encrypt.
+
+Przekaźnik publicznego huba przyjmuje wpisy z sieci mesh. Z internetu przyjmuje
+je tylko od członków, którzy udowodnią, że mają swój klucz (NIP-42). Członkami
+są osoby z listy, którą podpisują administratorzy (`write_pubkeys`). Przy
+ustawieniu `members: registered` członkiem jest każdy, kto ma konto na hubie.
+Szczegóły znajdziesz w [opisie modułów](../server/modules.md#people).
 
 ## kiwi-web-catalog { #kiwi-web-catalog }
 
 [derlocke-ng/kiwi-web-catalog](https://github.com/derlocke-ng/kiwi-web-catalog)
-wymienia huby, ich aplikacje i framework, w tym samym kształcie co katalog
-desktopowy: `apps.list` z jednym adresem URL git na linię (`path=` dla
-aplikacji wewnątrz repozytorium huba, `ref=` do przypięcia) i
-`kiwi.manifest` w każdym wpisie z `CATEGORY` równym `Framework`, `Hub` lub
-`App`.
+to katalog, czyli repozytorium git z listą innych repozytoriów. Wymienia huby,
+ich aplikacje oraz framework i ma ten sam format co katalog aplikacji dla
+desktopu. Plik `apps.list` zawiera po jednym adresie URL repozytorium git
+w każdym wierszu. Wiersz może mieć opcję `path=`, która wskazuje aplikację
+wewnątrz repozytorium huba, oraz `ref=`, która przypina wersję. Każda pozycja
+zawiera plik `kiwi.manifest` z wartością `CATEGORY` równą `Framework`, `Hub`
+albo `App`.
 
-Dziś wymienia kiwi-framework, Armory i dziesięć aplikacji Armory. **Nie** jest
-przeznaczony dla `kiwi catalog add`: te wpisy nie mają instalatora i nic
-jeszcze nie odczytuje katalogu automatycznie. Pliki katalogu są w domenie
-publicznej (CC0, według jego README).
+Obecnie katalog wymienia kiwi-framework, Armory i dziesięć aplikacji Armory.
+**Nie** jest przeznaczony dla polecenia `kiwi catalog add`. Jego pozycje nie
+mają instalatora i na razie nic nie odczytuje tego katalogu automatycznie.
+Według jego README pliki katalogu należą do domeny publicznej (CC0).
 
-Żeby dodać swój hub: zrób fork, dodaj linię, upewnij się, że repozytorium ma
-`kiwi.manifest`, i otwórz pull request.
+Żeby dodać swój hub, zrób fork katalogu, dopisz wiersz, upewnij się, że twoje
+repozytorium zawiera plik `kiwi.manifest`, i otwórz pull request.
 
-## Jeszcze niezbudowane { #not-built-yet }
+## Jeszcze niezrealizowane { #not-built-yet }
 
-To pochodzi z roadmapy samego frameworka:
+Te pozycje są w planach samego frameworka i jeszcze nie istnieją:
 
 - Blog.
-- Zatwierdzenia moderacyjne (NIP-72 kind 4550).
-- Obserwowanie przestrzeni, których hub nie dostarcza.
-- Podpisywanie przez NIP-07 i NIP-46.
-- Serwer TURN w stacku kiwi. Czeka w kiwi-modules; bez TURN dwa telefony na
-  danych mobilnych często nie znajdują bezpośredniej ścieżki.
+- Zatwierdzanie wpisów przez moderatorów (NIP-72, kind 4550).
+- Obserwowanie przestrzeni, której twój hub nie zawiera.
+- Logowanie przez rozszerzenie przeglądarki (NIP-07) lub zdalny program
+  podpisujący (NIP-46).
+- Serwer TURN w stacku Kiwi. Potrzebne do tego prace czekają w repozytorium
+  kiwi-modules. Bez serwera TURN dwa telefony korzystające z internetu
+  mobilnego często nie potrafią zestawić bezpośredniego połączenia.

@@ -1,101 +1,123 @@
 # DNS, nombres y certificados
 
-## Una sola cadena de resolución { #one-resolver-chain }
+Cada máquina y cada servicio de una Kiwi Network tiene un nombre, como
+`cloud.papaya.home`, y se abre por HTTPS con un certificado en el que tus
+dispositivos confían. En esta página se explica cómo se resuelven los nombres
+dentro de la red, cómo se forman y de dónde salen los certificados. Los
+servidores DNS son Pi-holes, que además bloquean los dominios no deseados con
+una lista de bloqueo común.
 
-El DNS es una sola cadena para toda la red:
+## Una sola cadena de servidores DNS { #one-resolver-chain }
+
+Todas las consultas DNS de la red recorren la misma cadena de servidores:
 
 ```
 LAN device ──▶ gateway node's Pi-hole ──▶ master's Pi-hole ──▶ gluetun DNS-over-TLS (Quad9)
 VPN client ───────────────────────────────▶ master's Pi-hole       └─ leaves through the VPN exit
 ```
 
-- **Los clientes VPN** (portátiles, teléfonos) preguntan al Pi-hole del master en
-  `10.8.0.1`.
-- **El Pi-hole de un node** pregunta primero al Pi-hole del master, así la red
-  comparte una sola lista de bloqueo y cada consulta sale por la salida del
-  master. Quad9 (`9.9.9.9`, `149.112.112.112`, `fallback_dns`) va después en
-  orden estricto y solo responde mientras el master no es accesible.
-- **El Pi-hole del master** reenvía al resolvedor DNS-over-TLS de su cliente VPN
-  (Quad9 por defecto, `dot_providers`).
-- **Los nombres bajo el dominio de la fleet** se reenvían al master y nunca
-  salen de él. El master marca el dominio como local.
+- **Los clientes de la VPN** (portátiles, teléfonos) envían sus consultas al
+  Pi-hole del master, en `10.8.0.1`.
+- **El Pi-hole de un node** pregunta primero al Pi-hole del master. De este
+  modo, toda la red comparte una única lista de bloqueo y todas las consultas
+  llegan a Internet por la salida del master, que es su conexión con Internet.
+  Quad9 (`9.9.9.9`, `149.112.112.112`, definido con `fallback_dns`) va después,
+  en orden estricto, así que solo responde mientras no se pueda llegar al
+  master.
+- **El Pi-hole del master** reenvía las consultas al servidor DNS-over-TLS de
+  su cliente de VPN. Por defecto, ese servidor es Quad9 (`dot_providers`).
+- **Los nombres del dominio de la fleet** se reenvían al master, y de ahí no
+  pasan a ningún otro servidor: el master marca el dominio como local.
 
-Cada host del stack lleva además los nombres de la fleet en `/etc/hosts` (sus
-propios nombres apuntando a sí mismo), de modo que las copias de seguridad y las
-renovaciones de certificados se resuelven sin un Pi-hole. En Fedora CoreOS y
-uCore, el propio host resuelve a través del Pi-hole de su propio stack.
+Además, toda máquina que tiene un stack lleva los nombres de la fleet en su
+archivo `/etc/hosts`, donde sus propios nombres apuntan a ella misma. Así, las
+copias de seguridad y la renovación de certificados pueden resolver nombres
+aunque no haya ningún Pi-hole. En Fedora CoreOS y uCore, la propia máquina usa
+como servidor DNS el Pi-hole de su stack.
 
-**Vecinos en la misma LAN.** El Pi-hole y el archivo hosts de un node responden
-con la **dirección LAN** de los nodes de la fleet que tienen una dirección
-estática en su propia subred, así el tráfico entre dos máquinas de la misma
-habitación se queda en la habitación. El master sigue respondiendo con
-direcciones de malla.
+**Vecinos en la misma LAN.** Si otros nodes de la fleet tienen una dirección
+estática en la subred de un node, el Pi-hole y el archivo hosts de ese node
+responden con la **dirección de LAN** de esos vecinos. De esta forma, el tráfico
+entre dos máquinas de la misma LAN no sale de ella. El master sigue respondiendo
+con las direcciones de la mesh, la red WireGuard privada que comparten todas las
+máquinas.
 
 ## Nombres: `service.hostname.home` { #names-servicehostnamehome }
 
-Cada host es `<host>.<domain>` (`papaya.home`), y cada servicio que ejecuta es un
-nombre debajo de él: `cloud.papaya.home`, `vault.papaya.home`,
-`portainer.papaya.home`, `dl.lychee.home` y, en el master, `wg.sorbet.home`,
-`pihole.sorbet.home`, `hub.sorbet.home`, `relay.sorbet.home`. Cada nombre que
-anuncia un módulo entra en los registros DNS de la fleet con la **dirección de
-malla** del host. Cada Pi-hole de la fleet resuelve todos los nombres de host y
-de servicio (horizonte dividido, `fleet_records`). Añade los tuyos con
-`extra_records`.
+Cada host se llama `<host>.<domain>`, por ejemplo `papaya.home`. Cada servicio
+que funciona en él recibe un nombre que cuelga del nombre del host:
+`cloud.papaya.home`, `vault.papaya.home`, `portainer.papaya.home`,
+`dl.lychee.home` y, en el master, `wg.sorbet.home`, `pihole.sorbet.home`,
+`hub.sorbet.home`, `relay.sorbet.home`. Todos los nombres que anuncia un módulo
+se añaden a los registros DNS de la fleet con la **dirección del host en la
+mesh**, y cualquier Pi-hole de la fleet puede resolver todos los nombres de
+host y de servicio. El ajuste correspondiente es `fleet_records`. La técnica se
+llama DNS de horizonte dividido (split-horizon DNS), porque esos nombres solo se
+responden dentro de tu red. Con `extra_records` puedes añadir tus propios
+registros.
 
-El dominio por defecto es **`.home`**, porque la ICANN no lo delegará como
-dominio de nivel superior público. Un nombre de la fleet nunca puede filtrarse a
-un registro público, y nadie más puede registrarlo ni obtener para él un
-certificado en el que confíen los navegadores. `.kiwi` es un TLD real, y por eso
-la fleet dejó de usarlo. kiwi-server comprueba tu elección: `home`, `corp`,
-`mail`, `internal`, `arpa` y `test` pasan sin aviso, `.local` se rechaza
-(pertenece a mDNS), `.lan` recibe una advertencia (los routers lo responden ellos
-mismos) y los TLD públicos reciben una advertencia.
+El dominio por defecto es **`.home`**. Se eligió porque la ICANN no lo va a
+delegar como dominio de nivel superior (TLD) público. Por tanto, un nombre de tu
+fleet nunca podrá acabar en un registro público, y nadie más podrá registrarlo
+ni conseguir para él un certificado en el que confíen los navegadores. `.kiwi`,
+en cambio, es un TLD real, y por eso Kiwi Network ya no lo usa. kiwi-server
+comprueba el dominio que eliges. `home`, `corp`, `mail`, `internal`, `arpa` y
+`test` se aceptan sin más. `.local` se rechaza, porque pertenece a mDNS. Con
+`.lan` aparece un aviso, porque los routers lo responden ellos mismos, y con los
+TLD públicos también.
 
-Los nombres *fuera* del dominio de la fleet, para un hub o un relay públicos,
-reciben certificados de Let's Encrypt cuando el proxy inverso del master es
-público.
+Los nombres de *fuera* del dominio de la fleet, que hacen falta para un hub o
+un relay públicos, reciben certificados de Let's Encrypt si el proxy inverso del
+master es público.
 
-## Proxies SOCKS5 de Mullvad por nombre { #mullvad-socks5-proxies-by-name }
+## Los proxies SOCKS5 de Mullvad, por su nombre { #mullvad-socks5-proxies-by-name }
 
-Desde kiwi-server 2.2.0, el Pi-hole del master responde por cada **proxy SOCKS5
-de Mullvad**, tanto como `de-fra-wg-socks5-001.relays.mullvad.net` como con el
-nombre corto `de-fra-001.mullvad.home`. gluetun rechaza estas respuestas de rango
-privado (protección contra DNS rebinding), así que sin los registros los nombres
-solo se resolverían a través de los resolvedores de reserva. Un temporizador del
-host (`km-mullvad-socks.timer`, cada 6 horas) actualiza la lista desde
+Los proxies SOCKS5 de Mullvad tienen direcciones de un rango privado, y esta
+función te permite usarlos por su nombre. Desde kiwi-server 2.2.0, el Pi-hole
+del master responde por todos los **proxies SOCKS5 de Mullvad**, tanto con su
+nombre completo (por ejemplo, `de-fra-wg-socks5-001.relays.mullvad.net`) como
+con un nombre corto (por ejemplo, `de-fra-001.mullvad.home`). gluetun rechaza
+las respuestas DNS que apuntan a direcciones privadas: es su protección contra
+el DNS rebinding. Sin estos registros, esos nombres solo se resolverían a través
+de los servidores DNS de reserva. Un temporizador del host
+(`km-mullvad-socks.timer`, cada 6 horas) actualiza la lista desde
 [derlocke-ng/mullvad-socks5](https://github.com/derlocke-ng/mullvad-socks5).
-De ella solo se aceptan nombres `*.relays.mullvad.net` con direcciones `10.x`,
-así que la lista nunca puede redirigir ningún otro nombre.
+De esa lista solo se aceptan los nombres `*.relays.mullvad.net` con direcciones
+`10.x`, de modo que la lista nunca puede redirigir ningún otro nombre.
 
-Está activado en el preset del master, cuya salida es Mullvad. Desactívalo con
-`mullvad_socks: false` en el bloque `dns:` del master.
+La función viene activada en el preset del master, porque la salida de ese
+preset es Mullvad. Para desactivarla, pon `mullvad_socks: false` en el bloque
+`dns:` del master.
 
-## Una CA para la fleet { #one-ca-for-the-fleet }
+## Una sola CA para toda la fleet { #one-ca-for-the-fleet }
 
-Con `tls.auto: true` (el valor por defecto), kiwi-server mantiene **una autoridad
-de certificación** para la fleet en `secrets/ca/` (`kiwiCA.key`, `kiwiCA.pem`,
-RSA-4096, válida 3650 días), creada la primera vez que un host necesita un
-certificado. Cada host que ejecuta el proxy inverso recibe un certificado para
-`<hostname>` y `*.<hostname>` (825 días, la vida más larga que los navegadores
-aún aceptan, renovado cuando quedan menos de 30 días), y cada máquina que
-construye kiwi-server instala la CA en su almacén de confianza.
+Una autoridad de certificación (CA) firma los certificados que tus servicios
+usan para HTTPS. Con `tls.auto: true`, que es el valor por defecto, kiwi-server
+mantiene **una única autoridad de certificación** para toda la fleet en
+`secrets/ca/`. La CA consta de los archivos `kiwiCA.key` y `kiwiCA.pem`, usa
+RSA-4096 y es válida durante 3650 días. kiwi-server la crea la primera vez que
+un host necesita un certificado. Cada host que ejecuta el proxy inverso recibe
+un certificado para `<hostname>` y `*.<hostname>`. Ese certificado es válido
+durante 825 días, la duración máxima que los navegadores todavía aceptan, y se
+renueva cuando le quedan menos de 30 días. Todas las máquinas que construye
+kiwi-server instalan la CA en su almacén de confianza.
 
-Fija **restricciones de nombre** y la CA solo podrá firmar nombres bajo el
-dominio de la fleet: `tls: { name_constraints: [home] }`. La fleet de ejemplo lo
-hace; el valor por defecto integrado es sin restricción. Así, una `kiwiCA.key`
-robada no vale para nada más, lo que importa porque todas las máquinas confían
-en ella.
+Si defines **restricciones de nombres** (name constraints), la CA solo puede
+firmar nombres del dominio de la fleet: `tls: { name_constraints: [home] }`. El
+archivo fleet de ejemplo las define, aunque el valor por defecto de kiwi-server
+es no poner ninguna restricción. Con la restricción, un `kiwiCA.key` robado no
+sirve de nada para ningún otro nombre. Esto es importante, porque todas las
+máquinas confían en la CA.
 
 ```bash
 kiwi-server ca fleet.yaml        # muestra la CA de la fleet
 ```
 
 Importa `kiwiCA.pem` en tus propios dispositivos (navegadores, teléfonos) para
-que `https://cloud.papaya.home` sea de confianza. Para usar tus propios
-certificados en su lugar, fija `tls_fullchain` y `tls_privkey` en el módulo
-reverse-proxy.
+que confíen en `https://cloud.papaya.home`. Si prefieres usar tus propios
+certificados, define `tls_fullchain` y `tls_privkey` en el módulo reverse-proxy.
 
 !!! warning "Mantén `secrets/` en privado"
     `kiwiCA.key` firma certificados en los que confían todas tus máquinas.
-    Mantén `secrets/` y `output/` fuera de git (`output/` ya está en el
+    Deja `secrets/` y `output/` fuera de git (`output/` ya está en el
     `.gitignore` de kiwi-server).

@@ -11,10 +11,10 @@ hide:
 
 # Kiwi Network
 
-<p class="kiwi-lede">La tua rete privata: un master al cancello, i node dietro di lui, ogni macchina è tua. Costruita da un solo file, con una sola porta verso Internet.</p>
+<p class="kiwi-lede">Un ambiente Linux open source che gestisci tu: i tuoi server, i tuoi dispositivi e il tuo desktop, collegati in un’unica rete privata. Si installa da solo, si tiene aggiornato, fa un backup ogni notte e, quando qualcosa si rompe, si può ricostruire.</p>
 
 [Come funziona](network/index.md){ .md-button .md-button--primary }
-[Costruiscine una](server/index.md){ .md-button }
+[Crea la tua rete](server/index.md){ .md-button }
 
 </div>
 
@@ -22,77 +22,87 @@ hide:
 
 <a href="network/">
 <strong>La rete</strong>
-<span>Un master, molti node, una mesh WireGuard. Gruppi di client, un'uscita a doppio hop, DNS e certificati tutti tuoi.</span>
+<span>I tuoi server e i tuoi dispositivi in un’unica rete WireGuard privata. Un solo server è raggiungibile da Internet, tutti gli altri restano a casa.</span>
 <em>Come funziona →</em>
 </a>
 
 <a href="server/">
 <strong>kiwi-server</strong>
-<span>Il file fleet, ISO di installazione, apply via SSH, registrazione, backup, sblocco. CLI e app GTK.</span>
-<em>Costruisci una rete →</em>
+<span>Lo strumento con cui costruisci e gestisci la rete: un solo file per tutte le macchine, installazione automatica, backup e sblocco dei dischi.</span>
+<em>Crea la tua rete →</em>
 </a>
 
 <a href="server/modules/">
 <strong>Moduli</strong>
-<span>Tutti e 20: WireGuard, Pi-hole, Tor, Nextcloud, Vaultwarden, backup, Tang, Immich, Paperless-ngx e altri.</span>
-<em>Cosa può essere un node →</em>
+<span>I 20 servizi che una macchina può eseguire: da WireGuard e Pi-hole a Nextcloud, Vaultwarden, i backup e Immich.</span>
+<em>Che cosa può fare un node →</em>
 </a>
 
 <a href="people/">
 <strong>Hub</strong>
-<span>kiwi-framework: mercati aperti, feed, chat e condivisione su nostr, sigillati nel browser. Armory è il primo.</span>
-<em>Hub, non piattaforme →</em>
+<span>Con kiwi-framework una comunità gestisce il proprio hub, con un mercato aperto, un feed e una chat, senza nessuna piattaforma centrale.</span>
+<em>Hub per le comunità →</em>
 </a>
 
 <a href="desktop/">
 <strong>Il desktop</strong>
-<span>kiwi-updater e le app per Fedora Atomic: kill switch, uscite sigillate per le reti dei clienti, configurazione, sincronizzazione.</span>
-<em>App da git →</em>
+<span>Una postazione di lavoro con Fedora Atomic e app installate da git: un kill switch per la VPN, connessioni isolate per le reti dei clienti, configurazione iniziale e sincronizzazione.</span>
+<em>Le app per il desktop →</em>
 </a>
 
 <a href="project/status/">
 <strong>Stato</strong>
-<span>Ogni repository, la sua release e le sue lacune note, descritti per come sono.</span>
-<em>A che punto siamo →</em>
+<span>Tutti i repository, ciascuno con la sua release attuale e con quello che ancora manca.</span>
+<em>Stato attuale →</em>
 </a>
 
 </div>
 
-## L'idea { #the-idea }
+## L’idea { #the-idea }
 
-Kiwi Network è un ambiente Linux completamente automatizzato in cui vivere e
-lavorare: sicuro, solido e protetto per una dura vita online. Le tue macchine si
-prendono cura di sé.
+Internet non è un posto tranquillo, e badare ai propri server è un lavoro che
+non finisce mai. Kiwi Network lo fa al posto tuo. Descrivi le tue macchine in un
+solo file, e le operazioni di routine vengono eseguite in automatico.
+Intrusioni, dischi guasti e macchine perse sono messi in conto fin dall’inizio.
 
-- **Si installano da sole.** Una ISO automatica per ogni macchina, oppure
-  direttamente su un server in affitto tramite l'API del provider (oggi netcup,
-  altri [previsti](server/roadmap.md#more-hosters-and-network-boot)).
-- **Si tengono aggiornate da sole.** Gli aggiornamenti si installano di continuo,
-  e i riavvii aspettano la finestra che imposti tu.
-- **Si fanno il backup da sole.** Ogni notte, cifrato e in sola aggiunta, su node
-  di backup tutti tuoi. Anche il file fleet e i suoi segreti finiscono nel backup.
-- **Si rimettono in piedi.** I dischi cifrati si sbloccano tramite Tang, o da
-  remoto quando qualcosa non va, e una macchina ricostruita torna a partire dal
-  file fleet e dal suo backup.
+- **Installazione automatica.** Ogni macchina viene installata senza nessuno
+  alla tastiera: dalla propria immagine di installazione, oppure direttamente su
+  un server a noleggio, tramite l’API del provider di hosting. Oggi funziona con
+  netcup, e altri provider sono
+  [previsti](server/roadmap.md#more-hosters-and-network-boot).
+- **Aggiornamenti automatici.** Gli aggiornamenti vengono installati senza che
+  tu debba fare nulla. Una macchina si riavvia soltanto nelle ore che hai
+  autorizzato.
+- **Un backup ogni notte.** Ogni macchina invia un backup cifrato a un server di
+  backup che appartiene a te. Può aggiungere ai propri backup, ma non può
+  cancellarli: chi riuscisse a entrare in una macchina non potrebbe farli
+  sparire. Nel backup finiscono anche il file fleet (`fleet.yaml`) e i suoi
+  segreti, cioè password e chiavi.
+- **Ripristino quando serve davvero.** I dischi sono cifrati. All’avvio le
+  macchine li sbloccano da sole, oppure li sblocchi tu da remoto. Se una
+  macchina va ricostruita, la configurazione arriva dal file fleet e i dati dal
+  backup.
 
 ## Le macchine { #the-machines }
 
-| Ruolo | Cosa diventa la macchina |
-|---|---|
-| `master` | il cancello: WireGuard, un'uscita a doppio hop o diretta, Pi-hole, Tor, le pagine di amministrazione e, se vuoi, un relay nostr e un hub |
-| `node` · `gateway` | una LAN attraverso la VPN, con Pi-hole come DNS e DHCP, una stazione di download e SFTP |
-| `node` · `cloud` | Nextcloud con Collabora, e Vaultwarden |
-| `node` · `minimal` | il tunnel e nginx, per i moduli che scegli tu: backup, Tang, Immich, Paperless-ngx, OpenCloud |
-| `bare` | solo il sistema di base |
+Ogni macchina ha un ruolo, che stabilisce che cosa fa nella rete.
 
-I master prendono il nome da piatti a base di frutta (sorbet, crumble, compote), i node
-da frutti (papaya, lychee, quince). Il master è l'unica macchina che deve essere
-raggiungibile da Internet, e di default pubblica una sola porta: WireGuard,
-UDP 51820.
+| Ruolo | Che cosa fa la macchina |
+|---|---|
+| `master` | È l’unica macchina raggiungibile da Internet. Esegue il server WireGuard, manda il traffico in uscita attraverso un provider VPN oppure direttamente a Internet, e offre il DNS con Pi-hole, Tor e le pagine di amministrazione. Può ospitare anche un relay nostr e un hub. |
+| `node` · `gateway` | Fa passare un’intera rete domestica o d’ufficio attraverso la VPN, con Pi-hole come server DNS e DHCP, un gestore di download e SFTP. |
+| `node` · `cloud` | Esegue Nextcloud con Collabora, e Vaultwarden. |
+| `node` · `minimal` | Ha soltanto la connessione alla rete e nginx. I moduli li aggiungi tu: per esempio i backup, Tang, Immich, Paperless-ngx oppure OpenCloud. |
+| `bare` | Ha soltanto il sistema di base. |
+
+I master prendono il nome da dolci a base di frutta (sorbet, crumble, compote),
+i node da frutti (papaya, lychee, quince). Il master è l’unica macchina che deve
+essere raggiungibile da Internet. Per impostazione predefinita ha una sola porta
+aperta: WireGuard, sulla UDP 51820.
 
 ```bash
 kiwi install kiwi-server            # oppure da un clone: ./install.sh install
 kiwi-server init && $EDITOR fleet.yaml
-kiwi-server build fleet.yaml        # una ISO automatica per ogni macchina
+kiwi-server build fleet.yaml        # una ISO per ogni macchina, che si installa da sola
 kiwi-server apply fleet.yaml papaya # il ruolo, via SSH
 ```

@@ -1,9 +1,20 @@
 # Jak działa sieć
 
-Kiwi Network to **sieć mesh WireGuard z jednym hubem**, *kiwi-master*. Każda
-inna maszyna (node'y w domu lub w biurze, laptopy, telefony, routery) łączy się
-z masterem i spotyka pozostałe w sieci mesh. Całość jest opisana w jednym pliku
-fleet i budowana przez [kiwi-server](../server/index.md).
+Kiwi Network łączy twoje maszyny w jedną prywatną sieć, niezależnie od tego,
+gdzie stoją: serwery w domu albo w biurze, laptopy, telefony, a nawet całe
+sieci domowe za routerem. Maszyny łączą się ze sobą tak, jakby były w tej samej
+sieci lokalnej, a dostępna z internetu musi być tylko jedna z nich. Z tej
+strony dowiesz się, jak ta sieć jest zbudowana i do czego służy każda jej
+część.
+
+Ta prywatna sieć to **sieć mesh oparta na WireGuard**. WireGuard to
+oprogramowanie VPN, które szyfruje połączenia, a *siecią mesh* nazywamy w tej
+dokumentacji prywatną sieć, do której należą wszystkie twoje maszyny. W jej
+środku stoi jedna maszyna, *kiwi-master*. Każda inna maszyna (node’y w domu
+albo w biurze, laptopy, telefony, routery) sama nawiązuje połączenie
+z masterem i dzięki temu może przez sieć mesh połączyć się z pozostałymi. Całą
+sieć opisuje jeden plik, plik fleet (`fleet.yaml`), a narzędzie
+[kiwi-server](../server/index.md) buduje ją na jego podstawie.
 
 ```
                           Internet
@@ -28,152 +39,182 @@ fleet i budowana przez [kiwi-server](../server/index.md).
 
 ## Master { #the-master }
 
-Rola `master` uruchamia pięć modułów. Pi-hole, Tor i nginx działają w
-przestrzeni nazw sieciowych serwera WireGuard i wracają razem z nim.
+Master to maszyna, z którą łączą się wszystkie pozostałe. Jego rola, `master`,
+uruchamia pięć modułów opisanych poniżej. Pi-hole, Tor i nginx współdzielą
+z serwerem WireGuard sieciową przestrzeń nazw (network namespace), czyli osobny
+zestaw interfejsów, adresów i tras, jaki ma kontener. Te trzy usługi nie mają
+więc własnej sieci, tylko korzystają z sieci serwera WireGuard. Z tego powodu
+są restartowane razem z nim.
 
-- **vpn-server** (wg-easy) to punkt wejścia dla każdego klienta i node'a; wydaje
-  też ich konfiguracje WireGuard. kiwi-server może je dla ciebie utworzyć
-  (`kiwi-server enroll`).
-- **vpn-client** (gluetun) łączy się z komercyjnym dostawcą VPN: w presecie z
-  Mullvad, ogólnie z dowolnym dostawcą obsługiwanym przez gluetun. Domyślna
-  trasa serwera WireGuard prowadzi do niego, więc ruch z sieci mesh wychodzi
-  przez dostawcę, a nie z własnego adresu mastera. To jest **podwójny skok**
-  (double hop). Master bez vpn-client wychodzi bezpośrednio.
-- **dns** (Pi-hole 6) odpowiada pod adresem mastera w sieci mesh, `10.8.0.1`.
-  Zobacz [DNS, nazwy i certyfikaty](dns.md).
-- **tor** udostępnia klientom sieci mesh SOCKS5 pod `10.8.0.1:9050`, z węzłami
-  wejściowymi i wyjściowymi przypiętymi do zestawu krajów (domyślnie
-  `de,ch,at,nl,fr`, `StrictNodes`).
-- **reverse-proxy** (nginx) serwuje strony administracyjne, `wg.<master>` i
-  `pihole.<master>`, grupom administracyjnym w sieci mesh.
+- **vpn-server** (wg-easy) to serwer WireGuard. Łączy się z nim każdy klient
+  i każdy node i to on wystawia im konfiguracje WireGuard. Może je dla ciebie
+  utworzyć kiwi-server (`kiwi-server enroll`).
+- **vpn-client** (gluetun) łączy mastera z komercyjnym dostawcą VPN. Preset
+  używa usługi Mullvad, ale zadziała każdy dostawca obsługiwany przez gluetun.
+  Trasa domyślna serwera WireGuard prowadzi do tego klienta VPN, więc ruch
+  z sieci mesh do internetu przechodzi przez dostawcę, a strony internetowe
+  widzą adres dostawcy, nie adres mastera. To połączenie jest *wyjściem*
+  mastera, czyli drogą, którą ruch z sieci mesh trafia do internetu. Ruch
+  przechodzi kolejno przez dwa VPN-y, najpierw twój, potem dostawcy, dlatego
+  taki układ nazywa się **podwójnym przeskokiem** (double hop). Master bez
+  modułu vpn-client wysyła ruch do internetu bezpośrednio, ze swojego adresu.
+- **dns** (Pi-hole 6) to serwer DNS sieci mesh. Odpowiada pod adresem mastera
+  w sieci mesh, `10.8.0.1`. Zobacz [DNS, nazwy i certyfikaty](dns.md).
+- **tor** udostępnia klientom w sieci mesh proxy SOCKS5 pod adresem
+  `10.8.0.1:9050`. Węzły wejściowe i wyjściowe Tora są ograniczone do wybranych
+  krajów (domyślnie `de,ch,at,nl,fr`, co wymusza opcja `StrictNodes`).
+- **reverse-proxy** (nginx) udostępnia strony administracyjne, czyli interfejsy
+  WWW wg-easy i Pi-hole: `wg.<master>` i `pihole.<master>`. Można je otworzyć
+  tylko z sieci mesh i tylko z klientów, którym wolno z nich korzystać (zobacz
+  „Grupy klientów” niżej).
 
-Master może też obsługiwać **przekaźnik nostr** i **hub** dla
-[ludzi w twojej sieci](../people/hubs.md#on-a-kiwi-network), a także Portainer
-i kopie zapasowe.
+Na masterze mogą też działać **przekaźnik nostr** i **hub** dla
+[ludzi z twojej sieci](../people/hubs.md#on-a-kiwi-network). Hub to strona
+społeczności, która działa w przeglądarce, a przekaźnik nostr to serwer, przez
+który huby synchronizują dane. Do mastera można również dodać Portainer i kopie
+zapasowe.
 
-### Co jest osiągalne z Internetu { #what-is-reachable-from-the-internet }
+### Co jest dostępne z internetu { #what-is-reachable-from-the-internet }
 
-Domyślnie master publikuje **jeden port**: WireGuard, UDP 51820. Strony
-administracyjne odpowiadają tylko sieci mesh. Dwa ustawienia dodają więcej:
+Domyślnie master ma otwarty do internetu **jeden port**: WireGuard na UDP 51820. Strony administracyjne da się otworzyć tylko z sieci mesh. Kolejne
+porty otwierają dwa ustawienia:
 
-- `reverse-proxy.public: true` publikuje porty 80 i 443, z certyfikatami Let's
-  Encrypt dla nazw spoza domeny floty. Wszystko inne nadal odpowiada tylko
-  sieci mesh, a strony administracyjne odpowiadają z zewnątrz kodem 403. To
-  opcja dla publicznego huba lub przekaźnika.
+- `reverse-proxy.public: true` otwiera porty 80 i 443 i pobiera certyfikaty
+  Let’s Encrypt dla nazw spoza domeny twojej sieci. Cała reszta nadal jest
+  dostępna wyłącznie z sieci mesh, a strony administracyjne odpowiadają na
+  zapytania z zewnątrz błędem 403. To ustawienie jest przeznaczone dla
+  publicznego huba albo przekaźnika.
 - `vpn-server.unlock_relay` otwiera porty TCP
   [pierścieni Tang](../server/operations.md#encrypted-disks-and-unlocking) dla
-  maszyn za NAT-em.
+  maszyn za NAT-em. Tang to serwer, dzięki któremu maszyna z zaszyfrowanym
+  dyskiem może odblokować ten dysk przy starcie, a pierścień to jeden serwer
+  Tang z własnymi kluczami.
 
-SSH pozostaje takie, jak ustawił je system operacyjny (domyślnie tylko klucze).
-kiwi-server używa go do `apply` i `status`.
+SSH pozostaje skonfigurowane tak, jak ustawił je system operacyjny, czyli
+domyślnie można się logować wyłącznie kluczem. Samo narzędzie kiwi-server
+używa SSH do poleceń `apply` i `status`.
 
 ## Grupy klientów { #client-groups }
 
-Klienci wg-easy są dzieleni na **grupy** według adresu. Każda grupa decyduje,
-do czego mają dostęp jej członkowie:
+Klienci serwera WireGuard (wg-easy) są przydzielani do **grup** według adresu.
+Grupa określa, z czym jej członkowie mogą się łączyć:
 
 | Grupa | Podsieć | Ma dostęp do | Widzi innych klientów | Strony administracyjne |
 |---|---|---|---|---|
-| `guests` | `10.8.1.0/24` | node'ów | nie | nie |
+| `guests` | `10.8.1.0/24` | node’ów | nie | nie |
 | `pentest` | `10.8.2.0/24` | niczego w sieci mesh | nie | nie |
 | `devices` | `10.8.3.0/24` | wszystkiego | tak | tak |
 | `routers` | `10.8.4.0/24` | wszystkiego | tak | nie |
 
 ```bash
 kiwi-server enroll fleet.yaml phone --group devices --qr   # kod QR dla aplikacji WireGuard
-kiwi-server enroll fleet.yaml anna  --group guests --split # przez tunel idzie tylko sieć mesh
+kiwi-server enroll fleet.yaml anna  --group guests --split # przez tunel idzie tylko ruch do sieci mesh
 ```
 
-Każda grupa może wychodzić do Internetu przez wyjście, chyba że ustawisz
-`internet: false`. Klienci spoza wszystkich grup (`10.8.0.x`) to zwykła sieć
-mesh: mają dostęp do wszystkiego i widzą strony administracyjne, dopóki
-`admin_from_mesh` jest włączone. Grupy są ustawieniem modułu vpn-server
-(`groups`), więc możesz je zmieniać lub dodawać własne (`reach` przyjmuje
-`all`, `nodes`, nazwy hostów, adresy lub podsieci). Stare pojedyncze
-`isolated_subnet` nadal istnieje, ale domyślnie jest wyłączone.
+Członkowie każdej grupy mają też dostęp do internetu przez wyjście mastera,
+chyba że ustawisz dla grupy `internet: false`. Klient, którego adres nie należy
+do żadnej grupy (`10.8.0.x`), jest zwykłym uczestnikiem sieci mesh. Ma dostęp
+do wszystkiego, a strony administracyjne otworzy, o ile włączone jest
+ustawienie `admin_from_mesh`.
 
-## Node'y { #nodes }
+Grupy są ustawieniem modułu vpn-server (`groups`), możesz więc je zmieniać
+i dodawać własne. Ustawienie `reach` grupy przyjmuje wartości `all` i `nodes`,
+nazwy hostów, adresy albo podsieci. Starsze ustawienie `isolated_subnet`, które
+definiowało jedną odizolowaną grupę, nadal istnieje, ale domyślnie jest
+wyłączone.
 
-vpn-client node'a nie rozmawia z komercyjnym VPN-em. Używa konfiguracji
-WireGuard, którą master dla niego wydał (`kiwi-server enroll` zapisuje
-`secrets/<hostname>.conf`, a node sam ją pobiera). Node nie potrzebuje
-otwartego portu w Internecie: sam łączy się z masterem, więc działa za NAT-em
-domowego routera.
+## Node’y { #nodes }
 
-Rola `node` ma trzy presety:
+Node to maszyna w domu albo w biurze, na której działają twoje usługi. On też
+ma moduł vpn-client, ale tutaj moduł ten nie łączy się z komercyjnym dostawcą
+VPN, tylko z masterem. Używa do tego konfiguracji WireGuard, którą master
+wystawił dla tego node’a. Polecenie `kiwi-server enroll` zapisuje ją w pliku
+`secrets/<hostname>.conf`, a node korzysta z niej bez żadnych dodatkowych
+ustawień. Node nie potrzebuje portu otwartego do internetu, bo sam nawiązuje
+połączenie z masterem. Dlatego działa także za NAT-em domowego routera.
+
+Rola `node` ma trzy presety, czyli gotowe listy modułów:
 
 | Preset | Czym staje się maszyna |
 |---|---|
-| `gateway` (domyślny) | Bramą LAN. Klienci w LAN, którzy używają jej jako bramy domyślnej, wychodzą przez VPN i mają dostęp do sieci mesh. Pi-hole obsługuje LAN (opcjonalnie jako jego serwer DHCP). Transmission i JDownloader działają *wewnątrz* przestrzeni nazw sieciowych klienta VPN, więc gdy tunel nie działa, nie mają żadnej trasy. Z nginx, Portainer i SFTP. |
-| `cloud` | Nextcloud (z kontenerów projektu AIO, bez kontenera AIO master) z Collabora, do tego Vaultwarden, za nginx, do tego Portainer |
-| `minimal` | Tylko klient VPN i nginx, a moduły wybierasz sam |
+| `gateway` (domyślny) | Bramą dla sieci lokalnej (LAN). Urządzenia w sieci lokalnej, które mają tę maszynę ustawioną jako bramę domyślną, wychodzą do internetu przez VPN i mają dostęp do sieci mesh. Pi-hole jest serwerem DNS sieci lokalnej, a opcjonalnie także jej serwerem DHCP. Programy do pobierania plików, Transmission i JDownloader, działają *wewnątrz* sieciowej przestrzeni nazw klienta VPN, więc gdy tunel nie działa, nie mają żadnej trasy. Preset zawiera też nginx, Portainer i SFTP. |
+| `cloud` | Twoją własną chmurą: Nextcloud z pakietem Collabora obsługuje pliki, kalendarze i dokumenty, a Vaultwarden hasła. Usługi te stoją za nginx, w zestawie jest też Portainer. Nextcloud jest zbudowany z kontenerów projektu AIO, ale bez jego kontenera głównego (master container). |
+| `minimal` | Tylko klient VPN i nginx. Potrzebne moduły dodajesz samodzielnie. |
 
-Node'y mogą też uruchamiać kopie zapasowe, serwer kopii zapasowych, Tang oraz
-(do wypróbowania) OpenCloud, Immich i Paperless-ngx. Zobacz
-[listę modułów](../server/modules.md).
+Node’y mogą też robić kopie zapasowe, służyć jako serwer kopii zapasowych
+i uruchamiać Tang. OpenCloud, Immich i Paperless-ngx są dołączone do
+wypróbowania. Zobacz [listę modułów](../server/modules.md).
 
-Usługi na nodzie są osiągalne w jego LAN i pod jego **adresem w sieci mesh**
-(np. `10.8.0.25`). Ruch z sieci mesh na ten adres na portach 80 i 443 trafia
-do reverse proxy.
+Z usług node’a można korzystać z jego sieci lokalnej oraz pod jego **adresem
+w sieci mesh** (na przykład `10.8.0.25`). Ruch z sieci mesh skierowany na ten
+adres, na porty 80 i 443, jest przekazywany do reverse proxy node’a.
 
 ## Nazwy { #names }
 
-Nazwy maszyn pochodzą z sadu: **mastery od deserów i potraw z owoców**
-(`crumble`, `sorbet`, `compote`, `chutney`, `strudel`, `cobbler`, `trifle`,
-`cider`), a **node'y od owoców** (`papaya`, `lychee`, `guava`, `quince`,
-`damson`), dzięki czemu rodzaj maszyny widać w każdej linii logu. To konwencja;
-każda nazwa działa. Usługi leżą pod swoim hostem: `cloud.papaya.home`,
-`vault.papaya.home`, `wg.sorbet.home`. Zobacz [DNS, nazwy i certyfikaty](dns.md).
+Nazwy maszyn trzymają się pewnej konwencji. **Mastery noszą nazwy potraw
+z owoców** (`crumble`, `sorbet`, `compote`, `chutney`, `strudel`, `cobbler`,
+`trifle`, `cider`), a **node’y nazwy owoców** (`papaya`, `lychee`, `guava`,
+`quince`, `damson`). Dzięki temu w każdej linii logu od razu widać, o jaki
+rodzaj maszyny chodzi. To tylko konwencja i zadziała każda nazwa. Usługa
+dostaje nazwę pod nazwą maszyny, na której działa: `cloud.papaya.home`,
+`vault.papaya.home`, `wg.sorbet.home`. Zobacz
+[DNS, nazwy i certyfikaty](dns.md).
 
-## Drogi wyjścia { #ways-out }
+## Jak sieć mesh łączy się z internetem { #ways-out }
 
-Master to serwer WireGuard z wyjściem, a wyjście ma trzy tryby:
+Master to serwer WireGuard z wyjściem, czyli drogą, którą ruch z sieci mesh
+trafia do internetu. Wyjście ma trzy tryby:
 
-| Tryb | Jak sieć mesh dociera do Internetu | Stan |
+| Tryb | Jak sieć mesh łączy się z internetem | Stan |
 |---|---|---|
-| **provider** | przez komercyjny VPN (gluetun): podwójny skok i preset mastera | zbudowany |
-| **direct** | prosto przez własne łącze mastera. Wypisz moduły mastera bez `vpn-client` | zbudowany |
-| **master** | przez *mastera innej sieci*, jako klient w jednej z jego grup, który może dotrzeć do Internetu i do niczego więcej: multi-hop | zaprojektowany; wymaga rejestracji między sieciami, czyli federacji |
+| **provider** | Przez komercyjnego dostawcę VPN (gluetun). To właśnie podwójny przeskok i tak konfiguruje mastera jego preset. | zrealizowane |
+| **direct** | Bezpośrednio przez łącze internetowe mastera. Żeby uzyskać ten tryb, wypisz moduły mastera bez `vpn-client`. | zrealizowane |
+| **master** | Przez *mastera innej sieci*. Twój master jest tam klientem w jednej z grup, które mają dostęp do internetu i do niczego więcej. Nazywa się to multi-hop. | zaprojektowane; wymaga dodawania maszyn między sieciami, czyli federacji |
 
-Każdy master udostępnia też sieci mesh SOCKS5 Tora, niezależnie od swojego
-wyjścia.
+Niezależnie od trybu wyjścia każdy master udostępnia sieci mesh także proxy
+SOCKS5 Tora.
 
-## Jedna sieć mesh na sieć { #one-mesh-per-network }
+## Jedna sieć mesh na każdą sieć { #one-mesh-per-network }
 
-Każda sieć ma własną sieć mesh. Domyślnie jest to `10.8.0.0/16`: mastery i
-node'y w `10.8.0.0/24`, potem guests `.1`, pentest `.2`, devices `.3` i
-routers `.4`. Druga sieć bierze inny zakres, na przykład `10.9.0.0/16`, żeby
-urządzenie należące do obu mogło je rozróżnić. Dziś zakres jest rozłożony na
-kilka ustawień (`mesh_subnet`, `server_ip` modułu vpn-server, `wg_subnet`,
-`wg_default_address` i `groups` oraz `socks_policy_accept` Tora), a plik fleet
-ustawia je wszystkie.
+Każda sieć ma własną sieć mesh z osobnym zakresem adresów. Domyślny zakres to
+`10.8.0.0/16`. Mastery i node’y mają adresy z `10.8.0.0/24`, a dalej idą grupy:
+guests w `.1`, pentest w `.2`, devices w `.3` i routers w `.4`. Druga sieć
+używa innego zakresu, na przykład `10.9.0.0/16`, żeby urządzenie należące do
+obu sieci mogło je odróżnić. Na razie zakresu nie ustawia się w jednym miejscu,
+tylko w kilku ustawieniach: `mesh_subnet`, w module vpn-server `server_ip`,
+`wg_subnet`, `wg_default_address` i `groups`, a w module tor
+`socks_policy_accept`. Wszystkie ustawia plik fleet.
 
 ## Adresacja { #addressing }
 
-| Co | Domyślnie |
+| Co | Wartość domyślna |
 |---|---|
 | Cała sieć mesh (trasowana na każdym hoście) | domyślnie `10.8.0.0/16` (`mesh_subnet`) |
-| Klienci wg-easy | `10.8.0.0/24`; serwer to `10.8.0.1` |
+| Klienci wg-easy | `10.8.0.0/24`; serwer ma adres `10.8.0.1` |
 | Grupy klientów | `10.8.1.0/24` … `10.8.4.0/24` |
-| Sieć stacka | `172.64.0.0/24` na masterze, `172.128.0.0/24` na nodzie |
-| MTU WireGuard | `1376` (`wg_mtu`), zmierzone przez [`kiwi-server mtu`](../server/operations.md#tunnel-mtu) |
-| MTU mostka stacka | `1500` (`bridge_mtu`) |
+| Sieć stacku | `172.64.0.0/24` na masterze, `172.128.0.0/24` na nodzie |
+| MTU WireGuard | `1376` (`wg_mtu`), zmierzone poleceniem [`kiwi-server mtu`](../server/operations.md#tunnel-mtu) |
+| MTU mostu stacku | `1500` (`bridge_mtu`) |
 
-Każdy host stacka trasuje sieć mesh przez swojego klienta VPN (na masterze
-przez serwer WireGuard), więc host i jego kontenery docierają do każdego
-node'a.
+Stack maszyny to wszystkie kontenery, które uruchamiają jej moduły. Każda
+maszyna ze stackiem kieruje ruch do całego zakresu adresów sieci mesh przez
+swojego klienta VPN, a master przez serwer WireGuard. Dzięki temu zarówno sama
+maszyna, jak i jej kontenery mają dostęp do każdego node’a.
 
-## Świeżość { #keeping-it-fresh }
+## Automatyczne restarty i aktualizacje { #keeping-it-fresh }
 
-Każda maszyna dostaje ze swoich ustawień stacka dwa timery: **codzienny
-restart VPN** (`07:00`, dla świeżego adresu wyjściowego) i **cotygodniową
-aktualizację** (niedziela 00:00; uruchamia `podman auto-update`, dopóki
-ustawione jest `auto_update: registry`). System operacyjny aktualizuje się sam
-i uruchamia ponownie tylko w [twoim oknie](../server/machines.md#updates).
+Każda maszyna dostaje dwa timery systemd, które konfiguruje się w ustawieniach
+jej stacku. Pierwszy to **codzienny restart VPN** o `07:00`, po którym maszyna
+ma nowy adres wyjściowy. Drugi to **cotygodniowa aktualizacja** w niedzielę
+o 00:00, która uruchamia `podman auto-update`, o ile ustawione jest
+`auto_update: registry`. System operacyjny też aktualizuje się sam, a ponownie
+uruchamia się tylko w
+[oknie czasowym, które wyznaczysz](../server/machines.md#updates).
 
-## Cały LAN w sieci mesh { #a-whole-lan-in-the-mesh }
+## Cała sieć lokalna w sieci mesh { #a-whole-lan-in-the-mesh }
 
-Router może dołączyć do sieci mesh jako klient WireGuard w grupie `routers`
-albo wysyłać podsieć mesh do node'a gateway przez trasę statyczną. Wtedy każde
-urządzenie w tym LAN dociera do każdego node'a bez uruchamiania WireGuard.
-Zobacz [Routery](routers.md).
+Router może dołączyć do sieci mesh jako klient WireGuard w grupie `routers`.
+Druga możliwość to trasa statyczna, którą router wysyła ruch do podsieci mesh
+do node’a `gateway`. W obu przypadkach każde urządzenie w sieci lokalnej tego
+routera ma dostęp do każdego node’a, choć samo nie uruchamia WireGuard. Zobacz
+[Routery](routers.md).

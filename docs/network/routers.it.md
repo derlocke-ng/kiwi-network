@@ -1,79 +1,97 @@
-# Router: un'intera LAN nella mesh
+# Router: un’intera LAN nella mesh
 
-Un dispositivo nella mesh risolve ogni nome della fleet e raggiunge ogni node. Una LAN
-dietro un router può fare lo stesso senza che ogni dispositivo esegua WireGuard, in uno
-di due modi:
+Questa pagina spiega come collegare alla tua Kiwi Network un’intera rete locale
+(LAN), per esempio la rete domestica o quella dell’ufficio, attraverso il suo
+router. Un dispositivo nella mesh, cioè nella rete WireGuard privata delle tue
+macchine, può risolvere tutti i nomi della fleet e raggiungere tutti i node. I
+dispositivi di una LAN dietro un router possono fare lo stesso, senza che
+ognuno di loro debba usare WireGuard. Ci sono due modi per arrivarci:
 
-- **Il router è un client della mesh.** Esegue WireGuard con una configurazione rilasciata
-  dal wg-easy del master (`kiwi-server enroll fleet.yaml router --group routers`) e
-  instrada la subnet della mesh (`10.8.0.0/16`) nel tunnel.
-  Questo è il tunnel *split*: ci passa solo il traffico della mesh. Il tunnel *full*
-  manda tutto, così l'intera LAN raggiunge Internet attraverso
-  l'uscita del master.
-- **Una route statica verso un node gateway.** Il router non ha un tunnel. Manda la
-  subnet della mesh a un node della LAN che esegue il modulo `gateway`, il quale
-  la inoltra attraverso il suo client VPN.
+- **Il router è un client della mesh.** Sul router gira WireGuard, con una
+  configurazione emessa da wg-easy, il server WireGuard del master
+  (`kiwi-server enroll fleet.yaml router --group routers`). Il router instrada
+  nel tunnel la sottorete della mesh (`10.8.0.0/16`). Questo si chiama tunnel
+  *split*, perché ci passa soltanto il traffico destinato alla mesh. In un
+  tunnel *full* passa invece tutto il traffico: l’intera LAN arriva allora a
+  Internet attraverso l’uscita del master, cioè la connessione del master a
+  Internet.
+- **Il router ha una rotta statica verso un node gateway.** Il router non ha
+  nessun tunnel. Manda il traffico destinato alla sottorete della mesh a un
+  node della LAN su cui gira il modulo `gateway`, e quel node lo inoltra
+  attraverso il proprio client VPN.
 
-In entrambi i casi, un'unica regola DNS sostituisce gli override per singolo host: il dominio della fleet
-(`*.home`) viene inoltrato al Pi-hole del master, che conosce ogni nome di host e
-di servizio. Nient'altro cambia nel DNS del router.
+In entrambi i casi basta una sola regola DNS, e non servono voci per i singoli
+host. La regola inoltra le query per il dominio della fleet (`*.home`) al
+Pi-hole del master, che conosce tutti i nomi di host e tutti i nomi di
+servizio. Per il resto, il DNS del router non cambia.
 
-Quello che la LAN non può fare è raggiungere un dispositivo *dietro un altro router* tramite il suo
-indirizzo LAN. La mesh trasporta solo indirizzi mesh, per scelta progettuale.
+Una cosa non funziona: un dispositivo della LAN non può raggiungere un
+dispositivo *dietro un altro router* usando l’indirizzo LAN di quest’ultimo. La
+mesh trasporta soltanto il traffico diretto a indirizzi della mesh, ed è una
+scelta voluta.
 
 ## OpenWrt { #openwrt }
 
-kiwi-server scrive l'intera configurazione come script `uci`:
+Per OpenWrt, kiwi-server scrive l’intera configurazione sotto forma di script
+`uci`:
 
 ```bash
-# il router come client della mesh, con la configurazione rilasciata dal wg-easy del master
+# il router come client della mesh, con la configurazione emessa dal wg-easy del master
 kiwi-server openwrt fleet.yaml --wireguard secrets/router.conf          # split: solo la mesh
 kiwi-server openwrt fleet.yaml --wireguard secrets/router.conf --full   # full: tutto
 
-# nessun tunnel sul router: una route statica verso il node gateway lychee
-# (lychee ha bisogno di un indirizzo LAN statico nella fleet: network.dhcp false + address)
+# nessun tunnel sul router: una rotta statica verso il node gateway lychee
+# (nella fleet lychee deve avere un indirizzo LAN statico: network.dhcp false + address)
 kiwi-server openwrt fleet.yaml --via lychee
 kiwi-server openwrt fleet.yaml --via 192.168.1.5
 ```
 
-Copia l'output sul router ed eseguilo:
+Copia l’output sul router ed eseguilo lì:
 
 ```bash
 kiwi-server openwrt fleet.yaml --wireguard secrets/router.conf > kiwi.sh
 scp kiwi.sh root@192.168.1.1:/tmp/ && ssh root@192.168.1.1 sh /tmp/kiwi.sh
 ```
 
-Lo script installa il pacchetto WireGuard se manca. Crea un'interfaccia
-`kiwi` (cambia il nome con `--name`), con il `wg_mtu` della fleet come
-MTU e un peer per il master
-e `route_allowed_ips`, una zona firewall verso cui la LAN può inoltrare (con
-masquerading e MSS clamping), e l'inoltro dnsmasq per il dominio della fleet
-(`server=/home/10.8.0.1`). Con `--full`, dnsmasq manda ogni risoluzione al
-Pi-hole del master. Ogni sezione ha un nome, quindi eseguire di nuovo lo script sostituisce
-ciò che aveva scritto prima.
+Lo script installa il pacchetto WireGuard, se manca. Crea un’interfaccia
+chiamata `kiwi`, un nome che puoi cambiare con `--name`. L’interfaccia usa come
+MTU il valore `wg_mtu` della fleet e ha un solo peer, il master. Il peer viene
+creato con `route_allowed_ips`, quindi le rotte le aggiunge OpenWrt. Lo script
+crea anche una zona del firewall verso cui la LAN può inoltrare traffico, con
+masquerading e MSS clamping. Infine aggiunge la regola di dnsmasq che inoltra
+il dominio della fleet al master (`server=/home/10.8.0.1`). Con `--full`,
+dnsmasq manda tutte le query DNS al Pi-hole del master. Ogni sezione scritta
+dallo script ha un nome: se lo esegui di nuovo, sostituisce ciò che aveva
+scritto la volta precedente.
 
 ## FritzBox { #fritzbox }
 
-Fritz!OS ha un client WireGuard e le route statiche, ma non l'inoltro DNS per
-dominio, quindi la regola DNS passa a un node:
+Fritz!OS ha un client WireGuard e le rotte statiche, ma non sa inoltrare le
+query DNS di un singolo dominio. Della regola DNS deve quindi occuparsi un
+node:
 
-1. **Tunnel:** Internet → Permit Access → VPN (WireGuard) → Add Connection →
-   connect to another WireGuard service → importa la configurazione rilasciata dal master.
-   I suoi `AllowedIPs` decidono tra split e full.
-2. **Oppure una route statica:** Home Network → Network → Network Settings → IPv4
-   Routes. Destinazione `10.8.0.0`, subnet mask `255.255.0.0`, gateway l'indirizzo
-   LAN del node gateway.
-3. **DNS:** fai puntare la LAN a un Pi-hole. Imposta il node gateway come server DNS
-   locale, oppure lascia che il Pi-hole del node sia il server DHCP della LAN (impostazioni
-   `dns.dhcp_*` più il modulo dhcp-relay). Il Pi-hole del node contiene i nomi della
-   fleet e inoltra il resto al master.
+1. **Tunnel:** vai in Internet → Abilitazioni → VPN (WireGuard) → Aggiungere
+   connessione, scegli di collegarti a un altro servizio WireGuard e importa la
+   configurazione emessa dal master. È la riga `AllowedIPs` di quella
+   configurazione a decidere se il tunnel è split o full.
+2. **Oppure una rotta statica:** vai in Rete domestica → Rete → Impostazioni di
+   rete → Route IPv4. Inserisci `10.8.0.0` come destinazione, `255.255.0.0` come
+   maschera di sottorete e l’indirizzo LAN del node gateway come gateway.
+3. **DNS:** fai in modo che la LAN usi un Pi-hole come server DNS. Puoi
+   impostare il node gateway come server DNS locale, oppure lasciare che il
+   Pi-hole del node faccia da server DHCP per la LAN (le impostazioni
+   `dns.dhcp_*` insieme al modulo dhcp-relay). Il Pi-hole del node conosce i
+   nomi della fleet e inoltra tutte le altre query al master.
 
-Il tunnel e le route statiche possono coesistere. Per la mesh vince il tunnel.
+Puoi usare il tunnel e le rotte statiche contemporaneamente. In quel caso il
+traffico per la mesh passa dal tunnel.
 
 ## Qualsiasi altro router { #any-other-router }
 
-Bastano tre cose. Dai al router una configurazione client WireGuard, oppure
-aggiungi una route statica per `10.8.0.0/16` verso l'indirizzo LAN del node gateway. Poi
-fai puntare il DNS della LAN a un Pi-hole che conosce la fleet, cioè qualsiasi node che esegue
-il modulo `dns`. I router con dnsmasq sotto (DD-WRT, Tomato, il forwarder di pfSense)
-accettano anche l'inoltro di una riga `server=/home/10.8.0.1`.
+Per qualsiasi altro router bastano tre cose. Dai al router una configurazione
+da client WireGuard, oppure aggiungi una rotta statica per `10.8.0.0/16` che
+punti all’indirizzo LAN del node gateway. Poi fai in modo che la LAN usi come
+server DNS un Pi-hole che conosce la fleet: lo è qualsiasi node su cui gira il
+modulo `dns`. I router basati su dnsmasq (DD-WRT, Tomato, il forwarder di
+pfSense) accettano anche la regola di inoltro su una sola riga
+`server=/home/10.8.0.1`.
