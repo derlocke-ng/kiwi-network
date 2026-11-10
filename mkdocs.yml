@@ -160,17 +160,16 @@ plugins:
           Roles: Ruoli
           Modules: Moduli
           Machines: Macchine
-          Operations: Operazioni
-          Roadmap: Dove sta andando
+          Operations: Gestione
           One machine without a fleet: Una macchina senza fleet
           Hubs: Hub
           Hubs, not platforms: Hub, non piattaforme
           The framework's apps: Le app del framework
           Armory, a distribution: Armory, una distribuzione
-          Running your own hub: Gestire un proprio hub
+          Running your own hub: Gestire il tuo hub
           Catalogs & publishing: Cataloghi e pubblicazione
           Client networks: Reti dei clienti
-          Provider modules: Moduli dei provider
+          Provider modules: Moduli provider
           Project: Progetto
           Repositories & status: Repository e stato
           Icons & colours: Icone e colori
