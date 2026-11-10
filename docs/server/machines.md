@@ -1,97 +1,138 @@
 # Machines: install, apply, update
 
+This page follows a machine from its entry in the fleet file to a running
+system that updates itself. kiwi-server builds an install image that installs
+the operating system without anyone at the keyboard. It then sets the machine
+up for its role over SSH with the `apply` command. After that the machine
+installs its updates by itself and reboots only at the times you allow.
+
 ## Targets
+
+A target is the operating system that kiwi-server installs on a machine.
 
 | Target | What gets installed | Install media |
 |---|---|---|
-| `coreos` | Fedora CoreOS, stable stream | the stock live ISO, customized with the host's Ignition (Butane `fcos` 1.6.0); no network needed for the install |
-| `ucore` | Fedora CoreOS that rebases itself onto a `ghcr.io/ublue-os/ucore*` image (`ucore-minimal`, `ucore`, `ucore-hci`, with `-nvidia` / `-zfs`), like uCore's own autorebase example | as for CoreOS, plus the autorebase units |
-| `debian` | Debian stable (trixie), amd64 | the stock netinst with the preseed in its initrd, so it answers from the first question on, and the host's files under `/kiwi-server`; BIOS and UEFI boot kept |
+| `coreos` | Fedora CoreOS, stable stream | The stock live ISO, customized with the host's Ignition configuration (Butane `fcos` 1.6.0). The install needs no network connection |
+| `ucore` | Fedora CoreOS that then switches itself (rebases) to a `ghcr.io/ublue-os/ucore*` image. The images are `ucore-minimal`, `ucore` and `ucore-hci`, also with `-nvidia` / `-zfs`. The rebase works like uCore's own autorebase example | The same as for CoreOS, plus the autorebase units |
+| `debian` | Debian stable (trixie), amd64 | The stock netinst image with the preseed (the file with the installer's answers) in its initrd, so that the installer has its answers from the first question on. The host's files are on the image under `/kiwi-server`. The image still boots with both BIOS and UEFI |
 
-The admin user gets passwordless sudo everywhere. SSH takes keys only unless you
-set `ssh_password_auth: true`.
+On every target the admin user can use sudo without a password. SSH accepts
+only keys unless you set `ssh_password_auth: true`.
 
 ## Install media
+
+The first command builds the install image (ISO) for one host. The second
+command copies it to a USB stick.
 
 ```bash
 kiwi-server build fleet.yaml sorbet      # → output/sorbet/sorbet.iso
 sudo dd if=output/sorbet/sorbet.iso of=/dev/sdX bs=4M status=progress oflag=sync
 ```
 
-- An ISO installs to `disk:` **without asking** and then **powers the machine
-  off** (`install.on_done: poweroff`, or `reboot`). Label your sticks.
-- By default the media carry the **base system only**: hostname, network, admin
-  user and keys, update policy. None of the stack's secrets are on them. The
-  role comes later with `apply`.
-- `--offline` puts the whole role and its secrets on the ISO, for a machine that
-  SSH cannot reach. Whoever holds that ISO holds those secrets.
-- The live installer shows the disks (`lsblk`) and has a shell with the fleet's
-  console password and keys.
+- The ISO installs to the disk named in `disk:` **without asking**, which
+  erases that disk. When the install is finished, it **powers the machine off**
+  (`install.on_done: poweroff`, or `reboot` to restart it instead). Label your
+  USB sticks.
+- By default the install media contain the **base system only**. This is the
+  hostname, the network settings, the admin user with the SSH keys and the
+  update policy. The media contain none of the stack's secrets. The machine
+  gets its role later, when you run `apply`.
+- With `--offline`, the whole role and its secrets are put on the ISO. This is
+  meant for a machine that cannot be reached over SSH. Anyone who has that ISO
+  has those secrets.
+- The live installer lists the machine's disks (`lsblk`) and has a shell, which
+  accepts the fleet's console password and SSH keys.
 
 ## Apply
+
+`apply` sets a machine up for its role over SSH.
 
 ```bash
 kiwi-server apply fleet.yaml papaya                         # by name, address or mesh address
 kiwi-server apply fleet.yaml papaya --ssh core@192.168.1.25 # the first time, by address
 ```
 
-`apply` re-renders the host and sends its role script over SSH to
-`/var/lib/kiwi-server/role.sh`. It runs the script as root, then binds the disk
-to its Tang rings and, on a master, saves the WireGuard state with the fleet's
-secrets. On an encrypted Debian machine, the first apply replaces the one-time
-install key. SSH uses the fleet's own key and checks host keys against
-`secrets/known_hosts`. `apply` and `status` find a machine by its name, static
-address, the master's public address or its mesh address, but only addresses
-whose host key is on record.
+`apply` first renders the host again, which means that it produces the host's
+files from the fleet file anew. It then copies the host's role script over SSH
+to `/var/lib/kiwi-server/role.sh`. The role script is the script that sets the
+machine up for its role, and `apply` runs it as root. Afterwards `apply` binds
+the disk to its Tang rings, which are servers that let an encrypted machine
+unlock its disk at boot. On a master it also saves the WireGuard state together
+with the fleet's secrets. On an encrypted Debian machine, the first apply
+replaces the one-time key that was used for the install.
 
-For a module role, the script hands the stack to `kiwi-stack`:
+The SSH connection uses the fleet's own key and checks the machine's host key
+against `secrets/known_hosts`. `apply` and `status` can reach a machine by its
+name, its static address, the master's public address or its mesh address,
+which is the machine's address in the private WireGuard network. They only use
+an address whose host key is already on record.
 
-1. It installs or enables podman 4.4+ (on Debian with `netavark`,
-   `aardvark-dns` and `catatonit`) or docker, and the service user.
-2. It loads kernel modules and sets sysctls. With Pi-hole, aardvark-dns moves to
-   port 5533 and the host resolves through the stack's Pi-hole. It also trusts
-   the mesh in firewalld.
-3. It refuses a stack rendered from a different seed. It unpacks the stack into
-   `docker_dir`, installs the quadlets in `/etc/containers/systemd` and the host
-   units, and removes what a module that left had installed.
+For a role that is built from modules, the role script passes the stack to
+`kiwi-stack`. The stack is the set of containers that the machine runs for its
+modules. `kiwi-stack` then works through these steps:
+
+1. It installs or enables podman 4.4+ or docker, and it makes sure that the
+   service user exists. On Debian, podman comes with `netavark`,
+   `aardvark-dns` and `catatonit`.
+2. It loads kernel modules and sets sysctls. If the stack has Pi-hole, podman's
+   aardvark-dns is moved to port 5533, and the host itself resolves names
+   through the stack's Pi-hole. It also adds the mesh to the networks that
+   firewalld trusts.
+3. It refuses a stack that was rendered from a different seed. The seed is the
+   secret from which the fleet's passwords are generated. Otherwise it unpacks
+   the stack into `docker_dir`. It installs the quadlets, which are the systemd
+   units for the containers, in `/etc/containers/systemd`, and it installs the
+   host units. It also removes whatever a module that is no longer in the stack
+   had installed.
 4. It opens the stack's ports in firewalld or ufw, if one of them is active.
-5. It pulls every image, then starts `kiwi-stack.service`
-   (→ `kiwi-stack.target`).
-6. It runs `kiwi-stack verify`: every container must be running, or the apply
-   fails and says which step failed.
+5. It downloads every container image and then starts `kiwi-stack.service`,
+   which starts `kiwi-stack.target`.
+6. It runs `kiwi-stack verify`, which checks that every container is running.
+   If one is not, the apply fails and reports the step that failed.
 
-Applying the same render again changes nothing, and a new render replaces what
-changed. A re-apply does restart every container of the stack.
+If you apply the same render again, nothing on the machine is changed. If you
+apply a new render, it replaces what has changed. Note that every apply
+restarts all containers of the stack, even when nothing has changed.
 
 ## First boot
 
-`kiwi-role.service` runs `/var/lib/kiwi-server/role.sh` once, after the
-network is up (waiting up to 120 seconds for DNS). `role.done` is written only
-once every container runs. A failure leaves `/var/lib/kiwi-server/role.failed`
-(the step and the command) and is retried on the next boot. The log is
-`/var/log/kiwi-server-role.log`. On uCore the role waits until the image is
-signed. `sudo bash /var/lib/kiwi-server/role.sh --force` runs it again.
+On the first boot, `kiwi-role.service` runs the role script
+`/var/lib/kiwi-server/role.sh` once. It starts after the network is up and
+waits up to 120 seconds for DNS. The file `role.done` marks the role as
+finished, and it is written only when every container is running. If the script
+fails, it leaves the file `/var/lib/kiwi-server/role.failed`, which names the
+step and the command that failed, and the script is run again on the next boot.
+The log is `/var/log/kiwi-server-role.log`. On uCore the role script waits
+until the machine runs the signed uCore image. To run the script again by hand,
+use `sudo bash /var/lib/kiwi-server/role.sh --force`.
 
 ## Updates
 
-Updates install continuously. The **reboot** into them only happens inside your
-window (`updates.days`, `time`, `length_minutes`, local time):
+Machines install their operating system updates continuously. The **reboot**
+that activates the updates only happens inside the time window you set with
+`updates.days`, `time` and `length_minutes`, in local time.
 
 | Target | Installs updates | Reboots |
 |---|---|---|
 | `coreos` | Zincati, continuously | only in the window (`strategy = "periodic"`) |
-| `ucore` | `rpm-ostreed-automatic.timer` stages them | `kiwi-staged-reboot.timer` in the window |
-| `debian` | unattended-upgrades, daily | `kiwi-reboot-if-required.timer` in the window, when one is required |
+| `ucore` | `rpm-ostreed-automatic.timer` downloads and prepares (stages) them | `kiwi-staged-reboot.timer` in the window |
+| `debian` | unattended-upgrades, daily | `kiwi-reboot-if-required.timer` in the window, if an update requires a reboot |
 
-`updates.days: []` means any day, and `updates.enabled: false` turns it all
-off. An encrypted machine whose Tang ring has to be forwarded in does not
-reboot by itself.
+`updates.days: []` allows the reboot on any day, and `updates.enabled: false`
+turns the updates and the reboots off. An encrypted machine does not reboot by
+itself if it needs a Tang ring that someone has to forward to it by hand. It
+would otherwise wait at boot until someone unlocked it.
 
-The containers have their own schedule: a weekly `kiwi-stack update` (Sunday
-00:00) runs `podman auto-update` while `auto_update: registry` is set. A daily
-restart of the VPN client at 07:00 gives a fresh exit address.
+The containers are updated on their own schedule. Once a week, on Sunday at
+00:00, `kiwi-stack update` runs `podman auto-update`, as long as
+`auto_update: registry` is set. The VPN client is restarted every day at 07:00,
+which gives it a new exit address. The exit address is the public address
+that websites see when traffic comes out of the VPN.
 
 ## On the machine: `kiwi-stack`
+
+`kiwi-stack` is the command that you run on the machine itself to look at the
+stack and to control it.
 
 ```bash
 sudo kiwi-stack status          # containers, host units, verify
@@ -104,19 +145,20 @@ sudo kiwi-stack backup | snapshots | restore [--at TIME] MODULE...   # with the 
 sudo kiwi-stack apply DIR       # a stack bundle, without a role script
 ```
 
-The stack lives in `docker_dir` (default `/home/user/docker`), and its settings
-in `/etc/kiwi-server/stack.env`. The units are `kiwi-stack.service`,
-`kiwi-stack-vpn-restart.timer` and `kiwi-stack-update.timer`, plus any a module
-adds.
+The stack's files are in `docker_dir` (by default `/home/user/docker`), and its
+settings are in `/etc/kiwi-server/stack.env`. The systemd units are
+`kiwi-stack.service`, `kiwi-stack-vpn-restart.timer` and
+`kiwi-stack-update.timer`, plus any units that a module adds.
 
 ## What a render produces
 
-`output/<host>/` contains:
+A render is what kiwi-server produces from the fleet file for one host. It is
+written to `output/<host>/`, which then contains these files.
 
 | File | What |
 |---|---|
-| `<host>.role.sh` | the role as one script: settings, the stack (embedded), the kiwi-stack command and library, and the role body. Mode 0600 |
-| `<host>.stack/` | the stack bundle, for review: `docker-compose.yml`, `quadlets/`, module configs, host units and `stack.sh`. `kiwi-stack apply` can install it by hand |
-| `<host>.bu`, `<host>.ign` | CoreOS and uCore: Butane and Ignition |
-| `<host>.preseed.cfg`, `<host>.kiwi-server/` | Debian: the preseed and the files it copies in |
-| `<host>.iso` | the unattended installer |
+| `<host>.role.sh` | The role as a single script. It contains the settings, the embedded stack, the kiwi-stack command and library, and the role body. The file has mode 0600 |
+| `<host>.stack/` | The stack bundle, so that you can review it. It contains `docker-compose.yml`, `quadlets/`, the modules' configuration files, the host units and `stack.sh`. You can also install it by hand with `kiwi-stack apply` |
+| `<host>.bu`, `<host>.ign` | On CoreOS and uCore, the Butane and Ignition configuration |
+| `<host>.preseed.cfg`, `<host>.kiwi-server/` | On Debian, the preseed file and the files that it copies onto the machine |
+| `<host>.iso` | The install image, which installs without anyone at the keyboard |
