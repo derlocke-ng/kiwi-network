@@ -35,8 +35,8 @@ Das Repository kiwi-network enthält die Homepage und diese Dokumentation:
 
 ```
 site/          the homepage: plain HTML, CSS and JS, served at kiwi-network.eu
-site/icons/    the app icons it uses: mostly from kiwi-icons, some from the apps' own repos
 docs/          this documentation (MkDocs Material), served at kiwi-network.eu/docs/
+docs/assets/   the logo and app icons (copied from kiwi-icons) and the docs' stylesheet
 mkdocs.yml     docs configuration
 ```
 
