@@ -80,7 +80,7 @@ plugins:
           Modules: Module
           Machines: Maschinen
           Operations: Betrieb
-          Roadmap: Wohin es geht
+          Roadmap: Ausblick
           One machine without a fleet: Eine Maschine ohne Fleet
           Hubs, not platforms: Hubs statt Plattformen
           The framework's apps: Die Apps des Frameworks
