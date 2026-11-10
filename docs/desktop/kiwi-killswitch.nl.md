@@ -15,9 +15,9 @@ wachtwoord.
 
 De killswitch beschermt **één** VPN-verbinding tegelijk, WireGuard of OpenVPN.
 Hij maakt zelf geen verbinding met je VPN. Je verbindingen start je in
-Instellingen van GNOME, en de killswitch stelt zijn firewallregels in voor de
-verbinding die echt actief is, zodat er geen verkeer buiten die verbinding om
-de computer uit kan.
+de Instellingen van GNOME, en de killswitch stelt zijn firewallregels in voor
+de verbinding die echt actief is, zodat de computer geen verkeer buiten die
+verbinding om kan versturen.
 
 - Repository: [derlocke-ng/kiwi-killswitch](https://github.com/derlocke-ng/kiwi-killswitch), GPL-3.0-or-later
 - Nieuwste release: **v0.2.3**. Staat in de [Kiwi-catalogus](catalogs.md) en
@@ -48,8 +48,8 @@ stuurt de gebruikersinterface alleen verzoeken naar de daemon.
   tethering, dan blijft alles geblokkeerd tot er weer een toegestane route is.
 - **Nieuwe netwerkinterfaces worden geblokkeerd.** Sluit je USB-tethering aan of
   zet je wifi aan terwijl de killswitch op scherp staat, dus is ingeschakeld,
-  dan is de nieuwe interface standaard geblokkeerd. Ze wordt niet toegelaten
-  alleen omdat geen enkele regel haar noemt.
+  dan is de nieuwe interface standaard geblokkeerd. Dat er geen regel voor haar
+  bestaat, is geen reden om haar door te laten.
 - **Er zijn drie filterniveaus.** *Standard* filtert uitgaand en inkomend
   verkeer. *Strict* is de standaardinstelling en filtert daarnaast
   **doorgestuurd** verkeer. Dat is nodig omdat containers, VM’s en Waydroid hun
@@ -79,9 +79,9 @@ stuurt de gebruikersinterface alleen verzoeken naar de daemon.
   gateway de plaats van de VPN innemen. De killswitch herkent hem aan zijn
   IP-adres **en** zijn MAC-adres. Dit moet je zelf aanzetten. De killswitch
   besluit nooit uit zichzelf dat een gateway te vertrouwen is.
-- **Er kan maar één VPN verbinding maken.** Alleen de server van de gekozen
+- **Maar één VPN kan verbinding maken.** Alleen de server van de gekozen
   verbinding is bereikbaar. Elke andere tunnel die je start, krijgt geen
-  verbinding, en de gebruikersinterface laat zien welke het is.
+  verbinding, en de gebruikersinterface noemt die tunnel bij naam.
 - **De regels blijven staan.** Ze zijn er nog na een herstart, na uit- en
   weer inloggen en na een herstart van NetworkManager. Een aparte unit laadt
   blokkeerregels *voordat het netwerk opkomt*.
@@ -151,7 +151,7 @@ host bereiken. De tabel laat zien wat elke instelling toestaat:
 | `bypass_subnets` | ja | nee | nee |
 | `mgmt_subnets` | ja | ja | ja |
 
-**Controleren of het werkt.** Zet de killswitch aan en haal daarna de VPN neer
+**Controleren of het werkt.** Zet de killswitch aan en verbreek daarna de VPN-verbinding
 met `nmcli connection down …`. Nu moet `curl --max-time 5 ifconfig.me` een
 **time-out** geven. Je echte IP-adres mag niet verschijnen. Beoordeel het
 resultaat niet door de publieke IP-adressen te vergelijken die je ziet. Of het
@@ -184,7 +184,7 @@ verkeer echt door de tunnel gaat, bewijs je met `wg show <iface> transfer` of
 - De killswitch houdt lekken tegen op netwerkniveau. Hij is geen Tails of
   Whonix. Tegen browser-fingerprinting, WebRTC of een app die via de tunnel
   gegevens naar de maker stuurt, doet hij niets.
-- Het is een persoonlijk programma en het is niet onafhankelijk gecontroleerd.
+- Het is een persoonlijk hulpmiddel en is niet onafhankelijk gecontroleerd.
   `tests/run.sh` test de echte daemon met echte nftables. Elke testgroep draait
   in een eigen namespace, en de tests hebben geen root nodig.
 - De release-tags zijn nog niet ondertekend. Met kiwi-updater 2.4 vraagt het

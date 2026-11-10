@@ -1,7 +1,7 @@
 # kiwi-updater
 
 kiwi-updater installeert opensource-apps op je desktop en houdt ze up-to-date.
-Het commando heet `kiwi`. De apps komen uit **git-catalogi**, en het werkt op
+Het commando heet `kiwi`. Het haalt de apps uit **git-catalogi** en werkt op
 Fedora Silverblue, Bluefin en andere ostree-systemen. Een catalogus is een
 git-repository met een lijst van apps. Een app is een git-repository met een
 bestand `kiwi.manifest` en een script `install.sh`. kiwi kloont de repository
@@ -71,8 +71,8 @@ kiwi self-update
 kiwi trust --system <app>    # de vastgezette ondertekeningssleutel van een systeemapp vergeten
 ```
 
-Met de volgende commando’s zie je wat een app gaat doen voordat je hem
-uitvoert, en ze helpen als er iets misgaat:
+Met de volgende commando’s zie je vooraf wat een app gaat doen, en ze helpen
+als er iets misgaat:
 
 ```bash
 kiwi info --installer <app>  # het script dat een installatie zou uitvoeren, vooraf
@@ -146,8 +146,8 @@ Sinds versie 2.4.0 gelden deze regels:
 
 - **Ondertekende releases.** Voor elke systeemapp zet root één
   SSH-ondertekeningssleutel vast. Een sleutel vastzetten betekent: hem onthouden
-  en vanaf dan alleen die sleutel accepteren. Root zet de eerste sleutel vast die
-  het voor de app ziet; dat heet trust on first use. Is een release-tag
+  en vanaf dan alleen die sleutel accepteren. Dat is de eerste sleutel die root
+  voor de app ziet (trust on first use). Is een release-tag
   ondertekend met de vastgezette sleutel, dan wordt de update zonder wachtwoord
   geïnstalleerd. Is een release niet ondertekend, dan vraagt kiwi om je
   wachtwoord en meldt het dat het de release niet kon verifiëren. kiwi weigert
@@ -155,11 +155,11 @@ Sinds versie 2.4.0 gelden deze regels:
   niet-ondertekende tag als eerdere tags wel ondertekend waren. Dat blijft zo
   tot je `kiwi trust --system <app>` uitvoert. Deze regels gelden voor de
   system-scope.
-- **Root installeert alleen uit bronnen die het zelf in zijn lijsten heeft.**
+- **Root installeert alleen uit bronnen die in de eigen lijsten van root staan.**
   Die bronnen zijn `/etc/kiwi-updater/apps.list` en de catalogi die voor root
   zijn geregistreerd. Komt een app uit een andere bron, dan installeert kiwi
-  alleen het gebruikersdeel en noemt het het commando
-  `kiwi add --system <https-url>` dat je moet uitvoeren. Kiwi Apps biedt in dat
+  alleen het gebruikersdeel en toont het commando dat je moet uitvoeren:
+  `kiwi add --system <https-url>`. Kiwi Apps biedt in dat
   geval de knop *Register and Install* aan, die de bron voor root registreert en
   de app installeert.
 - **Alleen https.** kiwi weigert overal bronnen met `http://`.
