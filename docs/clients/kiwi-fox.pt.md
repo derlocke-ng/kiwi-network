@@ -1,89 +1,105 @@
 # kiwi-fox
 
-Identidades de navegador isoladas em Podman sem root.
+O kiwi-fox dá-te um navegador separado para cada rede de cliente em que
+trabalhas e para cada conta que geres. O perfil que usas para um cliente
+chega às consolas web dele através da ligação desse cliente e não tem mais
+nenhum caminho para fora. Para isso, não precisas de nenhuma ligação VPN no
+anfitrião.
 
-Cada perfil é uma identidade persistente: o seu próprio armazenamento e,
-normalmente, uma saída do [kiwi-proxy](kiwi-proxy.md) com o seu gateway selado e
-um resolvedor com bloqueio de anúncios, num de três navegadores. Para uma rede de
-cliente, isso significa um navegador que chega às consolas web do cliente
-através da saída do cliente, e a mais nada.
+Cada perfil é uma identidade persistente. Tem o seu próprio armazenamento,
+corre um de três navegadores num contentor Podman rootless (um contentor que
+corre como o teu próprio utilizador, sem permissões de root) e normalmente
+usa um exit do [kiwi-proxy](kiwi-proxy.md). Um exit é uma ligação a um
+upstream, guardada com um nome, como o proxy SOCKS5 de um cliente. Para cada
+exit, o kiwi-proxy corre um gateway. O gateway é um contentor cuja única rota
+leva a esse upstream, e inclui um resolvedor DNS que bloqueia domínios de
+publicidade.
 
 - Repositório: [derlocke-ng/kiwi-fox](https://github.com/derlocke-ng/kiwi-fox), GPL-3.0-or-later
-- Versão mais recente: **v0.7.1**. Está no [catálogo Kiwi](../desktop/catalogs.md), âmbito de utilizador.
-- Os motores são descarregados, nunca redistribuídos: o Camoufox (MPL-2.0) na
-  configuração inicial, o Firefox e o Tor Browser a pedido
-  (`kiwi-fox engine fetch`), com a assinatura verificada.
+- Última versão: **v0.7.1**. Está no [catálogo Kiwi](../desktop/catalogs.md), âmbito de utilizador.
+- Os navegadores, a que o kiwi-fox chama motores, são descarregados para a tua
+  máquina e nunca redistribuídos. O Camoufox (MPL-2.0) é descarregado durante
+  a preparação inicial. O Firefox e o Tor Browser são descarregados quando os
+  pedes (`kiwi-fox engine fetch`), e as assinaturas deles são verificadas.
 
 | Motor | O que uma página vê |
 |---|---|
-| **Camoufox** (por omissão) | uma máquina Windows 11 coerente e comum, com a sua própria região: uma impressão digital congelada e falsificada |
-| **Firefox** | o Mozilla Firefox de origem, sem falsificar nada: os valores desta máquina, através da mesma saída selada |
-| **Tor Browser** | o Tor Browser, sem modificações, através de uma saída do módulo tor, com um circuito por site e nomes `.onion` |
+| **Camoufox** (predefinição) | Uma máquina Windows 11 comum, com a sua própria região, em que todos os valores batem certo uns com os outros. Esta impressão digital (o conjunto de valores que uma página consegue ler de um navegador para o voltar a reconhecer) é falsificada e não muda |
+| **Firefox** | O Mozilla Firefox sem alterações, que não falsifica nada. Uma página vê os valores reais desta máquina. A ligação continua a passar pelo exit do perfil |
+| **Tor Browser** | O Tor Browser sem alterações, ligado através de um exit do módulo tor. Cada site tem o seu próprio circuito (o seu próprio caminho pela rede Tor), e os nomes `.onion` funcionam |
 
-O kiwi-fox é para quem gere várias contas que são suas ou que está autorizado a
-gerir, e que não quer que essas contas fiquem ligadas entre si pela impressão
-digital do navegador ou pelo IP.
+O kiwi-fox é para quem gere várias contas que lhe pertencem ou que está
+autorizado a gerir, e não quer que essas contas fiquem associadas umas às
+outras pela impressão digital do navegador ou pelo endereço IP.
 
-## Instalar { #install }
+## Instalação { #install }
 
 ```bash
-kiwi install kiwi-fox      # traz consigo o kiwi-proxy; ou ./install.sh install
-kiwi-fox setup             # imagens, um motor de navegador de ~630 MB, dados DNS; também corre o setup do kiwi-proxy
-kiwi-fox engine fetch --engine firefox     # ou torbrowser: com a assinatura verificada
+kiwi install kiwi-fox      # traz o kiwi-proxy consigo; ou ./install.sh install
+kiwi-fox setup             # imagens, um motor de navegador de ~630 MB, dados de DNS; corre também o setup do kiwi-proxy
+kiwi-fox engine fetch --engine firefox     # ou torbrowser: com verificação de assinatura
 ```
 
-Precisa de Podman sem root e do kiwi-proxy, de uma sessão Wayland (o X11
-funciona, com uma fronteira mais fraca), de Python 3.12+, GTK4 + libadwaita,
-`secret-tool`, e de `gpg`/`gpgv` para verificar o Firefox e o Tor Browser. Com o
-driver proprietário da NVIDIA, precisa também do `nvidia-container-toolkit` com a
-sua especificação CDI.
+O kiwi-fox precisa do Podman rootless, do kiwi-proxy, do Python 3.12+, do GTK4
+com libadwaita e do `secret-tool`. Foi feito para uma sessão Wayland. O X11
+também funciona, mas aí o isolamento é mais fraco. Para verificar o Firefox e
+o Tor Browser, são necessários o `gpg`/`gpgv`. Com o controlador proprietário
+da NVIDIA, o kiwi-fox precisa também do `nvidia-container-toolkit` com a
+respetiva especificação CDI.
 
-## Usar { #use }
+## Utilização { #use }
 
 ```bash
-kiwi-proxy add client-a socks5://user:pass@host:1080   # uma saída, definida uma vez, no kiwi-proxy
-kiwi-fox new work --exit client-a     # um perfil nela: testa-a e gera uma identidade que lhe corresponde
+kiwi-proxy add client-a socks5://user:pass@host:1080   # um exit, definido uma vez, no kiwi-proxy
+kiwi-fox new work --exit client-a     # um perfil nesse exit: testa-o e gera uma identidade que lhe corresponda
 kiwi-fox new plain --no-proxy         # a ligação desta máquina, nada selado
 kiwi-fox list                         # --tag shop, --by-tag
-kiwi-fox run work                     # ou a app
+kiwi-fox run work                     # ou a aplicação gráfica
 kiwi-fox stop work
 kiwi-fox check                        # todos os perfis continuam coerentes?
-kiwi-fox selfcheck work               # mede o que as páginas veem e depois audita-o
+kiwi-fox selfcheck work               # medir o que as páginas veem e depois verificar o resultado
 kiwi-fox-gui                          # "Kiwi Fox" na grelha de aplicações
 ```
 
-`--desktop-entry` põe um perfil na grelha de aplicações, e as etiquetas agrupam
-perfis.
+Com `--desktop-entry`, um perfil recebe uma entrada própria na grelha de
+aplicações. As etiquetas permitem agrupar perfis.
 
-## Perfis e saídas { #profiles-and-exits }
+## Perfis e exits { #profiles-and-exits }
 
-Um perfil referencia uma saída, e as saídas são partilhadas: os perfis numa saída
-partilham o seu gateway (um namespace, um IP de saída, um conjunto de circuitos
-Tor). As identidades que não devem partilhar uma saída usam saídas diferentes.
-Com `--no-proxy` não há gateway: o contentor do navegador tem uma rede própria
-na ligação desta máquina, e nada fica selado.
+Um perfil não tem um exit só seu. Limita-se a apontar para um, e vários
+perfis podem apontar para o mesmo exit. Os perfis no mesmo exit partilham o gateway dele
+e, com ele, um namespace de rede, o endereço IP com que aparecem na Internet e
+um conjunto de circuitos Tor. Identidades que não podem partilhar um exit
+precisam de exits diferentes. Um perfil criado com `--no-proxy` não tem
+gateway. O contentor do navegador tem uma rede própria e usa a ligação desta
+máquina. Nesse caso nada fica selado, ou seja, o tráfego não fica restrito a
+uma única rota.
 
-O contentor do navegador junta-se ao namespace do gateway com todas as
-capabilities retiradas exceto `SYS_CHROOT` (a própria sandbox do Firefox precisa
-dela). Corre com `no-new-privileges`, e o motor é montado só de leitura.
+O contentor do navegador entra no namespace de rede do gateway. São-lhe
+retiradas todas as capabilities do Linux, exceto `SYS_CHROOT`, de que a
+própria sandbox do Firefox precisa. O contentor corre com
+`no-new-privileges`, e o motor é montado só de leitura.
 
 ## Um perfil Camoufox { #a-camoufox-profile }
 
-É a máquina mais comum que existe, porque são os valores raros que os detetores
-assinalam: um ecrã de 1920×1080, os tipos de letra que todos os Windows 11 têm e
-mais nenhuns, e a placa gráfica desta máquina tal como o Firefox no Windows a
-descreve. A região, a língua, o fuso horário e as vozes seguem a saída. Tudo pode
-ser alterado depois (`kiwi-fox set`, `kiwi-fox webgl`, `kiwi-fox fonts`), e as
-edições só são guardadas se o resultado continuar coerente.
+Um perfil Camoufox faz-se passar pela máquina mais comum que existe, porque os
+sistemas de deteção assinalam os valores raros. Indica um ecrã de 1920×1080,
+as fontes que todas as instalações do Windows 11 têm e nenhuma outra, e a
+placa gráfica real desta máquina, com o nome que o Firefox no Windows lhe dá.
+A região, a língua, o fuso horário e as vozes são escolhidos de acordo com o
+exit. Podes alterar tudo isto mais tarde com `kiwi-fox set`, `kiwi-fox webgl`
+e `kiwi-fox fonts`. Uma alteração só é guardada se o perfil continuar
+coerente, ou seja, se os valores continuarem a bater certo uns com os outros.
 
 ## O que não faz { #what-it-does-not-do }
 
-Não promete ser «indetetável». Os perfis estão isolados quanto ao armazenamento,
-ao IP e a todas as superfícies que o motor consegue falsificar, mas **não**
-contra identificadores entre navegadores ao nível do hardware: as imagens que a
-GPU de facto desenha e as temporizações do hardware vêm da máquina real e são as
-mesmas para todos os perfis nela. O `docs/detection-notes.md` do repositório
-documenta o que é medido.
+O kiwi-fox não promete que um perfil seja «indetetável». Os perfis estão
+separados uns dos outros no armazenamento, no endereço IP e em todos os
+valores que o motor consegue falsificar. **Não** estão separados nos
+identificadores que vêm do hardware e que são iguais em todos os navegadores.
+As imagens que a GPU desenha de facto e os tempos do hardware vêm da máquina
+real, por isso são iguais em todos os perfis dessa máquina. O que foi medido
+está documentado no ficheiro `docs/detection-notes.md` do repositório.
 
-Não há automação: nem bots nem criação de contas em massa. É apenas para
-navegação interativa.
+O kiwi-fox não tem automação. Não corre bots nem cria contas em massa. Foi
+feito apenas para navegação interativa.

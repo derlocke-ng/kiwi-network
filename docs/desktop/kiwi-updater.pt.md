@@ -1,95 +1,119 @@
 # kiwi-updater
 
-O `kiwi` instala e atualiza apps de código aberto a partir de **catálogos git** no
-Fedora Silverblue, no Bluefin e noutros sistemas ostree. Uma app é um repositório
-git com um `kiwi.manifest` e um `install.sh`. O kiwi clona-o, faz checkout da sua
-tag de versão mais recente, corre o seu instalador e mantém-no atualizado em
-segundo plano, a ele próprio incluído.
+O kiwi-updater instala aplicações de código aberto no teu computador e
+mantém-nas atualizadas. O comando chama-se `kiwi`. Vai buscar as aplicações a
+**catálogos git** e funciona no Fedora Silverblue, no Bluefin e noutros
+sistemas ostree. Um catálogo é um repositório git com uma lista de
+aplicações. Uma aplicação é um repositório git com um ficheiro `kiwi.manifest`
+e um script `install.sh`. O kiwi clona o repositório da aplicação, faz
+checkout da tag de versão mais recente e corre o instalador. A partir daí,
+atualiza a aplicação em segundo plano, e atualiza-se a si próprio da mesma
+forma.
 
-Não há contas, nem loja, nem fornecedor. Um catálogo é um repositório que podes
-ler, fazer fork e para o qual podes enviar um pull request.
+Não precisas de conta, e não há loja de aplicações nem empresa por trás. Um
+catálogo é um repositório que podes ler, de que podes fazer fork e para o qual
+podes enviar pull requests.
 
 - Repositório: [derlocke-ng/kiwi-updater](https://github.com/derlocke-ng/kiwi-updater), GPL-3.0-or-later
-- Versão mais recente: **v2.4.0**, uma versão de segurança
-- O **`kiwi`** é a CLI. Precisa de `git`, coreutils, `util-linux` e `awk`, todos
-  na imagem base, mais `ssh-keygen` para as verificações de assinaturas.
-- O **Kiwi Apps** (`kiwi-gui`) é a app GTK4: pesquisa, filtros, uma vista de
-  detalhe por app com o seu ícone, capturas de ecrã e dependências. Mostra o
-  instalador e o diff de uma atualização antes de correr qualquer um deles, e põe
-  os teus cliques em fila. Os seus dados vêm da CLI; os ícones e as capturas de
-  ecrã são lidos dos clones das apps, por isso nada é descarregado para eles.
+- Última versão: **v2.4.0**, uma versão de segurança
+- **`kiwi`** é a ferramenta de linha de comandos (CLI). Precisa do `git`, do
+  coreutils, do `util-linux` e do `awk`, que fazem todos parte da imagem
+  base. Para verificar assinaturas, precisa também do `ssh-keygen`.
+- **Kiwi Apps** (`kiwi-gui`) é a aplicação gráfica, feita com GTK4. Podes
+  pesquisar e filtrar as aplicações, e cada uma tem uma página de detalhes com
+  o ícone, capturas de ecrã e dependências. Antes de instalar uma aplicação, a
+  Kiwi Apps mostra-te o instalador, e antes de a atualizar mostra-te o que a
+  atualização muda. Se clicares em várias ações seguidas, ela põe-nas numa
+  fila. Os dados vêm da CLI. Os ícones e as capturas de ecrã são lidos dos
+  clones locais das aplicações, por isso a Kiwi Apps não descarrega nada para
+  os mostrar.
 
-## Instalar { #install }
+## Instalação { #install }
+
+O kiwi trabalha com dois âmbitos. O âmbito de utilizador é tudo o que está na
+tua pasta pessoal e nunca precisa de root. O âmbito de sistema é uma parte que
+pertence ao root, para as aplicações que precisam de root. Ao instalar,
+escolhes quanto do âmbito de sistema queres:
 
 ```bash
-# recomendado: âmbito de utilizador mais o âmbito de sistema pertencente a root, um só pedido de palavra-passe
+# recomendado: âmbito de utilizador mais o âmbito de sistema do root, um único pedido de palavra-passe
 curl -fsSL https://raw.githubusercontent.com/derlocke-ng/kiwi-updater/main/get-kiwi.sh | bash
 
-# mínimo: 100 % ao nível do utilizador, só ~/.local, sem root e sem palavra-passe, nunca
+# mínimo: 100% ao nível do utilizador, só ~/.local, sem root e sem palavra-passe, nunca
 curl -fsSL https://raw.githubusercontent.com/derlocke-ng/kiwi-updater/main/get-kiwi.sh | bash -s -- --minimal
 
-# nenhuma ação sem palavra-passe: cada alteração ao sistema pede uma palavra-passe
+# nenhuma ação sem palavra-passe: cada alteração ao sistema pede a palavra-passe
 curl -fsSL https://raw.githubusercontent.com/derlocke-ng/kiwi-updater/main/get-kiwi.sh | bash -s -- --with-system=manual
 ```
 
-O [catálogo Kiwi](catalogs.md) é registado pela instalação. Vai diretamente para
-`kiwi list` ou abre o **Kiwi Apps**.
+A instalação regista o [catálogo Kiwi](catalogs.md), por isso podes executar
+`kiwi list` ou abrir a **Kiwi Apps** de imediato.
 
-As apps que são apenas ficheiros na tua pasta pessoal (as ferramentas CLI, o
-ensconce, o syncman) ficam completas com a instalação mínima. Uma app com uma
-metade root, como o kiwi-killswitch, precisa do âmbito de sistema. Numa
-instalação mínima, `kiwi install kiwi-killswitch` configura-o na hora com uma
-palavra-passe.
+Algumas aplicações são apenas ficheiros na tua pasta pessoal, por exemplo as
+ferramentas de linha de comandos, o ensconce e o syncman. Estas aplicações
+ficam completas com a instalação mínima. Uma aplicação com uma metade que
+corre como root, como o kiwi-killswitch, precisa do âmbito de sistema. Numa
+instalação mínima, `kiwi install kiwi-killswitch` prepara o âmbito de sistema
+nesse momento e pede a tua palavra-passe uma vez.
 
 ## Comandos { #commands }
 
 ```bash
-kiwi list [--check]          # todas as apps que esta máquina conhece
-kiwi search vpn              # encontra uma app em todos os catálogos registados
+kiwi list [--check]          # todas as aplicações que esta máquina conhece
+kiwi search vpn              # procurar uma aplicação em todos os catálogos registados
 kiwi info kiwi-killswitch    # o que é, o que instala, se precisa de root
-kiwi install <app>           # um nome, ou um --all explícito
+kiwi install <app>           # um nome, ou --all explícito
 kiwi update [<app>]          # tudo o que tiver uma versão nova
-kiwi uninstall <app>         # --purge também apaga a sua configuração
-kiwi check                   # sai com 10 se alguma coisa tiver uma atualização
+kiwi uninstall <app>         # --purge apaga também a configuração
+kiwi check                   # código de saída 10 se houver alguma atualização
 
-kiwi add <https-url>         # acompanha um repositório diretamente, sem catálogo
-kiwi catalog add|list|remove # gere catálogos
-kiwi sync                    # atualiza os catálogos agora
+kiwi add <https-url>         # seguir um repositório diretamente, sem catálogo
+kiwi catalog add|list|remove # gerir catálogos
+kiwi sync                    # atualizar os catálogos agora
 kiwi self-update
-kiwi trust --system <app>    # esquece a chave de assinatura fixada para uma app de sistema
+kiwi trust --system <app>    # esquecer a chave de assinatura fixada para uma aplicação de sistema
 ```
 
-Antes de correres alguma coisa, e quando algo corre mal:
+Os comandos seguintes mostram-te o que uma aplicação vai fazer antes de a
+executares, e ajudam quando alguma coisa corre mal:
 
 ```bash
-kiwi info --installer <app>  # o script que uma instalação correria, antes de correr
-kiwi diff <app>              # o que uma atualização mudaria, incluindo o seu instalador
-kiwi pin <app> v1.2.0        # fica nessa; kiwi unpin <app> para voltar a seguir as versões
+kiwi info --installer <app>  # o script que uma instalação correria, antes de o correr
+kiwi diff <app>              # o que uma atualização mudaria, incluindo o instalador
+kiwi pin <app> v1.2.0        # ficar nesta versão; kiwi unpin <app> para voltar a seguir as versões
 kiwi install <app> --dry-run # âmbito, URL, ref, caminho do instalador, e mais nada
-kiwi doctor                  # bloqueios obsoletos, versões desalinhadas, ficheiros de lista errados, temporizadores
+kiwi doctor                  # locks esquecidos, versões desencontradas, listas com erros, temporizadores
 ```
 
 ## As versões são tags { #releases-are-tags }
 
-Uma app segue a sua **tag de versão** mais recente, uma que corresponda a
-`^v?[0-9]+(\.[0-9]+){0,3}$` (`v1`, `v1.2`, `1.2.3`, `v1.2.3.4`). As pré-versões
-e as tags de rascunho nunca passam à frente de uma versão. Um repositório sem tag
-de versão segue o seu ramo por omissão. `ref=<tag>` numa linha de lista pede uma
-específica.
+O kiwi usa as tags do git como versões. Uma aplicação segue a sua **tag de
+versão** mais recente. Uma tag de versão é uma tag que corresponde a
+`^v?[0-9]+(\.[0-9]+){0,3}$`, por exemplo `v1`, `v1.2`, `1.2.3` ou `v1.2.3.4`.
+As tags de pré-versão e as tags temporárias não correspondem, por isso nunca
+são usadas no lugar de uma versão. Um repositório sem tags de versão segue o
+seu ramo predefinido. Para pedires uma versão específica, acrescenta
+`ref=<tag>` à linha da aplicação numa lista.
 
 ## Dependências { #dependencies }
 
-`DEPENDS=` num manifesto indica o que uma app precisa. Uma palavra que seja uma
-app no teu próprio catálogo ou lista é instalada **primeiro**, no mesmo âmbito, no
-momento da instalação. `kiwi install kiwi-plugin-tor`, por exemplo, traz consigo
-o kiwi-proxy. Qualquer outra palavra é um programa, verificado com `command -v`.
+A linha `DEPENDS=` de um manifesto indica aquilo de que uma aplicação precisa.
+Se uma palavra dessa linha for o nome de uma aplicação do teu catálogo ou da
+tua lista, o kiwi instala essa aplicação **primeiro**, no mesmo âmbito, no
+momento em que instalas a aplicação que precisa dela. Por exemplo,
+`kiwi install kiwi-plugin-tor` instala também o kiwi-proxy. Qualquer outra
+palavra é tratada como o nome de um programa, e o kiwi verifica com
+`command -v` se esse programa existe.
 
-## Uma app, duas metades { #one-app-two-halves }
+## Uma aplicação, duas metades { #one-app-two-halves }
 
-Algumas apps são só um binário em `~/.local/bin`. Outras, como um kill switch de
-VPN, são um daemon root **e** uma app de ambiente de trabalho **e** uma extensão
-GNOME. As metades instalam-se com privilégios diferentes, porque **o root nunca
-pode executar um ficheiro em que o utilizador possa escrever**. A app declara-o:
+Algumas aplicações são apenas um programa em `~/.local/bin`. Outras, como um
+kill switch de VPN, são compostas por um daemon que corre como root, **mais**
+uma aplicação gráfica **mais** uma extensão do GNOME. Uma aplicação destas tem
+duas metades, uma de utilizador e uma de sistema, e as duas são instaladas
+com privilégios diferentes. A razão é que **o root nunca pode executar um
+ficheiro em que o utilizador possa escrever**. A aplicação declara as suas
+partes e os seus âmbitos no manifesto:
 
 ```ini
 COMPONENTS=daemon cli gui gnome-extension
@@ -97,62 +121,81 @@ SCOPES=user system
 ROOT_REASON=installs a root firewall daemon, its D-Bus policy and two systemd units
 ```
 
-Um catálogo lista essa app uma vez, e o kiwi instala cada metade corretamente.
-Antes de pedir a tua palavra-passe, mostra o `ROOT_REASON`.
+Um catálogo lista uma aplicação destas uma única vez, e o kiwi instala cada
+metade no âmbito certo. Antes de te pedir a palavra-passe, o kiwi mostra-te o
+`ROOT_REASON`.
 
-| Peça | Onde | Porquê |
+| Parte | Onde | Porquê |
 |---|---|---|
-| `kiwi`, Kiwi Apps, apps de utilizador | `~/.local` | não precisa de root; sobrevive a um rebase ostree |
-| a cópia do kiwi do próprio root | `/usr/local/bin`, clonada para `/var/lib/kiwi-updater/repos/` | o root nunca corre um ficheiro em que possas escrever |
-| apps de sistema | `/var/lib`, `/etc` | graváveis no ostree, pertencentes a root |
-| listas | `~/.config/kiwi-updater/apps.list`, `/etc/kiwi-updater/apps.list` | as entradas próprias de uma máquina prevalecem sobre qualquer catálogo |
-| chaves de assinatura fixadas | `/etc/kiwi-updater/signers/<app>` | ver abaixo |
+| `kiwi`, Kiwi Apps, aplicações de utilizador | `~/.local` | não precisa de root e mantém-se quando o sistema muda (rebase) para outra imagem ostree |
+| a cópia do kiwi que pertence ao root | `/usr/local/bin`, clonada em `/var/lib/kiwi-updater/repos/` | o root nunca corre um ficheiro em que tu possas escrever |
+| aplicações de sistema | `/var/lib`, `/etc` | nos sistemas ostree, estes diretórios podem ser escritos e pertencem ao root |
+| listas | `~/.config/kiwi-updater/apps.list`, `/etc/kiwi-updater/apps.list` | as entradas da lista da própria máquina têm prioridade sobre qualquer catálogo |
+| chaves de assinatura fixadas | `/etc/kiwi-updater/signers/<app>` | vê a secção seguinte |
 
-O `/usr` imutável nunca é tocado.
+O kiwi nunca altera nada no `/usr` imutável.
 
 ## Root, palavras-passe e assinaturas { #root-passwords-and-signatures }
 
+A tabela mostra que ações precisam de root e quais pedem palavra-passe.
+
 | | Precisa de root | Pede palavra-passe |
 |---|---|---|
-| tudo no âmbito de utilizador | não | não |
-| **atualizar** uma app de sistema | sim | **não**, para uma versão assinada pela chave que o root fixou para essa app. **Sim** para uma versão não assinada, e sempre no modo `manual` |
-| **instalar** ou **desinstalar** uma app de sistema | sim | sim |
+| qualquer coisa no âmbito de utilizador | não | não |
+| **atualizar** uma aplicação de sistema | sim | **não**, se a versão estiver assinada com a chave que o root fixou para essa aplicação. **Sim**, se a versão não estiver assinada, e sempre no modo `manual` |
+| **instalar** ou **desinstalar** uma aplicação de sistema | sim | sim |
 
-Desde a 2.4.0:
+Desde a versão 2.4.0, aplicam-se estas regras:
 
-- **Versões assinadas.** O root fixa uma chave de assinatura SSH por app de
-  sistema, a primeira que vê (confiança no primeiro uso). Uma tag de versão
-  assinada por essa chave atualiza sem palavra-passe. Uma versão não assinada
-  pede uma e diz que não a conseguiu verificar. Uma tag assinada por outra chave,
-  ou uma tag não assinada depois de tags assinadas, é recusada até correres
-  `kiwi trust --system <app>`. Isto aplica-se ao âmbito de sistema.
-- **O root só instala a partir de fontes que lista**: `/etc/kiwi-updater/apps.list`
-  e os catálogos registados para root. Para tudo o resto, o kiwi instala a metade
-  de utilizador e indica o `kiwi add --system <https-url>` a correr. O Kiwi Apps
-  oferece *Register and Install*.
-- **Só https.** As fontes `http://` são recusadas em todo o lado.
+- **Versões assinadas.** Para cada aplicação de sistema, o root fixa uma
+  chave de assinatura SSH. Fixar uma chave significa memorizá-la e, a partir
+  daí, aceitar apenas essa chave. O root fixa a primeira chave que vê para a
+  aplicação, o que se chama confiança no primeiro uso (trust on first use).
+  Se uma tag de versão estiver assinada com a chave fixada, a atualização é
+  instalada sem palavra-passe. Se uma versão não estiver assinada, o kiwi
+  pede a tua palavra-passe e avisa que não a conseguiu verificar. O kiwi
+  recusa uma tag assinada com outra chave, e recusa uma tag sem assinatura
+  quando as anteriores estavam assinadas. Continua a recusá-las até
+  executares `kiwi trust --system <app>`. Estas regras aplicam-se ao âmbito
+  de sistema.
+- **O root só instala a partir das fontes que ele próprio tem nas suas
+  listas.** Essas fontes são o `/etc/kiwi-updater/apps.list` e os catálogos
+  registados para o root. Se uma aplicação vier de outra fonte, o kiwi
+  instala apenas a metade de utilizador e indica-te o comando
+  `kiwi add --system <https-url>` que tens de executar. Nesse caso, a Kiwi
+  Apps oferece a opção *Register and Install* (registar e instalar).
+- **Só https.** O kiwi recusa fontes `http://` em todo o lado.
 
-As atualizações de sistema sem palavra-passe passam por um único auxiliar de
-finalidade fixa, `/usr/local/libexec/kiwi-system-update`. Uma regra polkit
-permite-o para sessões `wheel` ativas, e ele só aceita nomes de apps como uma
-seleção das listas do próprio root.
+As atualizações de sistema sem palavra-passe são feitas por um único programa
+auxiliar, `/usr/local/libexec/kiwi-system-update`, que só serve para isso. Uma
+regra do polkit permite aos utilizadores do grupo `wheel` executá-lo quando a
+sessão deles está ativa. O programa auxiliar só aceita nomes de aplicações, e
+um nome só pode selecionar uma aplicação das listas do próprio root.
 
 ## Atualizações em segundo plano { #background-updates }
 
-Há um só temporizador, e é teu: `kiwi-updater.timer` corre `kiwi update --all`
-seis horas depois da última execução (dez minutos depois do arranque, com algum
-atraso aleatório). Atualiza diretamente as metades de utilizador, e as metades de
-sistema através do auxiliar acima. Não há temporizador de root. No modo `manual`,
-as metades de sistema esperam pelo teu próximo `kiwi update` interativo.
+Há um único temporizador (timer) do systemd para as atualizações em segundo
+plano, e é um temporizador de utilizador: corre como o teu utilizador e não
+como root. O `kiwi-updater.timer` executa `kiwi update --all` seis horas
+depois da última execução e dez minutos depois do arranque, com um pequeno
+atraso aleatório. Esta execução atualiza diretamente as metades de utilizador
+e atualiza as metades de sistema através do programa auxiliar descrito acima.
+Não há nenhum temporizador do root. No modo `manual`, o temporizador não
+atualiza as metades de sistema. Essas ficam à espera até executares tu
+próprio `kiwi update`.
 
 ## Confiança { #trust }
 
-Instalar uma app **corre o `install.sh` desse repositório**, e uma app que declara
-o âmbito de sistema corre-o **como root**. Os catálogos são selecionados, não
-auditados. Acrescenta aqueles em que confias, como acrescentarias um repositório
-de pacotes, e usa `kiwi info --installer`, `kiwi diff` e `kiwi pin` para decidir
-de olhos abertos. Uma assinatura restringe *quem pode publicar*. Não diz nada
-sobre *o que faz aquilo que foi publicado*.
+Quando instalas uma aplicação, o kiwi **corre o `install.sh` do repositório
+dessa aplicação**. Se a aplicação declarar o âmbito de sistema, o kiwi corre
+este script **como root**. Os catálogos são selecionados, mas não auditados.
+Isto quer dizer que alguém escolheu as aplicações, não que o código delas
+tenha sido revisto. Acrescenta apenas catálogos em que confias, tal como
+farias com um repositório de pacotes. Usa `kiwi info --installer`, `kiwi diff`
+e `kiwi pin` para veres o que uma aplicação faz antes de decidires. Uma
+assinatura limita *quem pode publicar* uma versão. Não diz nada sobre *o que
+essa versão faz*.
 
-Ainda planeado: um registo alojado de catálogos de confiança
-(`kiwi catalog browse`) com as impressões digitais dos signatários por entrada.
+Há uma coisa ainda planeada: um registo alojado de catálogos de confiança, com
+o comando `kiwi catalog browse` e com as impressões digitais dos signatários
+de cada entrada.
