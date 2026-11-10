@@ -6,7 +6,7 @@ Day-two work on a running fleet, all from the operator's machine.
 
 ```bash
 kiwi-server status fleet.yaml            # every host
-kiwi-server status fleet.yaml sh3        # one
+kiwi-server status fleet.yaml papaya        # one
 ```
 
 Each machine reports over SSH (read-only): its role, its stack, problems (a
@@ -26,7 +26,7 @@ kiwi-server secrets init fleet.yaml      # secrets/ becomes one age-encrypted fi
 kiwi-server secrets unlock fleet.yaml    # open it into memory (--for 8h; 0 keeps it open)
 kiwi-server secrets lock fleet.yaml
 kiwi-server secrets status fleet.yaml
-kiwi-server secrets show fleet.yaml sh3 [setting]   # a host's generated passwords
+kiwi-server secrets show fleet.yaml papaya [setting]   # a host's generated passwords
 ```
 
 `secrets init` keeps one key in the GNOME Keyring and shows a **recovery key**
@@ -39,7 +39,7 @@ After every successful render or build, the fleet directory is encrypted
 `backup.hosts`, which keep the newest ten. On a fresh machine:
 
 ```bash
-kiwi-server restore --from core@m1.home  # the fleet directory back
+kiwi-server restore --from core@lychee.home  # the fleet directory back
 kiwi-server backup fleet.yaml --local /mnt/usb   # or a copy to a directory, any time
 ```
 
@@ -49,14 +49,14 @@ Give a node the `backup-server` module (a restic REST server), and every
 machine that should be backed up the `backup` module, pointing at it:
 
 ```yaml
-m1:
+lychee:
   node:
     modules: [vpn-client, reverse-proxy, backup-server]
-    backup-server: { clients: [sh3.home, gate.home] }
-sh3:
+    backup-server: { clients: [papaya.home, sorbet.home] }
+papaya:
   node:
     modules: [vpn-client, reverse-proxy, cloud, vault, portainer, backup]
-    backup: { server: https://backup.m1.home }
+    backup: { server: https://backup.lychee.home }
 ```
 
 Each night at 03:00 (within 15 minutes after) restic sends what each module asks to keep,
@@ -91,7 +91,7 @@ kiwi-server prune fleet.yaml            # keep 7 daily, 4 weekly, 6 monthly
 ## Tunnel MTU
 
 ```bash
-kiwi-server mtu fleet.yaml sh3 --write   # measure with don't-fragment pings, write wg_mtu
+kiwi-server mtu fleet.yaml papaya --write   # measure with don't-fragment pings, write wg_mtu
 ```
 
 ## netcup VPSes
@@ -99,7 +99,7 @@ kiwi-server mtu fleet.yaml sh3 --write   # measure with don't-fragment pings, wr
 ```bash
 kiwi-server vps login fleet.yaml         # device-flow login; the token goes to secrets/
 kiwi-server vps list fleet.yaml
-kiwi-server vps install fleet.yaml gate  # wipe the server and install the host's ISO
+kiwi-server vps install fleet.yaml sorbet  # wipe the server and install the host's ISO
 ```
 
 `vps install` asks first unless you pass `--yes`. It refuses an ISO that

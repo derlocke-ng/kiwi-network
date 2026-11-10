@@ -114,11 +114,42 @@ Services on a node are reachable on its LAN and at its **mesh address** (e.g.
 `10.8.0.25`). Mesh traffic to that address on 80 and 443 is forwarded to the
 reverse proxy.
 
+## Names
+
+Machines are named from the orchard: **masters after fruit dishes** (`crumble`,
+`sorbet`, `compote`, `chutney`, `strudel`, `cobbler`, `trifle`, `cider`) and
+**nodes after fruits** (`papaya`, `lychee`, `guava`, `quince`, `damson`), so
+the kind of a machine is readable in every log line. It is a convention, and
+any name works. Services sit beneath their host: `cloud.papaya.home`,
+`vault.papaya.home`, `wg.sorbet.home`. See [DNS, names & certificates](dns.md).
+
+## Ways out
+
+A master is a WireGuard server with an exit, and the exit has three modes:
+
+| Mode | How the mesh reaches the Internet | Status |
+|---|---|---|
+| **provider** | through a commercial VPN (gluetun): the double hop, and the master's preset | built |
+| **direct** | straight out of the master's own uplink. List the master's modules without `vpn-client` | built |
+| **master** | through *another network's master*, as a client in one of its groups that may reach the Internet and nothing else: multi-hop | designed; it needs enrolment across networks, which is federation |
+
+Every master also offers Tor's SOCKS5 to the mesh, whatever its exit.
+
+## One mesh per network
+
+Each network has its own mesh. The default is `10.8.0.0/16`: masters and nodes
+in `10.8.0.0/24`, then guests `.1`, pentest `.2`, devices `.3` and routers
+`.4`. A second network takes another range, for example `10.9.0.0/16`, so a
+device that is in both can tell them apart. Today the range is spread over
+several settings (`mesh_subnet`, the vpn-server's `server_ip`, `wg_subnet`,
+`wg_default_address` and `groups`, and Tor's `socks_policy_accept`), and the
+fleet file sets them all.
+
 ## Addressing
 
 | What | Default |
 |---|---|
-| The whole mesh (routed on every host) | `10.8.0.0/16` (`mesh_subnet`) |
+| The whole mesh (routed on every host) | `10.8.0.0/16` by default (`mesh_subnet`) |
 | wg-easy clients | `10.8.0.0/24`; the server is `10.8.0.1` |
 | Client groups | `10.8.1.0/24` … `10.8.4.0/24` |
 | Stack network | `172.64.0.0/24` on a master, `172.128.0.0/24` on a node |

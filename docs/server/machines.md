@@ -14,8 +14,8 @@ set `ssh_password_auth: true`.
 ## Install media
 
 ```bash
-kiwi-server build fleet.yaml gate      # → output/gate/gate.iso
-sudo dd if=output/gate/gate.iso of=/dev/sdX bs=4M status=progress oflag=sync
+kiwi-server build fleet.yaml sorbet      # → output/sorbet/sorbet.iso
+sudo dd if=output/sorbet/sorbet.iso of=/dev/sdX bs=4M status=progress oflag=sync
 ```
 
 - An ISO installs to `disk:` **without asking** and then **powers the machine
@@ -31,8 +31,8 @@ sudo dd if=output/gate/gate.iso of=/dev/sdX bs=4M status=progress oflag=sync
 ## Apply
 
 ```bash
-kiwi-server apply fleet.yaml sh3                         # by name, address or mesh address
-kiwi-server apply fleet.yaml sh3 --ssh core@192.168.1.25 # the first time, by address
+kiwi-server apply fleet.yaml papaya                         # by name, address or mesh address
+kiwi-server apply fleet.yaml papaya --ssh core@192.168.1.25 # the first time, by address
 ```
 
 `apply` re-renders the host and sends its role script over SSH to

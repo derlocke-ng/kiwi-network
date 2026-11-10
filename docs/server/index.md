@@ -57,14 +57,14 @@ kiwi-server secrets init fleet.yaml       # optional: secrets/ as one age-encryp
 kiwi-server validate fleet.yaml
 
 # the master
-kiwi-server build fleet.yaml gate         # → output/gate/gate.iso
+kiwi-server build fleet.yaml sorbet         # → output/sorbet/sorbet.iso
 #   boot it; it installs and powers off; start it again
-kiwi-server apply fleet.yaml gate --ssh core@203.0.113.5
+kiwi-server apply fleet.yaml sorbet --ssh core@203.0.113.5
 
 # each node: its WireGuard client first, then media, then the role
-kiwi-server enroll fleet.yaml sh3         # → secrets/sh3.home.conf
-kiwi-server build fleet.yaml sh3
-kiwi-server apply fleet.yaml sh3 --ssh core@192.168.1.25
+kiwi-server enroll fleet.yaml papaya         # → secrets/papaya.home.conf
+kiwi-server build fleet.yaml papaya
+kiwi-server apply fleet.yaml papaya --ssh core@192.168.1.25
 
 # your own devices
 kiwi-server enroll fleet.yaml laptop --group devices
@@ -76,10 +76,10 @@ The role and its stack arrive with `apply`. If a machine cannot be reached over
 SSH, `build --offline` puts the whole role and its secrets on the ISO instead.
 Keep such an ISO off a provider's ISO store and delete it after the install.
 
-**No ISO at all?** `kiwi-server script fleet.yaml sh3` prints the script for a
+**No ISO at all?** `kiwi-server script fleet.yaml papaya` prints the script for a
 machine you installed yourself (`--offline` for the whole role).
 
-On a netcup VPS, `kiwi-server vps install fleet.yaml gate` wipes the server and
+On a netcup VPS, `kiwi-server vps install fleet.yaml sorbet` wipes the server and
 installs the ISO through netcup's API.
 
 ## Commands

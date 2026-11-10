@@ -1,10 +1,12 @@
-# People: hubs on nostr
+# Hubs, not platforms
 
-The network side of Kiwi connects your machines. This side connects **people**.
-A **hub** is a set of web apps (shared lists, chat, file sharing, a password
-manager, a marketplace, …) that run entirely in the browser and sync over
-[nostr](https://nostr.com) relays. There is no account server and no backend
-of ours, and everything private is encrypted on your device before it leaves.
+The network connects your machines. **Hubs** connect people. A hub is a set of
+web apps (an open marketplace, a feed, chat, file sharing, shared lists, a
+password manager, a calendar) that run entirely in the browser and sync over
+[nostr](https://nostr.com) relays the community chooses. There is no account
+server and no backend in the middle, and everything private is encrypted on the
+device before it leaves. Anyone can run a hub for any community. See
+[the framework's apps](apps.md).
 
 Three repositories make this up:
 

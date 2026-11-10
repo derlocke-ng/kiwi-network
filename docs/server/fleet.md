@@ -17,7 +17,7 @@ A host has a **target** (what gets installed) and a **role** (what it becomes):
 defaults:
   target: ucore
   role: bare
-  domain: home                       # sh3 becomes sh3.home; services are cloud.sh3.home …
+  domain: home                       # papaya becomes papaya.home; services are cloud.papaya.home …
   timezone: Europe/Berlin
   disk: /dev/sda                     # WIPED by the ISO without asking
   admin:
@@ -29,7 +29,7 @@ defaults:
   debian: { release: trixie, partitioning: lvm }
 
 hosts:
-  gate:                              # the master, a Debian VPS
+  sorbet:                              # the master, a Debian VPS
     role: master
     target: debian
     disk: /dev/vda
@@ -42,14 +42,14 @@ hosts:
       vpn-server:
         wg_host: vpn.example.org     # what clients and nodes connect to
 
-  m1:                                # a gateway node
+  lychee:                                # a gateway node
     role: node
     node:
       preset: gateway
       pub_iface: eth0                # the LAN side
       downloader: { download_dir: /mnt/data/downloads }
 
-  sh3:                               # a cloud node on uCore HCI
+  papaya:                               # a cloud node on uCore HCI
     role: node
     ucore: { image: ghcr.io/ublue-os/ucore-hci:stable }
     node:
@@ -60,7 +60,7 @@ hosts:
 ```
 
 There are no service passwords in it. Every password you leave out is
-generated from `secrets/seed`, and `kiwi-server secrets show fleet.yaml sh3`
+generated from `secrets/seed`, and `kiwi-server secrets show fleet.yaml papaya`
 prints them. The nodes' WireGuard configs aren't named either:
 `kiwi-server enroll` writes `secrets/<hostname>.conf`, which each node finds by
 itself, and the node's mesh address is read from it.
@@ -122,7 +122,7 @@ default.
 
 ```bash
 kiwi-server validate fleet.yaml          # errors and warnings
-kiwi-server show fleet.yaml sh3          # one host's effective config, secrets masked
+kiwi-server show fleet.yaml papaya          # one host's effective config, secrets masked
 ```
 
 kiwi-server also checks the domain: `.local` is refused, `.lan` and public

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Kiwi Network">
+  <circle cx="32" cy="32" r="30" fill="#7a5a35"/>
+  <circle cx="32" cy="32" r="26" fill="#8cc63f"/>
+  <circle cx="32" cy="32" r="18" fill="#a9d65f"/>
+  <g fill="#1d2a12">
+    <ellipse cx="32" cy="19" rx="1.6" ry="2.6"/>
+    <ellipse cx="32" cy="45" rx="1.6" ry="2.6"/>
+    <ellipse cx="19" cy="32" rx="2.6" ry="1.6"/>
+    <ellipse cx="45" cy="32" rx="2.6" ry="1.6"/>
+    <ellipse cx="22.8" cy="22.8" rx="1.6" ry="2.6" transform="rotate(-45 22.8 22.8)"/>
+    <ellipse cx="41.2" cy="41.2" rx="1.6" ry="2.6" transform="rotate(-45 41.2 41.2)"/>
+    <ellipse cx="41.2" cy="22.8" rx="1.6" ry="2.6" transform="rotate(45 41.2 22.8)"/>
+    <ellipse cx="22.8" cy="41.2" rx="1.6" ry="2.6" transform="rotate(45 22.8 41.2)"/>
+  </g>
+  <circle cx="32" cy="32" r="7" fill="#f4f6e6"/>
+</svg>

@@ -34,7 +34,7 @@ A master can add `nostr-relay` and `hub` (a [hub for people](../people/hubs.md))
 masters only.
 
 ```yaml
-gate:
+sorbet:
   role: master
   master:
     modules: [vpn-client, vpn-server, dns, tor, reverse-proxy, nostr-relay, hub]
@@ -47,12 +47,12 @@ come in by themselves. Containers are named `kn-…` on the `knet-node` network
 (`172.128.0.0/24`).
 
 ```yaml
-sh3:
+papaya:
   role: node
   node:
     preset: cloud
     modules: [vpn-client, reverse-proxy, cloud, vault, portainer, backup]
-    backup: { server: https://backup.m1.home }   # m1 runs the backup-server module
+    backup: { server: https://backup.lychee.home }   # lychee runs the backup-server module
 ```
 
 The gateway preset turns on Pi-hole's own web page (`expose_web_ui: true`) at

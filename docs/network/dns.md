@@ -31,10 +31,10 @@ keeps answering with mesh addresses.
 
 ## Names: `service.hostname.home`
 
-Each host is `<host>.<domain>` (`sh3.home`), and each service it runs is a name
-under it: `cloud.sh3.home`, `vault.sh3.home`, `portainer.sh3.home`,
-`dl.m1.home`, and on the master `wg.gate.home`, `pihole.gate.home`,
-`hub.gate.home`, `relay.gate.home`. Every name a module announces goes into the fleet's DNS records at
+Each host is `<host>.<domain>` (`papaya.home`), and each service it runs is a name
+under it: `cloud.papaya.home`, `vault.papaya.home`, `portainer.papaya.home`,
+`dl.lychee.home`, and on the master `wg.sorbet.home`, `pihole.sorbet.home`,
+`hub.sorbet.home`, `relay.sorbet.home`. Every name a module announces goes into the fleet's DNS records at
 the host's **mesh address**. Every Pi-hole in the fleet resolves every host and
 service name (split-horizon, `fleet_records`). Add your own with
 `extra_records`.
@@ -84,7 +84,7 @@ kiwi-server ca fleet.yaml        # show the fleet CA
 ```
 
 Import `kiwiCA.pem` on your own devices (browsers, phones) so that
-`https://cloud.sh3.home` is trusted. To use your own certificates instead, set
+`https://cloud.papaya.home` is trusted. To use your own certificates instead, set
 `tls_fullchain` and `tls_privkey` in the reverse-proxy module.
 
 !!! warning "Keep `secrets/` private"

@@ -79,10 +79,12 @@ nav:
           - Modules: server/modules.md
           - Machines: server/machines.md
           - Operations: server/operations.md
+          - Where it is going: server/roadmap.md
       - One machine without a fleet: server/single.md
-  - People:
-      - Hubs on nostr: people/index.md
-      - Armory: people/armory.md
+  - Hubs:
+      - Hubs, not platforms: people/index.md
+      - The framework's apps: people/apps.md
+      - Armory, a distribution: people/armory.md
       - Running your own hub: people/hubs.md
   - Desktop:
       - Overview: desktop/index.md
