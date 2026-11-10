@@ -31,7 +31,7 @@ mkdocs.yml     docs configuration
 ```
 
 ```bash
-python -m pip install mkdocs-material
+python -m pip install mkdocs-material mkdocs-static-i18n
 mkdocs serve             # live-voorbeeld op http://127.0.0.1:8000
 mkdocs build --strict    # wat CI bouwt: faalt bij kapotte links en ankers
 python -m http.server -d site 8080   # de homepage

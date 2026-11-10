@@ -30,7 +30,7 @@ mkdocs.yml     docs configuration
 ```
 
 ```bash
-python -m pip install mkdocs-material
+python -m pip install mkdocs-material mkdocs-static-i18n
 mkdocs serve             # Live-Vorschau unter http://127.0.0.1:8000
 mkdocs build --strict    # was die CI baut: scheitert an kaputten Links und Ankern
 python -m http.server -d site 8080   # die Homepage
