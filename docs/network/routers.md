@@ -45,8 +45,8 @@ scp kiwi.sh root@192.168.1.1:/tmp/ && ssh root@192.168.1.1 sh /tmp/kiwi.sh
 
 The script installs the WireGuard package if it is missing. It creates an
 interface `kiwi` (change the name with `--name`), with the fleet's `wg_mtu` as
-its MTU and one peer for the master
-and `route_allowed_ips`, a firewall zone the LAN may forward into (with
+its MTU and one peer for the master (with `route_allowed_ips`, so OpenWrt adds
+the routes), a firewall zone the LAN may forward into (with
 masquerading and MSS clamping), and the dnsmasq forward for the fleet's domain
 (`server=/home/10.8.0.1`). With `--full`, dnsmasq sends every lookup to the
 master's Pi-hole. Every section is named, so running the script again replaces
