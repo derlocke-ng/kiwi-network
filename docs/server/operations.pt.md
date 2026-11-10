@@ -174,6 +174,10 @@ sonda o indicar.
 
 ## VPSes da netcup { #netcup-vpses }
 
+A netcup é o fornecedor onde o kiwi-server consegue hoje instalar sozinho,
+através da API do seu Server Control Panel. Outros fornecedores estão
+[planeados](roadmap.md#more-hosters-and-network-boot) como plugins.
+
 ```bash
 kiwi-server vps login fleet.yaml         # início de sessão device-flow; o token vai para secrets/
 kiwi-server vps list fleet.yaml

@@ -82,7 +82,9 @@ hem na de installatie.
 voor een machine die je zelf hebt geïnstalleerd (`--offline` voor de hele rol).
 
 Op een netcup-VPS wist `kiwi-server vps install fleet.yaml sorbet` de server en
-installeert hij de ISO via de API van netcup.
+installeert hij de ISO via de API van netcup, zonder dat er iemand achter een
+console zit. netcup is tot nu toe de enige provider; andere zijn
+[gepland](roadmap.md#more-hosters-and-network-boot).
 
 ## Commando's { #commands }
 

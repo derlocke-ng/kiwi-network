@@ -172,6 +172,10 @@ aangeeft.
 
 ## netcup-VPS'en { #netcup-vpses }
 
+netcup is de provider waarop kiwi-server vandaag zelfstandig kan installeren,
+via de Server Control Panel-API ervan. Andere providers zijn als plugins
+[gepland](roadmap.md#more-hosters-and-network-boot).
+
 ```bash
 kiwi-server vps login fleet.yaml         # inloggen via device flow; het token gaat naar secrets/
 kiwi-server vps list fleet.yaml

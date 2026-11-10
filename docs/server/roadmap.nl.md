@@ -84,6 +84,18 @@ het niet lezen, en draait één VM per tenant. De netcup-ondersteuning van
 kiwi-server (`kiwi-server
 vps`, *gebouwd*) is het eerste stuk van zijn providerdriver.
 
+## Meer providers, en netwerkboot { #more-hosters-and-network-boot }
+
+*Gepland.* Het doel is een volledig geautomatiseerde installatie, waar een machine
+ook staat.
+
+- **Providers als plugins.** netcup is vandaag ingebouwd. Het plan is een eigen
+  repository voor API's van providers, zodat iedereen AWS, Hetzner en de rest kan
+  toevoegen zoals netcup nu werkt: een server aanmaken of wissen, de installatie
+  erop zetten en hem opstarten.
+- **Wake-on-LAN en PXE-boot** voor machines thuis: een node wordt wakker en
+  installeert zich via het netwerk, zonder USB-stick.
+
 ## Ook op de lijst { #also-on-the-list }
 
 Een stand-by-master, rootless podman, IPv6 van begin tot eind, ARM-borden,

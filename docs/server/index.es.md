@@ -82,7 +82,9 @@ la instalación.
 máquina que instalaste tú mismo (`--offline` para todo el rol).
 
 En un VPS de netcup, `kiwi-server vps install fleet.yaml sorbet` borra el
-servidor e instala la ISO a través de la API de netcup.
+servidor e instala la ISO a través de la API de netcup, sin nadie delante de
+una consola. netcup es el único proveedor por ahora; hay otros
+[previstos](roadmap.md#more-hosters-and-network-boot).
 
 ## Comandos { #commands }
 

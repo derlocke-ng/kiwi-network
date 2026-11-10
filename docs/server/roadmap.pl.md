@@ -88,6 +88,18 @@ hostujący mastera nie może jej odczytać i uruchamia jedną maszynę wirtualn�
 najemcę. Obsługa netcup w kiwi-server (`kiwi-server
 vps`, *zbudowane*) to pierwszy element jego sterownika dostawców.
 
+## Więcej dostawców i rozruch sieciowy { #more-hosters-and-network-boot }
+
+*Planowane.* Celem jest w pełni zautomatyzowana instalacja, gdziekolwiek stoi
+maszyna.
+
+- **Dostawcy jako wtyczki.** netcup jest dziś wbudowany. Plan to osobne
+  repozytorium na API dostawców, żeby każdy mógł dodać AWS, Hetzner i resztę tak,
+  jak teraz działa netcup: utworzyć lub wyczyścić serwer, umieścić na nim
+  instalację i go uruchomić.
+- **Wake-on-LAN i rozruch PXE** dla maszyn w domu: node budzi się i instaluje
+  przez sieć, bez pendrive'a USB.
+
 ## Również na liście { #also-on-the-list }
 
 Zapasowy master, podman bez roota, IPv6 od końca do końca, płytki ARM, zakresy

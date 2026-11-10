@@ -86,6 +86,18 @@ puede leerla, y ejecuta una VM por cliente. El soporte de netcup de kiwi-server
 (`kiwi-server
 vps`, *construido*) es la primera pieza de su controlador de proveedores.
 
+## Más proveedores, y arranque por red { #more-hosters-and-network-boot }
+
+*Previsto.* El objetivo es una instalación totalmente automatizada, esté donde
+esté la máquina.
+
+- **Proveedores como plugins.** netcup viene integrado hoy. El plan es un
+  repositorio propio para las API de proveedores, para que cualquiera pueda
+  añadir AWS, Hetzner y los demás tal como funciona netcup ahora: crear o borrar
+  un servidor, poner la instalación en él y arrancarlo.
+- **Wake-on-LAN y arranque PXE** para máquinas en casa: un node se despierta y se
+  instala por la red, sin memoria USB.
+
 ## También en la lista { #also-on-the-list }
 
 Un master de reserva, podman sin root, IPv6 de extremo a extremo, placas ARM,

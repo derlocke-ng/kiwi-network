@@ -86,6 +86,18 @@ Hoster des Masters kann es nicht lesen und betreibt eine VM pro Mandant. Die
 netcup-Unterstützung von kiwi-server (`kiwi-server
 vps`, *gebaut*) ist das erste Stück seines Provider-Treibers.
 
+## Mehr Hoster und Netzwerk-Boot { #more-hosters-and-network-boot }
+
+*Geplant.* Das Ziel ist eine vollautomatische Installation, wo auch immer eine
+Maschine steht.
+
+- **Hoster als Plugins.** netcup ist heute eingebaut. Der Plan ist ein eigenes
+  Repository für Hoster-APIs, damit jeder AWS, Hetzner und den Rest so ergänzen
+  kann, wie netcup jetzt funktioniert: einen Server anlegen oder löschen, die
+  Installation darauf bringen und ihn booten.
+- **Wake-on-LAN und PXE-Boot** für Maschinen zu Hause: Ein Node wacht auf und
+  installiert sich über das Netzwerk, ohne USB-Stick.
+
 ## Außerdem auf der Liste { #also-on-the-list }
 
 Ein Standby-Master, rootless podman, IPv6 Ende-zu-Ende, ARM-Boards, Portbereiche und

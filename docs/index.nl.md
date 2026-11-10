@@ -58,6 +58,24 @@ hide:
 
 </div>
 
+## Het idee { #the-idea }
+
+Kiwi Network is een volledig geautomatiseerde Linux-omgeving om in te leven en te
+werken: beveiligd, degelijk en veilig voor een ruw leven online. Je machines
+zorgen voor zichzelf.
+
+- **Ze installeren zichzelf.** Per machine een ISO die zonder tussenkomst
+  installeert, of rechtstreeks op een gehuurde server via de API van de provider
+  (vandaag netcup, meer [gepland](server/roadmap.md#more-hosters-and-network-boot)).
+- **Ze houden zichzelf actueel.** Updates worden doorlopend geïnstalleerd, en
+  herstarts wachten op het venster dat je instelt.
+- **Ze maken zelf back-ups.** Elke nacht, versleuteld en alleen toevoegend, naar
+  je eigen back-upnodes. Ook van het fleet-bestand en zijn geheimen wordt een
+  back-up gemaakt.
+- **Ze komen weer overeind.** Versleutelde schijven ontgrendelen via Tang, of op
+  afstand als er iets mis is, en een opnieuw opgebouwde machine komt terug uit
+  het fleet-bestand en haar back-up.
+
 ## De machines { #the-machines }
 
 | Rol | Wat de machine wordt |

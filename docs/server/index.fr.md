@@ -82,7 +82,9 @@ d’un hébergeur et supprimez-la après l’installation.
 pour une machine que vous avez installée vous-même (`--offline` pour tout le rôle).
 
 Sur un VPS netcup, `kiwi-server vps install fleet.yaml sorbet` efface le serveur et
-installe l’ISO via l’API de netcup.
+installe l’ISO via l’API de netcup, sans personne devant une console. netcup
+est le seul hébergeur pour l’instant ; d’autres sont
+[prévus](roadmap.md#more-hosters-and-network-boot).
 
 ## Commandes { #commands }
 

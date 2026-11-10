@@ -174,6 +174,10 @@ Messung das sagt.
 
 ## netcup-VPSes { #netcup-vpses }
 
+netcup ist der Hoster, auf dem kiwi-server heute von selbst installieren kann,
+über seine Server-Control-Panel-API. Weitere Hoster sind als Plugins
+[geplant](roadmap.md#more-hosters-and-network-boot).
+
 ```bash
 kiwi-server vps login fleet.yaml         # Anmeldung per Device Flow; das Token kommt nach secrets/
 kiwi-server vps list fleet.yaml

@@ -81,7 +81,9 @@ apaga-a depois da instalação.
 máquina que instalaste tu mesmo (`--offline` para o papel inteiro).
 
 Num VPS da netcup, `kiwi-server vps install fleet.yaml sorbet` apaga o servidor e
-instala a ISO através da API da netcup.
+instala a ISO através da API da netcup, sem ninguém à consola. A netcup é o
+único fornecedor até agora; outros estão
+[planeados](roadmap.md#more-hosters-and-network-boot).
 
 ## Comandos { #commands }
 

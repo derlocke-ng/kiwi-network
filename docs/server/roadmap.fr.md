@@ -93,6 +93,18 @@ master ne peut pas le lire, et fait tourner une VM par locataire. La prise en
 charge de netcup dans kiwi-server (`kiwi-server
 vps`, *construit*) est la première pièce de son pilote d’hébergeur.
 
+## Plus d’hébergeurs, et le démarrage réseau { #more-hosters-and-network-boot }
+
+*Prévu.* Le but est une installation entièrement automatisée, où que se trouve
+une machine.
+
+- **Les hébergeurs comme plugins.** netcup est intégré aujourd’hui. Le plan : un
+  dépôt à part pour les API d’hébergeurs, afin que chacun puisse ajouter AWS,
+  Hetzner et les autres de la même façon que netcup fonctionne maintenant : créer
+  ou effacer un serveur, y placer l’installation et le démarrer.
+- **Wake-on-LAN et démarrage PXE** pour les machines à la maison : un node se
+  réveille et s’installe par le réseau, sans clé USB.
+
 ## Également sur la liste { #also-on-the-list }
 
 Un master de secours, podman rootless, IPv6 de bout en bout, les cartes ARM, les

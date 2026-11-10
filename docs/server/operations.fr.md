@@ -175,6 +175,10 @@ une encapsulation imbriquée, mesurez le téléphone lui-même et baissez son pr
 
 ## VPS netcup { #netcup-vpses }
 
+netcup est l’hébergeur sur lequel kiwi-server sait installer tout seul
+aujourd’hui, via l’API de son Server Control Panel. D’autres hébergeurs sont
+[prévus](roadmap.md#more-hosters-and-network-boot) sous forme de plugins.
+
 ```bash
 kiwi-server vps login fleet.yaml         # connexion par device flow ; le jeton va dans secrets/
 kiwi-server vps list fleet.yaml

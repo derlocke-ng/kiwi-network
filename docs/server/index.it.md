@@ -80,7 +80,9 @@ Non caricare una ISO del genere nell'archivio ISO di un provider ed eliminala do
 macchina che hai installato tu (`--offline` per l'intero ruolo).
 
 Su una VPS netcup, `kiwi-server vps install fleet.yaml sorbet` cancella il server e
-installa la ISO tramite l'API di netcup.
+installa la ISO tramite l'API di netcup, senza nessuno davanti a una console.
+netcup è l'unico provider per ora; altri sono
+[previsti](roadmap.md#more-hosters-and-network-boot).
 
 ## Comandi { #commands }
 

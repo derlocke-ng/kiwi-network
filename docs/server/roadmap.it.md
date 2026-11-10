@@ -82,6 +82,18 @@ che ogni tenant ha a casa custodisce la sua rete. Chi ospita il master non può 
 e gestisce una VM per tenant. Il supporto netcup di kiwi-server (`kiwi-server
 vps`, *realizzato*) è il primo pezzo del suo driver per i provider.
 
+## Più provider, e avvio di rete { #more-hosters-and-network-boot }
+
+*Previsto.* L'obiettivo è un'installazione completamente automatizzata ovunque si
+trovi una macchina.
+
+- **Provider come plugin.** Oggi netcup è integrato. Il piano è un repository a sé
+  per le API dei provider, così che chiunque possa aggiungere AWS, Hetzner e gli
+  altri nel modo in cui funziona netcup ora: creare o cancellare un server,
+  metterci sopra l'installazione e avviarlo.
+- **Wake-on-LAN e avvio PXE** per le macchine di casa: un node si sveglia e si
+  installa via rete, senza chiavetta USB.
+
 ## Anche in lista { #also-on-the-list }
 
 Un master di riserva, podman rootless, IPv6 end-to-end, schede ARM, intervalli di porte

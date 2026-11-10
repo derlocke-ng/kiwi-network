@@ -58,6 +58,24 @@ hide:
 
 </div>
 
+## Idea { #the-idea }
+
+Kiwi Network to w pełni zautomatyzowane środowisko Linux do życia i pracy:
+zabezpieczone, solidne i bezpieczne na trudne życie w sieci. Twoje maszyny same
+o siebie dbają.
+
+- **Same się instalują.** Nienadzorowany obraz ISO dla każdej maszyny albo
+  instalacja prosto na wynajęty serwer przez API dostawcy (dziś netcup, kolejni
+  [planowani](server/roadmap.md#more-hosters-and-network-boot)).
+- **Same się aktualizują.** Aktualizacje instalują się na bieżąco, a restarty
+  czekają na okno, które ustawisz.
+- **Same robią swoje kopie zapasowe.** Co noc, zaszyfrowane i w trybie tylko do
+  dopisywania, na twoje własne node'y z kopiami zapasowymi. Plik fleet i jego
+  sekrety też mają kopie zapasowe.
+- **Wracają na nogi.** Zaszyfrowane dyski odblokowują się przez Tang albo zdalnie,
+  gdy coś jest nie tak, a odbudowana maszyna wraca z pliku fleet i swojej kopii
+  zapasowej.
+
 ## Maszyny { #the-machines }
 
 | Rola | Czym staje się maszyna |

@@ -87,6 +87,18 @@ a consegue ler e corre uma VM por cliente. O suporte da netcup no kiwi-server
 (`kiwi-server
 vps`, *construído*) é a primeira peça do seu driver de fornecedores.
 
+## Mais fornecedores, e arranque pela rede { #more-hosters-and-network-boot }
+
+*Planeado.* O objetivo é uma instalação totalmente automatizada onde quer que uma
+máquina esteja.
+
+- **Fornecedores como plugins.** A netcup está hoje integrada. O plano é um
+  repositório próprio para as APIs dos fornecedores, para que qualquer pessoa
+  possa acrescentar a AWS, a Hetzner e os restantes da forma como a netcup
+  funciona agora: criar ou apagar um servidor, pôr lá a instalação e arrancá-lo.
+- **Wake-on-LAN e arranque PXE** para máquinas em casa: um node acorda e
+  instala-se pela rede, sem pen USB.
+
 ## Também na lista { #also-on-the-list }
 
 Um master de reserva, podman sem root, IPv6 de ponta a ponta, placas ARM,
