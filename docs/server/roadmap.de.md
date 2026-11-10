@@ -6,9 +6,9 @@ Plans es schon gibt.
 !!! info "Entworfen, noch nicht umgesetzt"
     Diese Seite fasst den [Entwurf der Control
     Plane](https://github.com/derlocke-ng/kiwi-server/blob/main/docs/design/control-plane.md)
-    von kiwi-server zusammen, auf den man sich im Oktober 2026 geeinigt hat.
-    Nichts davon gibt es bisher, außer wo eine Zeile *umgesetzt* sagt. In
-    welcher Reihenfolge die Arbeit erledigt wird, steht in der
+    von kiwi-server zusammen, der im Oktober 2026 beschlossen wurde. Nichts
+    davon gibt es bisher, außer dort, wo *umgesetzt* steht. In welcher
+    Reihenfolge die Arbeit erledigt wird, steht in der
     [Roadmap](https://github.com/derlocke-ng/kiwi-server/blob/main/docs/ROADMAP.md).
 
 Heute ist kiwi-server ein Werkzeug für den Desktop. Die Fleet-Datei, die Secrets
@@ -26,9 +26,9 @@ Der Entwurf teilt die Software in fünf Schichten.
 
 1. **kiwi-modules** enthält die Module und den Render-Vertrag, der festlegt, wie
    die Konfiguration einer Maschine erzeugt wird. *Umgesetzt.*
-2. **kiwi-stack** ist der Teil, der auf der Maschine läuft. Er beginnt mit
-   `kiwi-stack apply`, das eine erzeugte Konfiguration auf die Maschine bringt.
-   *Umgesetzt.*
+2. **kiwi-stack** ist der Teil, der auf der Maschine läuft. Seine Aufgabe
+   beginnt bei `kiwi-stack apply`, das eine erzeugte Konfiguration auf die
+   Maschine bringt. *Umgesetzt.*
 3. **Der Kern von kiwi-server** kümmert sich um die Fleet, die Hosts, die
    Zielsysteme, die ISOs, die CA, das Aufnehmen von Geräten und `apply`. Er ist
    headless, hat also wie heute keine eigene grafische Oberfläche. *Umgesetzt.*
@@ -47,7 +47,7 @@ können ihn erreichen, und zwar nur aus dem Mesh, und seine Festplatte ist
 verschlüsselt. Auf ihm liegen der Seed, der Schlüssel der CA, die Fleet-Datei
 und jede Konfiguration.
 
-Der gemietete **Master wird zu einem Relay, das sich ersetzen lässt**. Er leitet
+Der gemietete **Master wird zu einer austauschbaren Zwischenstation**. Er leitet
 den Verkehr des Netzwerks weiter und hat nur, was er für den Betrieb braucht:
 seine WireGuard-Schlüssel und Peers, seine eigenen Passwörter und sein
 Zertifikat. Geht der Master verloren, richtest du ihn vom Control-Node aus neu
@@ -83,14 +83,13 @@ bekommt die Maschine beim ersten Start.
 ## Föderation und Multi-Hop { #federation-and-multi-hop }
 
 Die Föderation verbindet getrennte Kiwi Networks miteinander. Netzwerke, die der
-CA des jeweils anderen vertrauen und einander Namen delegieren, werden
-gegenseitig zu Clients. Ein Master hat drei Ausgangsarten, die bestimmen, wie
-sein Verkehr ins Internet gelangt. Bei der dritten schickt der Master eines
-Netzwerks seinen Internetverkehr über den Master eines anderen Netzwerks. Das
-nennt sich **Multi-Hop**, und der zweite Master sieht nur den ersten. Wer auf
-diese Weise mehrere Master betreibt, hat einen eigenen VPN-Dienst, mit
-Eingangs-Mastern in einem Land, Ausgangs-Mastern in anderen Ländern und Tor
-innerhalb des Netzwerks.
+CA des jeweils anderen vertrauen und einander Namen delegieren, werden jeweils
+Clients des anderen. Ein Master hat drei Ausgangsarten, die bestimmen, wie sein
+Verkehr ins Internet gelangt. Bei der dritten schickt der Master eines Netzwerks
+seinen Internetverkehr über den Master eines anderen Netzwerks. Das nennt sich
+**Multi-Hop**, und der zweite Master sieht nur den ersten. Wer auf diese Weise
+mehrere Master betreibt, hat einen eigenen VPN-Dienst, mit Eingangs-Mastern in
+einem Land, Ausgangs-Mastern in anderen Ländern und Tor innerhalb des Netzwerks.
 
 ## Der Orchard { #the-orchard }
 
@@ -129,6 +128,5 @@ egal wo sie steht.
 ## Außerdem auf der Liste { #also-on-the-list }
 
 In der Roadmap stehen außerdem ein Ersatz-Master in Bereitschaft, rootless
-podman, IPv6 durchgängig von Ende zu Ende, ARM-Boards, Portbereiche und ein
-Modul für Spiele sowie das Wiederherstellen der Daten eines Nodes beim ersten
-Start.
+podman, durchgängiges IPv6, ARM-Boards, Portbereiche und ein Modul für Spiele
+sowie das Wiederherstellen der Daten eines Nodes beim ersten Start.

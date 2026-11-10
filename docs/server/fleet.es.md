@@ -1,25 +1,38 @@
 # El archivo fleet
 
-`fleet.yaml` describe cada máquina que construye kiwi-server. Tiene dos claves:
-`defaults`, que se aplica a todos los hosts, y `hosts`, con una entrada por
-máquina. Todo lo que fija un host sustituye a los valores por defecto.
-`kiwi-server init` escribe un punto de partida comentado, y la referencia
-completa es
+En el archivo fleet, `fleet.yaml`, describes todas las máquinas de tu Kiwi
+Network. Para cada una indica qué sistema operativo recibe, para qué se usa y
+cómo se configuran sus servicios. kiwi-server construye todas las máquinas a
+partir de esta descripción: escribes una sola vez lo que quieres y no tienes que
+configurar ninguna máquina a mano.
+
+El archivo tiene dos claves. `defaults` contiene los ajustes que valen para
+todos los hosts, y `hosts` tiene una entrada por máquina. Un ajuste en la
+entrada de un host tiene prioridad sobre el mismo ajuste en `defaults`.
+`kiwi-server init` escribe un archivo comentado del que puedes partir, y la
+referencia completa está en
 [examples/fleet.yaml](https://github.com/derlocke-ng/kiwi-server/blob/main/examples/fleet.yaml).
 
-Un host tiene un **target** (lo que se instala) y un **rol** (en lo que se
-convierte):
+Cada host tiene un **sistema de destino** (`target`), que es el sistema
+operativo que se instala, y un **rol** (`role`), que es la tarea que la máquina
+cumple después.
 
-- `target`: `coreos`, `ucore` (por defecto) o `debian`. Consulta [Máquinas](machines.md).
-- `role`: `bare` (por defecto), `master` o `node`. Consulta [Roles](roles.md).
+- `target` es `coreos`, `ucore` (el valor por defecto) o `debian`. Consulta [Máquinas](machines.md).
+- `role` es `bare` (el valor por defecto), `master` o `node`. Consulta [Roles](roles.md).
 
 ## Ejemplo { #example }
+
+Este archivo fleet describe tres máquinas. La primera es el master, la máquina a
+la que se conectan todas las demás, en un VPS con Debian (un servidor virtual
+alquilado). La segunda es un node `gateway`, que envía por la VPN el tráfico de
+una red local. La tercera es un node `cloud`, en el que funcionan Nextcloud y
+Vaultwarden.
 
 ```yaml
 defaults:
   target: ucore
   role: bare
-  domain: home                       # papaya pasa a ser papaya.home; los servicios son cloud.papaya.home …
+  domain: home                       # papaya pasa a ser papaya.home; los servicios, cloud.papaya.home …
   timezone: Europe/Berlin
   disk: /dev/sda                     # la ISO lo BORRA sin preguntar
   admin:
@@ -42,7 +55,7 @@ hosts:
         wireguard_addresses: 10.66.1.2/32
         server_countries: Germany
       vpn-server:
-        wg_host: vpn.example.org     # a lo que se conectan clientes y nodes
+        wg_host: vpn.example.org     # la dirección a la que se conectan los clientes y los nodes
 
   lychee:                                # un node gateway
     role: node
@@ -51,7 +64,7 @@ hosts:
       pub_iface: eth0                # el lado de la LAN
       downloader: { download_dir: /mnt/data/downloads }
 
-  papaya:                               # un node cloud en uCore HCI
+  papaya:                               # un node cloud con uCore HCI
     role: node
     ucore: { image: ghcr.io/ublue-os/ucore-hci:stable }
     node:
@@ -61,83 +74,108 @@ hosts:
       vault: { signups_allowed: true }   # para la primera cuenta; desactívalo después
 ```
 
-No contiene contraseñas de servicios. Cada contraseña que omites se genera a
-partir de `secrets/seed`, y `kiwi-server secrets show fleet.yaml papaya` las
-imprime. Tampoco se nombran las configuraciones WireGuard de los nodes:
-`kiwi-server enroll` escribe `secrets/<hostname>.conf`, que cada node encuentra
-por sí solo, y de ahí se lee la dirección de malla del node.
+El ejemplo no contiene ninguna contraseña de servicio. kiwi-server genera todas
+las contraseñas que no pongas a partir del seed que hay en `secrets/seed`, y
+`kiwi-server secrets show fleet.yaml papaya` muestra las contraseñas de ese
+host.
+
+Tampoco aparecen en el ejemplo los archivos de configuración de WireGuard de los
+nodes. `kiwi-server enroll` guarda la configuración de un node en
+`secrets/<hostname>.conf`, y el cliente de VPN del node la encuentra ahí sin que
+haga falta ninguna entrada en el archivo fleet. De ese mismo archivo se lee la
+dirección del node en la mesh. La mesh es la red WireGuard privada que comparten
+todas tus máquinas, y la dirección en la mesh es la que tiene cada máquina
+dentro de ella.
 
 ## Valores por defecto { #defaults }
 
-| Clave | Por defecto |
+Si ni tu bloque `defaults` ni un host definen una clave, kiwi-server usa el
+valor incorporado que aparece en esta tabla.
+
+| Clave | Valor por defecto |
 |---|---|
 | `target` / `role` / `domain` | `ucore` / `bare` / `home` |
 | `timezone` / `locale` / `keyboard` | `UTC` / `en_US.UTF-8` / `us` |
-| `disk` | ninguno; obligatorio para `build`, debe empezar por `/dev/` |
-| `admin` | `user: core`, `ssh_keys: []`, `ssh_password_auth: false`; da un `password_hash` para la consola |
-| `network` | `dhcp: true`; estática con `address` (CIDR), `gateway`, `dns`, o un `iprange` que reparte direcciones en el orden del archivo |
+| `disk` | Sin valor por defecto. `build` lo necesita, y tiene que empezar por `/dev/` |
+| `admin` | `user: core`, `ssh_keys: []`, `ssh_password_auth: false`. Define un `password_hash` si quieres poder entrar desde la consola |
+| `network` | `dhcp: true`. Para una dirección estática, define `address` (en notación CIDR), `gateway` y `dns`. O bien define un `iprange`, del que los hosts reciben sus direcciones en el orden en que aparecen en el archivo |
 | `updates` | `enabled: true`, `days: [Sun]`, `time: "03:30"`, `length_minutes: 90` |
 | `install` | `on_done: poweroff` (o `reboot`) |
 | `tls` | `auto: true`, `ca_dir: secrets/ca`, `name_constraints: []` |
 | `debian` | `release: trixie`, `partitioning: lvm` (`regular`, `lvm`, `crypto`), `encrypt: false` |
 | `ucore` | `image: ghcr.io/ublue-os/ucore:stable` |
-| `unlock` | anillos Tang a los que vincular el disco (consulta [Operaciones](operations.md#encrypted-disks-and-unlocking)) |
-| `backup` | a dónde se copia el directorio de la fleet (`hosts: []`, `keep: 10`) |
-| `vps` | `server:` un id, nombre o apodo de servidor de netcup |
+| `unlock` | Los anillos Tang a los que está vinculado el disco. Un anillo es un servidor Tang, que permite a una máquina cifrada desbloquear su disco al arrancar (consulta [Administración](operations.md#encrypted-disks-and-unlocking)) |
+| `backup` | Los hosts en los que se guarda la copia de seguridad del directorio de la fleet, y cuántas copias se conservan (`hosts: []`, `keep: 10`) |
+| `vps` | `server:` el id, el nombre o el apodo de un servidor de netcup |
 
 ## Cómo se combinan los ajustes { #how-settings-combine }
 
-- Los hosts sustituyen a los valores por defecto **clave por clave**. Las listas
-  `admin.ssh_keys`, `debian.packages`, `debian.kernel_arguments` y las listas
-  `coreos.*`, en cambio, se *suman* a los valores por defecto.
-- Un rol de módulos guarda sus ajustes en un bloque con el nombre del rol
-  (`master:`, `node:`): primero los **ajustes del stack**, luego **un bloque por
-  módulo**.
-- `modules:` en ese bloque **sustituye** la lista de módulos del preset. Los
-  módulos obligatorios se añaden solos.
-- Los **ajustes de archivo** (certificados, configuraciones) son rutas relativas
-  al archivo fleet. Su contenido se incrusta en el script de rol del host.
-- Un ajuste dado sin valor significa el valor por defecto. Una clave mal escrita
-  es un error con una sugerencia.
+- Un host sustituye los valores por defecto **clave por clave**, así que solo
+  tiene que nombrar las claves que cambian. Las listas `admin.ssh_keys`,
+  `debian.packages`, `debian.kernel_arguments` y las listas `coreos.*` son la
+  excepción: las entradas que pone un host en ellas se *añaden* a las de
+  `defaults` en lugar de sustituirlas.
+- Los roles que se construyen con módulos, `master` y `node`, guardan sus
+  ajustes en un bloque con el nombre del rol (`master:` o `node:`). En ese
+  bloque van primero los **ajustes del stack** y después **un bloque por
+  módulo**. El stack es el conjunto de contenedores que una máquina ejecuta para
+  sus módulos, y los ajustes del stack se aplican a todos ellos.
+- Una lista `modules:` dentro de ese bloque **sustituye** la lista de módulos
+  del preset. Un preset es una lista de módulos ya preparada. Los módulos que
+  necesitan los de la lista se añaden automáticamente.
+- Los **ajustes de archivo**, como los certificados y los archivos de
+  configuración, se indican como rutas relativas al archivo fleet. kiwi-server
+  copia el contenido de esos archivos en el script de rol del host, que es el
+  script que prepara la máquina para su rol.
+- Un ajuste que escribas sin valor recibe su valor por defecto. Si te equivocas
+  al escribir una clave, kiwi-server da un error y te sugiere la clave que
+  probablemente querías poner.
 
 ## Ajustes del stack { #stack-settings }
 
-| Ajuste | Por defecto | Notas |
+Los ajustes del stack se aplican a todo el stack de una máquina. Se escriben
+directamente en el bloque del rol.
+
+| Ajuste | Valor por defecto | Notas |
 |---|---|---|
 | `preset` (node) | `gateway` | `gateway`, `cloud` o `minimal` |
-| `runtime` | `podman` | quadlets de podman; `docker` ejecuta docker compose |
-| `auto_update` | `registry` | `podman auto-update` semanal; `off`: las imágenes cambian con un apply |
-| `docker_dir` | `/home/user/docker` | el stack y sus datos |
-| `service_user` | el usuario administrador | es dueño de los directorios de datos |
-| `vpn_ip` | de la configuración WireGuard | la dirección de malla de la máquina |
-| `master_ip` | de la fleet | la dirección de malla del master |
+| `runtime` | `podman` | Con `podman`, los contenedores funcionan como quadlets de podman, que son unidades de systemd para contenedores. Con `docker` se usa docker compose |
+| `auto_update` | `registry` | `registry` ejecuta `podman auto-update` una vez por semana. Con `off`, las imágenes de los contenedores solo cambian cuando vuelves a aplicar el host |
+| `docker_dir` | `/home/user/docker` | el directorio que contiene el stack y sus datos |
+| `service_user` | el usuario administrador | el usuario propietario de los directorios de datos |
+| `vpn_ip` | de la configuración de WireGuard | la dirección de la máquina en la mesh |
+| `master_ip` | de la fleet | la dirección del master en la mesh |
 | `mesh_subnet` | `10.8.0.0/16` | |
-| `wg_mtu` / `bridge_mtu` | `1376` / `1500` | mídela con `kiwi-server mtu` |
-| `docker_subnet` | `172.64.0.0/24` master, `172.128.0.0/24` node | |
-| `pub_iface` | de la ruta por defecto | la interfaz de la LAN |
-| `daily_vpn_restart` | `07:00` | vacío: nunca |
-| `weekly_update` | `Sun *-*-* 00:00` | vacío: nunca |
+| `wg_mtu` / `bridge_mtu` | `1376` / `1500` | puedes medirlas con `kiwi-server mtu` |
+| `docker_subnet` | `172.64.0.0/24` en el master, `172.128.0.0/24` en un node | |
+| `pub_iface` | según la ruta por defecto | la interfaz de red del lado de la LAN |
+| `daily_vpn_restart` | `07:00` | con un valor vacío se desactiva el reinicio diario |
+| `weekly_update` | `Sun *-*-* 00:00` | con un valor vacío se desactiva la actualización semanal |
 
-`kiwi-server roles -v` y `kiwi-server modules -v` enumeran cada ajuste con su
-valor por defecto.
+`kiwi-server roles -v` y `kiwi-server modules -v` enumeran todos los ajustes con
+su valor por defecto.
 
-## Comprobar lo que escribiste { #checking-what-you-wrote }
+## Comprobar lo que has escrito { #checking-what-you-wrote }
+
+kiwi-server puede revisar el archivo fleet por ti y mostrarte cómo interpreta
+un host.
 
 ```bash
-kiwi-server validate fleet.yaml          # errores y advertencias
-kiwi-server show fleet.yaml papaya          # one host's effective config, secrets masked
+kiwi-server validate fleet.yaml          # errores y avisos
+kiwi-server show fleet.yaml papaya          # la configuración efectiva de un host, con los secretos ocultos
 ```
 
-kiwi-server también comprueba el dominio: `.local` se rechaza, y `.lan` y los
-dominios de nivel superior públicos reciben una advertencia (consulta
+kiwi-server también comprueba el dominio. Rechaza `.local` y avisa si usas
+`.lan` o un dominio de nivel superior público (consulta
 [DNS](../network/dns.md#names-servicehostnamehome)).
 
-## Tomar el control de una máquina v1 { #taking-over-a-v1-machine }
+## Incorporar una máquina v1 { #taking-over-a-v1-machine }
 
-Una máquina que ejecutaba uno de los antiguos stacks v1 se puede tomar sin perder
-datos. El runtime por defecto ahora es podman, y el script de rol no detiene los
-contenedores de docker. Así que o bien fijas `runtime: docker`, o bien detienes
-antes el stack antiguo. Después fija `docker_subnet` a lo que usaba el stack
-antiguo y renombra los directorios de datos con los nombres de los módulos
-(`kmvpn-server` → `km-vpn-server`, `knvault` → `kn-vault`, …). Los contenedores
-conservan sus direcciones y wg-easy conserva sus peers.
+Una máquina que funcionaba con uno de los antiguos stacks v1 puede pasar a la
+fleet sin perder sus datos. El entorno de ejecución por defecto es ahora podman,
+y el script de rol no detiene los contenedores de docker que sigan en marcha.
+Así que pon `runtime: docker` o detén primero el stack antiguo. Después, pon en
+`docker_subnet` la subred que usaba el stack antiguo y cambia el nombre de los
+directorios de datos por los nuevos nombres de módulo (`kmvpn-server` →
+`km-vpn-server`, `knvault` → `kn-vault`, …). Así, los contenedores conservan sus
+direcciones y wg-easy conserva sus peers.

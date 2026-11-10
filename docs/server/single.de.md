@@ -1,8 +1,8 @@
 # Eine Maschine ohne Fleet
 
-kiwi-server verwaltet eine ganze Reihe von Maschinen. Wenn du nur auf einer
-einzelnen Maschine einen Stack betreiben willst, brauchst du es nicht. Ein Stack
-sind alle Container und Dienste, die eine Maschine betreibt. kiwi-server besteht
+kiwi-server verwaltet viele Maschinen gemeinsam. Wenn du nur auf einer einzelnen
+Maschine einen Stack betreiben willst, brauchst du es nicht. Ein Stack umfasst
+alle Container und Dienste, die auf einer Maschine laufen. kiwi-server besteht
 aus zwei kleineren Werkzeugen, und die kannst du auch für sich allein verwenden:
 
 | Repository | Was es ist |
@@ -14,9 +14,10 @@ Die beiden Werkzeuge sind das Richtige, wenn du einen Stack auf einer Maschine
 willst, aber den Rest von kiwi-server nicht brauchst. Beispiele sind ein Node,
 den du von Hand einrichtest, ein Modul, das du gerade entwickelst, oder eine
 Maschine, die ihren Stack selbst erzeugt. kiwi-server enthält eine Kopie beider
-Werkzeuge, jeweils auf ein Release-Tag festgelegt. Eine Maschine sieht am Ende
-gleich aus, egal ob du sie mit kiwi-server oder mit den beiden Werkzeugen
-einrichtest, und beide Wege leiten aus demselben Seed dieselben Secrets ab.
+Werkzeuge, jeweils auf ein Release-Tag festgelegt. Am Ende ist eine Maschine
+genau gleich eingerichtet, egal ob du sie mit kiwi-server oder mit den beiden
+Werkzeugen einrichtest, und beide Wege leiten aus demselben Seed dieselben
+Secrets ab.
 
 ```
 machine.yaml ──kiwi-modules render──▶ bundle/ ──copy──▶ sudo kiwi-stack apply bundle/
@@ -99,4 +100,4 @@ bekommst du zurück, indem du ein älteres Bundle anwendest.
 
 Einige Namen auf der Maschine lauten noch `kiwi-server`, zum Beispiel
 `/etc/kiwi-server/stack.env` und `/var/lib/kiwi-server/`. Das ist Absicht, denn
-über diese Namen sind die beiden Werkzeuge miteinander verbunden.
+diese Namen sind die vereinbarte Schnittstelle zwischen den beiden.
