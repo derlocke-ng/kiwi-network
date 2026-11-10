@@ -82,4 +82,5 @@ dados regressam com `kiwi-stack restore` a partir do módulo backup, e uma
 configuração mais antiga aplicando um pacote mais antigo.
 
 Na máquina, os nomes continuam a dizer `kiwi-server` (`/etc/kiwi-server/stack.env`,
-`/var/lib/kiwi-server/`), por desenho: são o contrato entre os dois.
+`/var/lib/kiwi-server/`), de propósito: as ferramentas
+Kiwi dependem destes nomes, por isso não são alterados.

@@ -99,5 +99,5 @@ anzuwenden ändert nichts. Einen Rollback gibt es nicht. Daten holst du mit
 bekommst du zurück, indem du ein älteres Bundle anwendest.
 
 Einige Namen auf der Maschine lauten noch `kiwi-server`, zum Beispiel
-`/etc/kiwi-server/stack.env` und `/var/lib/kiwi-server/`. Das ist Absicht, denn
-diese Namen sind die vereinbarte Schnittstelle zwischen den beiden.
+`/etc/kiwi-server/stack.env` und `/var/lib/kiwi-server/`. Das ist Absicht: Die
+Kiwi-Werkzeuge verlassen sich auf diese Namen, deshalb werden sie nicht umbenannt.

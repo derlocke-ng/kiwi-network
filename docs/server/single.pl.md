@@ -82,4 +82,5 @@ wycofywania zmian. Dane wracają przez `kiwi-stack restore` z modułu backup, a
 starsza konfiguracja przez zastosowanie starszej paczki.
 
 Na maszynie nazwy nadal mówią `kiwi-server` (`/etc/kiwi-server/stack.env`,
-`/var/lib/kiwi-server/`), celowo: to kontrakt między tymi dwoma narzędziami.
+`/var/lib/kiwi-server/`), celowo: narzędzia Kiwi
+opierają się na tych nazwach, więc nie są one zmieniane.

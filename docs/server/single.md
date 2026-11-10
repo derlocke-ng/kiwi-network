@@ -94,5 +94,5 @@ nothing. There is no rollback. To get data back, use `kiwi-stack restore` from
 the backup module. To get an older configuration back, apply an older bundle.
 
 Some names on the machine still say `kiwi-server`, for example
-`/etc/kiwi-server/stack.env` and `/var/lib/kiwi-server/`. This is by design,
-because these names are the contract between the two.
+`/etc/kiwi-server/stack.env` and `/var/lib/kiwi-server/`. This is deliberate:
+the Kiwi tools rely on these names, so they are not renamed.

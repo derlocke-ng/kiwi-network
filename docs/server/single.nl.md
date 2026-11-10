@@ -81,4 +81,4 @@ oudere configuratie door een oudere bundel toe te passen.
 
 Op de machine zeggen de namen nog steeds `kiwi-server`
 (`/etc/kiwi-server/stack.env`, `/var/lib/kiwi-server/`), en dat is zo bedoeld:
-ze zijn het contract tussen de twee.
+de Kiwi-tools rekenen op deze namen, dus ze worden niet hernoemd.

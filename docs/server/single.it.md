@@ -97,5 +97,5 @@ backup. Per tornare a una configurazione precedente, applica un bundle più
 vecchio.
 
 Alcuni nomi sulla macchina contengono ancora `kiwi-server`, per esempio
-`/etc/kiwi-server/stack.env` e `/var/lib/kiwi-server/`. È voluto: questi nomi
-sono il punto d’incontro concordato tra i due strumenti.
+`/etc/kiwi-server/stack.env` e `/var/lib/kiwi-server/`. È voluto: gli
+strumenti Kiwi si basano su questi nomi, quindi non vengono rinominati.

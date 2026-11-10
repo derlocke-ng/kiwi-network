@@ -99,5 +99,5 @@ backup. Pour revenir à une configuration plus ancienne, appliquez un paquet
 plus ancien.
 
 Certains noms sur la machine contiennent encore `kiwi-server`, par exemple
-`/etc/kiwi-server/stack.env` et `/var/lib/kiwi-server/`. C’est voulu, car ces
-noms constituent le contrat entre les deux.
+`/etc/kiwi-server/stack.env` et `/var/lib/kiwi-server/`. C’est voulu : les
+outils Kiwi s’appuient sur ces noms, c’est pourquoi ils ne sont pas renommés.
