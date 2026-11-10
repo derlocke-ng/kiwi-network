@@ -1,9 +1,9 @@
 # The desktop
 
-The desktop part of Kiwi Network is a Linux workstation that is set up
-automatically and gets its apps from git catalogs. A catalog is a git
-repository that lists apps. You need this part if you want to use the Kiwi apps
-on your own computer, and it saves you from setting that computer up by hand.
+The desktop part of Kiwi Network is the computer you work on: a Linux
+workstation that is set up automatically and gets its apps from git catalogs.
+A catalog is a git repository that lists apps. You do not have to set the
+machine up by hand, and you can set up the next one the same way.
 
 The Kiwi desktop tools are built for **Fedora Atomic desktops**: Fedora
 Silverblue and [Bluefin](https://projectbluefin.io/), and Bluefin-DX in
