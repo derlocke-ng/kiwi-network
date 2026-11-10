@@ -34,7 +34,7 @@ Projekt dzieli oprogramowanie na pięć warstw.
    graficznego (headless). *Zrealizowane.*
 4. **Moduł sterujący** to rdzeń zapakowany w kontener, z API i interfejsem
    WWW. Działa na nodzie jak każdy inny moduł.
-5. **Programy klienckie** to programy, za pomocą których pracujesz z modułem sterującym.
+5. **Programy klienckie** to te, za pomocą których pracujesz z modułem sterującym.
    Najpierw powstanie interfejs WWW. Aplikacja GTK zostaje i komunikuje się
    albo z lokalnym CLI, albo przez sieć mesh, czyli prywatną sieć WireGuard,
    z kontrolerem (działającym modułem sterującym). CLI też zostaje. Cała

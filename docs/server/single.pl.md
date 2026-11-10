@@ -1,18 +1,22 @@
-# Jedna maszyna, bez floty
+# Jedna maszyna bez pliku fleet
 
-kiwi-server jest zbudowany z dwóch mniejszych narzędzi, których możesz używać
-osobno:
+kiwi-server zarządza całą siecią maszyn. Jeśli chcesz uruchomić stack tylko na
+jednej maszynie, nie jest ci potrzebny. Stack to wszystkie kontenery i usługi,
+które uruchamia maszyna. kiwi-server składa się z dwóch mniejszych narzędzi
+i możesz używać ich osobno:
 
 | Repozytorium | Co to jest |
 |---|---|
-| [**kiwi-modules**](https://github.com/derlocke-ng/kiwi-modules) | Moduły i ich renderer: **na wejściu jeden plik maszyny, na wyjściu paczka stacka**. v0.23.0, GPL-3.0-or-later |
-| [**kiwi-stack**](https://github.com/derlocke-ng/kiwi-stack) | Strona maszyny: polecenie `kiwi-stack` i biblioteka, które umieszczają paczkę na CoreOS, uCore lub Debianie i utrzymują ją w działaniu. v0.5.0, GPL-3.0-or-later |
+| [**kiwi-modules**](https://github.com/derlocke-ng/kiwi-modules) | Moduły i program, który generuje z nich konfigurację. Czyta **jeden plik maszyny i zapisuje paczkę stacku**, czyli katalog z wygenerowaną konfiguracją stacku tej maszyny. v0.23.0, GPL-3.0-or-later |
+| [**kiwi-stack**](https://github.com/derlocke-ng/kiwi-stack) | Część działająca na maszynie. Składa się z polecenia `kiwi-stack` i biblioteki, które umieszczają paczkę na maszynie z CoreOS, uCore albo Debianem i pilnują, żeby działała. v0.5.0, GPL-3.0-or-later |
 
-Używaj ich, gdy chcesz mieć stack na jednej maszynie bez reszty: node
-konfigurowany ręcznie, moduł, który rozwijasz, albo maszynę, która renderuje
-własny stack. kiwi-server dołącza oba do repozytorium (vendored), przypięte
-tagiem. Maszyna skonfigurowana dowolną z tych dróg wychodzi identyczna, a oba
-wyprowadzają te same sekrety z tego samego seeda.
+Te dwa narzędzia przydają się, gdy chcesz mieć stack na jednej maszynie bez
+reszty kiwi-server. Może to być node konfigurowany ręcznie, moduł, który
+właśnie rozwijasz, albo maszyna, która sama generuje swój stack. kiwi-server
+zawiera kopie obu narzędzi, każde przypięte do tagu wydania. Maszyna wygląda
+dokładnie tak samo niezależnie od tego, czy skonfigurujesz ją narzędziem
+kiwi-server, czy tymi dwoma narzędziami, a w obu przypadkach z tego samego
+seeda powstają te same sekrety.
 
 ```
 machine.yaml ──kiwi-modules render──▶ bundle/ ──copy──▶ sudo kiwi-stack apply bundle/
@@ -21,20 +25,26 @@ machine.yaml ──kiwi-modules render──▶ bundle/ ──copy──▶ sudo
                                       quadlets/  configs  → kiwi-stack.target, verify
 ```
 
-## Wyrenderuj maszynę { #render-a-machine }
+## Generowanie konfiguracji maszyny { #render-a-machine }
+
+Poniższe polecenia instalują kiwi-modules, tworzą seed i generują z
+przykładowego pliku maszyny paczkę stacku. Ostatnia linia kopiuje paczkę na
+maszynę i tam ją stosuje.
 
 ```bash
 git clone https://github.com/derlocke-ng/kiwi-modules && cd kiwi-modules
 ./install.sh install                       # ~/.local/bin/kiwi-modules
 mkdir -p sh3/secrets && head -c 32 /dev/urandom > sh3/secrets/seed
-cp examples/sh3.yaml sh3/                  # edytuj: pliki TLS, konfiguracja WireGuard
+cp examples/sh3.yaml sh3/                  # do edycji: pliki TLS, konfiguracja WireGuard
 kiwi-modules render sh3/sh3.yaml -o sh3/sh3.bundle
 scp -r sh3/sh3.bundle sh3:/tmp/ && ssh sh3 sudo kiwi-stack apply /tmp/sh3.bundle
 ```
 
-Potrzebuje Pythona 3 z PyYAML i Jinja2. `kiwi-modules modules -v` wypisuje
-każdy moduł i ustawienie, a `kiwi-modules profiles` wypisuje role i ich
+kiwi-modules wymaga Pythona 3 z PyYAML i Jinja2. `kiwi-modules modules -v`
+wypisuje wszystkie moduły i ustawienia, a `kiwi-modules profiles` role i ich
 presety.
+
+Plik maszyny opisuje jedną maszynę, tak jak w tym przykładzie:
 
 ```yaml
 # node cloud
@@ -50,19 +60,22 @@ node:
   reverse-proxy:
     tls_fullchain: secrets/sh3-fullchain.pem
     tls_privkey: secrets/sh3-privkey.pem
-dns_records:                    # the network's names
+dns_records:                    # nazwy w sieci
   - [10.8.0.1, gate.home]
   - [10.8.0.25, cloud.sh3.home]
 master_ip: 10.8.0.1
-ca_cert: ca.pem                 # zaufany wewnątrz kontenerów i na hoście
-seed: secrets/seed              # z niego wyprowadzane są wygenerowane hasła
+ca_cert: ca.pem                 # zaufany w kontenerach i na hoście
+seed: secrets/seed              # z niego powstają generowane hasła
 ```
 
-kiwi-modules nie ma własnego urzędu certyfikacji, więc samodzielny render
-potrzebuje plików certyfikatu i klucza TLS. Konfiguracja WireGuard jest
-szukana w `secrets/<hostname>.conf`, gdy plik maszyny żadnej nie wskazuje.
+kiwi-modules nie ma własnego urzędu certyfikacji. Jeśli generujesz
+konfigurację maszyny bez kiwi-server, pliki certyfikatu i klucza TLS musisz
+więc dostarczyć samodzielnie. Jeśli plik maszyny nie wskazuje konfiguracji WireGuard,
+kiwi-modules szuka jej w `secrets/<hostname>.conf`.
 
-## Umieść to na maszynie { #put-it-on-the-machine }
+## Instalacja na maszynie { #put-it-on-the-machine }
+
+Na maszynie zainstaluj kiwi-stack i zastosuj paczkę:
 
 ```bash
 git clone https://github.com/derlocke-ng/kiwi-stack && cd kiwi-stack
@@ -71,15 +84,16 @@ sudo kiwi-stack apply /tmp/sh3.bundle
 kiwi-stack status
 ```
 
-Potrzebuje basha i systemd, plus podmana 4.4+ z catatonit (albo dockera z
-wtyczką compose), zależnie od `runtime` paczki. Na Debianie sam instaluje
-podmana.
+kiwi-stack wymaga basha i systemd. Potrzebuje też środowiska kontenerów, które
+wskazuje `runtime` w paczce: albo podmana 4.4+ z catatonit, albo dockera
+z wtyczką compose. Na Debianie kiwi-stack sam instaluje podmana.
 
-`apply` robi to, co rola kiwi-server robi ze stackiem (zobacz
-[Maszyny](machines.md#apply)), poza ustawieniem nazwy hosta i strefy czasowej.
-Jest powtarzalne: ta sama paczka ponownie niczego nie zmienia. Nie ma
-wycofywania zmian. Dane wracają przez `kiwi-stack restore` z modułu backup, a
-starsza konfiguracja przez zastosowanie starszej paczki.
+`apply` robi ze stackiem to samo co rola kiwi-server (zobacz
+[Maszyny](machines.md#apply)), tylko nie ustawia nazwy hosta ani strefy
+czasowej. Można je powtarzać: ponowne zastosowanie tej samej paczki niczego
+nie zmienia. Nie ma wycofywania zmian. Dane przywrócisz poleceniem
+`kiwi-stack restore` z modułu backup, a starszą konfigurację, stosując starszą
+paczkę.
 
 Na maszynie nazwy nadal mówią `kiwi-server` (`/etc/kiwi-server/stack.env`,
 `/var/lib/kiwi-server/`), celowo: narzędzia Kiwi
