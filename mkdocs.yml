@@ -80,7 +80,7 @@ plugins:
           Modules: Module
           Machines: Maschinen
           Operations: Betrieb
-          Where it is going: Wohin es geht
+          Roadmap: Wohin es geht
           One machine without a fleet: Eine Maschine ohne Fleet
           Hubs, not platforms: Hubs statt Plattformen
           The framework's apps: Die Apps des Frameworks
@@ -106,7 +106,7 @@ plugins:
           The fleet file: Le fichier fleet
           Roles: Rôles
           Operations: Exploitation
-          Where it is going: Où cela va
+          Roadmap: Où cela va
           One machine without a fleet: Une machine sans fleet
           Hubs, not platforms: Des hubs, pas des plateformes
           The framework's apps: Les apps du framework
@@ -133,7 +133,7 @@ plugins:
           Modules: Módulos
           Machines: Máquinas
           Operations: Operaciones
-          Where it is going: Hacia dónde va
+          Roadmap: Hacia dónde va
           One machine without a fleet: Una máquina sin fleet
           Hubs, not platforms: Hubs, no plataformas
           The framework's apps: Las apps del framework
@@ -161,7 +161,7 @@ plugins:
           Modules: Moduli
           Machines: Macchine
           Operations: Operazioni
-          Where it is going: Dove sta andando
+          Roadmap: Dove sta andando
           One machine without a fleet: Una macchina senza fleet
           Hubs: Hub
           Hubs, not platforms: Hub, non piattaforme
@@ -187,7 +187,7 @@ plugins:
           The fleet file: Het fleet-bestand
           Roles: Rollen
           Operations: Beheer
-          Where it is going: Waar het heen gaat
+          Roadmap: Waar het heen gaat
           One machine without a fleet: Eén machine zonder fleet
           Hubs, not platforms: Hubs, geen platforms
           The framework's apps: De apps van het framework
@@ -214,7 +214,7 @@ plugins:
           Modules: Moduły
           Machines: Maszyny
           Operations: Eksploatacja
-          Where it is going: Dokąd to zmierza
+          Roadmap: Dokąd to zmierza
           One machine without a fleet: Jedna maszyna bez floty
           Hubs: Huby
           Hubs, not platforms: Huby, nie platformy
@@ -243,7 +243,7 @@ plugins:
           Modules: Módulos
           Machines: Máquinas
           Operations: Operações
-          Where it is going: Para onde vai
+          Roadmap: Para onde vai
           One machine without a fleet: Uma máquina sem fleet
           Hubs, not platforms: Hubs, não plataformas
           The framework's apps: As apps do framework
@@ -284,7 +284,7 @@ nav:
           - Modules: server/modules.md
           - Machines: server/machines.md
           - Operations: server/operations.md
-          - Where it is going: server/roadmap.md
+          - Roadmap: server/roadmap.md
       - One machine without a fleet: server/single.md
   - Hubs:
       - Hubs, not platforms: people/index.md
