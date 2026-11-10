@@ -31,6 +31,8 @@
   --kiwi-surface: #ffffff;
   --kiwi-border: #e1ddec;
   --kiwi-soft: rgba(111, 87, 171, .08);
+  --kiwi-button: #5b4590;
+  --kiwi-button-hover: #37275b;
 }
 
 /* ---------- dark ---------- */
@@ -57,6 +59,8 @@
   --kiwi-surface: #1c1926;
   --kiwi-border: #312c41;
   --kiwi-soft: rgba(196, 171, 255, .08);
+  --kiwi-button: #6f57ab;
+  --kiwi-button-hover: #5b4590;
 }
 
 /* ---------- header, tabs, search ---------- */
@@ -73,6 +77,9 @@
 .md-search__input::placeholder { color: var(--md-default-fg-color--light); }
 .md-search__icon { color: var(--md-default-fg-color--light); }
 .md-source { color: var(--md-default-fg-color--light); }
+.md-select:hover .md-select__inner, .md-select:focus-within .md-select__inner { max-height: 20rem; }
+.md-select__list { max-height: 20rem; }
+.md-select__link:hover, .md-select__link:focus { color: var(--md-typeset-a-color); }
 
 /* ---------- navigation ---------- */
 .md-nav__title { font-weight: 700; }
@@ -119,6 +126,12 @@
 .md-typeset .kiwi-hero h1 { font-size: 2.3em; margin: .2rem 0 .6rem; }
 .kiwi-hero .kiwi-lede { max-width: 34em; margin: 0 auto 1.2rem; color: var(--md-default-fg-color--light); font-size: 1.05em; }
 .kiwi-hero .md-button { margin: .2rem .3rem; border-radius: 10px; }
+
+/* buttons: Material paints them with the primary (header) colour, which is light here */
+.md-typeset .md-button { color: var(--md-typeset-a-color); border-color: var(--kiwi-border); background: var(--kiwi-surface); }
+.md-typeset .md-button:hover, .md-typeset .md-button:focus { color: var(--md-typeset-a-color); border-color: var(--md-accent-fg-color); background: var(--kiwi-soft); }
+.md-typeset .md-button--primary { color: #fff; background: var(--kiwi-button); border-color: var(--kiwi-button); }
+.md-typeset .md-button--primary:hover, .md-typeset .md-button--primary:focus { color: #fff; background: var(--kiwi-button-hover); border-color: var(--kiwi-button-hover); }
 
 .kiwi-cards { display: grid; gap: .8rem; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); margin: 1.4rem 0; }
 .md-typeset .kiwi-cards > a {
