@@ -169,8 +169,8 @@ verkeer echt door de tunnel gaat, bewijs je met `wg show <iface> transfer` of
   binnen enkele seconden opnieuw, maar gedurende die seconden ontbreken ze, en
   er is geen reden om dat te veroorzaken.
 - Een VPN waarvan de server als **hostnaam** is opgegeven, kan geen nieuwe
-  verbinding maken zolang de killswitch op scherp staat, tenzij DNS op *een
-  resolver die ik kies* staat. NetworkManager en OpenVPN zoeken de naam namelijk
+  verbinding maken zolang de killswitch op scherp staat, tenzij DNS op *a
+  resolver I choose* (een zelfgekozen resolver) staat. NetworkManager en OpenVPN zoeken de naam namelijk
   op via de resolver van het systeem, en die is geblokkeerd zolang er geen
   tunnel actief is. Verbindingen waarvan de server als IP-adres is opgegeven,
   hebben hier geen last van.
