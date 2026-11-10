@@ -57,8 +57,8 @@ sorbet:
 ## `node` { #node }
 
 É o preset que define que módulos corre um node. Se escreveres a tua própria
-lista `modules:`, ela substitui a do preset, e os módulos de que os módulos
-indicados dependem são acrescentados automaticamente. Os contentores de um node
+lista `modules:`, ela substitui a do preset. Se os módulos indicados precisarem
+de outros, estes são acrescentados automaticamente. Os contentores de um node
 chamam-se `kn-…` e estão ligados à rede `knet-node` (`172.128.0.0/24`).
 
 ```yaml
@@ -71,8 +71,8 @@ papaya:
 ```
 
 O preset gateway disponibiliza também a página web do próprio Pi-hole em
-`127.0.0.1:8080`, no node (`expose_web_ui: true`). Com esta definição ligada ou
-não, o proxy inverso serve essa página por TLS em `pihole.<hostname>`.
+`127.0.0.1:8080`, no node (`expose_web_ui: true`). Esteja esta definição ligada
+ou não, o proxy inverso serve essa página por TLS em `pihole.<hostname>`.
 
 ## Escrever uma função { #writing-a-role }
 
@@ -100,4 +100,4 @@ Uma função sem módulos faz ela própria o trabalho em `ks_role_apply()`. Pode
 usar a biblioteca em `roles/common/lib.sh`, que vem do kiwi-stack. As
 definições que o `role.yaml` declara chegam ao script como variáveis com o nome
 `KS_ROLE_<KEY>`. O script corre como root, com `set -euo pipefail`. Os testes
-do projeto geram todas as funções da árvore e passam-lhes o shellcheck.
+do projeto geram todas as funções da árvore e verificam-nas com o shellcheck.

@@ -9,7 +9,8 @@ Aplikacja to repozytorium git z plikiem `kiwi.manifest` i skryptem
 najnowszy tag wydania i uruchamia jej instalator. Potem aktualizuje aplikację
 w tle i w ten sam sposób aktualizuje też samego siebie.
 
-Nie potrzebujesz konta, nie ma tu sklepu z aplikacjami ani żadnego dostawcy.
+Nie potrzebujesz konta, nie ma tu sklepu z aplikacjami ani producenta, od
+którego zależysz.
 Katalog to repozytorium, które możesz przeczytać, sforkować i do którego
 możesz wysłać pull request.
 
@@ -31,7 +32,7 @@ możesz wysłać pull request.
 kiwi działa w dwóch zakresach. Zakres użytkownika obejmuje wszystko w twoim
 folderze domowym i nigdy nie wymaga roota. Zakres systemowy to część należąca
 do roota, przeznaczona dla aplikacji, które potrzebują uprawnień roota. Przy
-instalacji wybierasz, ile zakresu systemowego chcesz mieć:
+instalacji decydujesz, w jakim stopniu chcesz korzystać z zakresu systemowego:
 
 ```bash
 # zalecane: zakres użytkownika plus systemowy, należący do roota; hasło podajesz raz
@@ -108,7 +109,7 @@ Niektóre aplikacje to tylko jeden program w `~/.local/bin`. Inne, np. kill
 switch dla VPN, składają się z demona działającego jako root **oraz** aplikacji
 desktopowej **oraz** rozszerzenia GNOME. Taka aplikacja ma dwie części: część
 użytkownika i część systemową, a każda z nich jest instalowana z innymi
-uprawnieniami. Powód jest prosty: **root nie może nigdy uruchomić pliku, który
+uprawnieniami. Zasada jest taka, że **root nie może nigdy uruchomić pliku, który
 użytkownik może zmienić**. Aplikacja deklaruje swoje składniki i zakresy
 w manifeście:
 
@@ -149,7 +150,7 @@ Od wersji 2.4.0 obowiązują te zasady:
   danej aplikacji (zasada trust on first use, czyli zaufanie przy pierwszym
   użyciu). Jeśli tag wydania jest podpisany przypiętym kluczem, aktualizacja
   instaluje się bez hasła. Jeśli wydanie nie jest podpisane, kiwi pyta o hasło
-  i informuje, że nie mogło zweryfikować wydania. kiwi odrzuca tag podpisany
+  i informuje, że nie udało się zweryfikować wydania. kiwi odrzuca tag podpisany
   innym kluczem, a także tag niepodpisany, jeśli wcześniejsze tagi były
   podpisane. Odrzuca je, dopóki nie uruchomisz `kiwi trust --system <app>`.
   Te zasady dotyczą zakresu systemowego.
@@ -175,15 +176,15 @@ uruchamia `kiwi update --all` sześć godzin po poprzednim przebiegu oraz
 dziesięć minut po starcie systemu, z niewielkim losowym opóźnieniem. Ten
 przebieg aktualizuje części użytkownika bezpośrednio, a części systemowe przez
 opisany wyżej program pomocniczy. Timera roota nie ma. W trybie `manual` timer
-nie aktualizuje części systemowych. Czekają one, aż sam uruchomisz
+nie aktualizuje części systemowych. Czekają one, aż samodzielnie uruchomisz
 `kiwi update`.
 
 ## Zaufanie { #trust }
 
 Gdy instalujesz aplikację, kiwi **uruchamia skrypt `install.sh`
 z repozytorium tej aplikacji**. Jeśli aplikacja deklaruje zakres systemowy,
-kiwi uruchamia ten skrypt **jako root**. Katalogi są wybierane ręcznie, ale nie
-audytowane. Oznacza to, że ktoś wybrał te aplikacje, a nie że ktoś przejrzał
+kiwi uruchamia ten skrypt **jako root**. Katalogi są starannie dobierane, ale nikt ich
+nie audytuje. Oznacza to, że ktoś wybrał te aplikacje, a nie że ktoś przejrzał
 ich kod. Dodawaj tylko katalogi, którym ufasz, tak samo jak dodajesz
 repozytorium pakietów. Zanim zdecydujesz, sprawdź, co robi aplikacja, za
 pomocą `kiwi info --installer`, `kiwi diff` i `kiwi pin`. Podpis ogranicza to,

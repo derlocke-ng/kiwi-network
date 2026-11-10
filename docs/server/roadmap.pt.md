@@ -13,9 +13,9 @@ partes desse plano já existem.
 
 Hoje, o kiwi-server é uma ferramenta de desktop. O ficheiro fleet, os segredos e
 a CA (a autoridade de certificação da rede) ficam no teu próprio computador. O
-plano é transformá-lo num **serviço** que possa correr num node. Passa então a
+plano é transformá-lo num **serviço** que possa correr num node. Assim, passa a
 ser possível criar e gerir uma rede sem um desktop Linux, a partir de um
-telemóvel e a várias pessoas. As máquinas continuam a poder ser reproduzidas a
+telemóvel, e várias pessoas podem geri-la em conjunto. As máquinas continuam a poder ser reproduzidas a
 partir do ficheiro fleet. O plano de controlo é a parte que guarda esse ficheiro
 e corre o programa que gera, a partir dele, a configuração de cada máquina.
 
@@ -25,8 +25,8 @@ O desenho divide o software em cinco camadas.
 
 1. **O kiwi-modules** contém os módulos e o contrato de geração, que define
    como se gera a configuração de uma máquina. *Implementado.*
-2. **O kiwi-stack** é a parte que corre na máquina. Começa com
-   `kiwi-stack apply`, que instala na máquina uma configuração gerada.
+2. **O kiwi-stack** é a parte que corre na máquina. O ponto de partida é
+   o `kiwi-stack apply`, que instala na máquina uma configuração gerada.
    *Implementado.*
 3. **O núcleo do kiwi-server** trata do ficheiro fleet, das máquinas, dos
    sistemas de destino, das ISOs, da CA, da adição de dispositivos e do
@@ -129,5 +129,5 @@ totalmente automática, esteja onde estiver.
 ## Também na lista { #also-on-the-list }
 
 O roteiro inclui ainda um master de reserva, o podman rootless, IPv6 de ponta a
-ponta, placas ARM, intervalos de portas e um módulo para jogos, e o restauro dos
-dados de um node no primeiro arranque.
+ponta, placas ARM, intervalos de portas e um módulo para jogos, bem como o restauro
+dos dados de um node no primeiro arranque.

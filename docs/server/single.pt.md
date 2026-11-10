@@ -3,7 +3,7 @@
 O kiwi-server gere um conjunto inteiro de máquinas. Se só quiseres correr uma
 stack numa única máquina, não precisas dele. Uma stack é o conjunto de
 contentores e serviços que uma máquina corre. O kiwi-server é feito de duas
-ferramentas mais pequenas, e podes usá-las por si só:
+ferramentas mais pequenas, e podes usá-las separadamente:
 
 | Repositório | O que é |
 |---|---|
@@ -26,8 +26,8 @@ machine.yaml ──kiwi-modules render──▶ bundle/ ──copy──▶ sudo
 
 ## Gerar a configuração de uma máquina { #render-a-machine }
 
-Os comandos abaixo instalam o kiwi-modules, criam uma seed e geram, a partir do
-ficheiro de máquina de exemplo, um pacote. A última linha copia o pacote para a
+Os comandos abaixo instalam o kiwi-modules, criam uma seed e geram um pacote a
+partir do ficheiro de máquina de exemplo. A última linha copia o pacote para a
 máquina e aplica-o lá.
 
 ```bash

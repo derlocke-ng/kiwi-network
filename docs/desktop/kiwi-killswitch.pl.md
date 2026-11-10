@@ -58,8 +58,8 @@ użytkownika tylko wysyła do niego polecenia.
   (raw sockets).
 - **Zapytania DNS nie mogą ominąć tunelu.** Wybierasz, który serwer DNS jest
   używany, gdy kill switch jest uzbrojony. Zapytania DNS możesz kierować przez
-  VPN, korzystać z serwera DNS sieci, w której jesteś, albo z serwera, który
-  wybierzesz sam. Serwer DNS samej sieci jest używany tylko w sieci zaufanego
+  VPN, korzystać z serwera DNS sieci, w której jesteś, albo z dowolnego
+  serwera według własnego wyboru. Serwer DNS samej sieci jest używany tylko w sieci zaufanego
   kiwi-node’a. Kill switch wprowadza twój wybór przez ustawienia
   systemd-resolved dla poszczególnych interfejsów. Dodatkowym zabezpieczeniem
   jest reguła nftables, która odrzuca każde inne zapytanie DNS.
@@ -77,7 +77,7 @@ użytkownika tylko wysyła do niego polecenia.
   twój ruch przez tunel. W sieci Kiwi jest to
   [node `gateway`](../server/roles.md#node). W swojej własnej sieci taka brama
   może zastąpić VPN. Kill switch rozpoznaje ją po adresie IP **i** adresie MAC.
-  Musisz to włączyć sam. Kill switch nigdy nie uznaje bramy za zaufaną na
+  Musisz to włączyć samodzielnie. Kill switch nigdy nie uznaje bramy za zaufaną na
   własną rękę.
 - **Połączyć się może tylko jeden VPN.** Dostępny jest wyłącznie serwer
   wybranego połączenia. Każdy inny tunel, który uruchomisz, nie nawiąże
@@ -171,7 +171,7 @@ udowodnić, że ruch idzie przez tunel, uruchom `wg show <iface> transfer` albo
   ma powodu do tego doprowadzać.
 - VPN, którego serwer jest podany jako **nazwa hosta**, nie może połączyć się
   ponownie, gdy kill switch jest uzbrojony, chyba że DNS jest ustawiony na
-  *serwer, który wybieram sam*. Powód: NetworkManager i OpenVPN rozwiązują tę
+  *a resolver I choose*, czyli na serwer DNS wybrany przez ciebie. Powód: NetworkManager i OpenVPN rozwiązują tę
   nazwę przez systemowy serwer DNS, a ten jest zablokowany, dopóki nie działa
   żaden tunel. Nie dotyczy to połączeń, których serwer jest podany jako adres IP.
 - **Serwer DNS wybrany przez ciebie jest dostępny poza tunelem**, gdy tunel nie

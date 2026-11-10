@@ -1,17 +1,28 @@
 # kiwi-proxy
 
-Zapieczętowane wyjścia SOCKS5 i VPN w Podmanie bez roota, dla przeglądarek,
-narzędzi testowych, aplikacji hosta i maszyn kiwi-server.
+kiwi-proxy jest dla osób, które pracują w sieciach wielu klientów i łączą się
+z każdą z nich przez osobne połączenie VPN lub SOCKS. Każde połączenie
+zapisujesz jako **exit** z własną nazwą i uruchamiasz je tylko wtedy, gdy go
+potrzebujesz. Exity są od siebie odizolowane, a program, który korzysta
+z exitu, może łączyć się z siecią wyłącznie przez niego. Dziesięciu klientów
+nie oznacza więc dziesięciu połączeń VPN działających naraz na hoście.
+Z exitu mogą korzystać przeglądarki, narzędzia do testów, programy na hoście
+i maszyny z kiwi-server. kiwi-proxy działa w rootless Podmanie, czyli
+w kontenerach uruchamianych jako twój własny użytkownik, bez uprawnień roota.
 
 - Repozytorium: [derlocke-ng/kiwi-proxy](https://github.com/derlocke-ng/kiwi-proxy), GPL-3.0-or-later
 - Najnowsze wydanie: **v0.7.3**. Jest w [katalogu Kiwi](../desktop/catalogs.md), zakres użytkownika.
-- CLI (`kiwi-proxy`), aplikacja GTK4 (**Kiwi Proxy**) i jednostki użytkownika
-  systemd. To silnik proxy, który wcześniej był częścią kiwi-fox, wydzielony,
-  żeby obsługiwał więcej niż jedną aplikację.
+- Składa się z narzędzia wiersza poleceń (`kiwi-proxy`), aplikacji GTK4
+  (**Kiwi Proxy**) i jednostek użytkownika systemd. To silnik proxy, który
+  wcześniej był częścią kiwi-fox. Został wydzielony do osobnego projektu, żeby
+  mogło z niego korzystać więcej niż jedna aplikacja.
 
-**Wyjście** (exit) to jeden upstream o nazwie: SOCKS5, który ci przekazano, albo
-taki, który tworzy [moduł dostawcy](providers.md) (Tor, tunel VPN, 9proxy,
-Mysterium). Wyjście to tylko dane. Uruchomienie go tworzy **gateway**:
+**Exit** to jedno połączenie z upstreamem, zapisane pod własną nazwą. Upstream
+to proxy, do którego wysyłany jest ruch. Jest to albo proxy SOCKS5, które ci
+przekazano, albo proxy, które [moduł dostawcy](providers.md) tworzy dla ciebie
+przez Tor, tunel VPN, 9proxy albo Mysterium. Sam exit to tylko zapisany wpis
+i nic dla niego nie działa. Gdy uruchamiasz exit, kiwi-proxy uruchamia dla
+niego kontener **gateway**:
 
 ```
 gateway container   owns the network namespace
@@ -20,43 +31,50 @@ gateway container   owns the network namespace
                     dnscrypt-proxy 127.0.0.2:53: DNS through the same exit, with blocklists
 ```
 
-Cokolwiek dołącza do przestrzeni nazw gatewaya (przeglądarka kiwi-fox,
-kontener kiwi-custodia, kontener z narzędziem), nie ma żadnej trasy poza tym
-upstreamem. Jeśli gateway padnie, jego członkowie tracą trasę.
+Gateway tworzy sieciową przestrzeń nazw (network namespace), czyli osobny stos
+sieciowy z własnymi trasami i regułami zapory. Przeglądarka z kiwi-fox, box
+z kiwi-custodia albo kontener z narzędziem dołącza do tej przestrzeni i staje
+się członkiem gatewaya. Od tej chwili jego jedyna trasa prowadzi do upstreamu
+exitu. Jeśli gateway przestanie działać, jego członkowie nie mają już żadnej
+trasy. Takie zachowanie nazywa się fail-closed: awaria przerywa połączenie
+i nigdy nie otwiera innej drogi.
 
 ## Instalacja { #install }
 
 ```bash
-kiwi install kiwi-proxy      # kiwi-fox i kiwi-custodia przynoszą go ze sobą
+kiwi install kiwi-proxy      # kiwi-fox i kiwi-custodia instalują go przy okazji
 kiwi-proxy setup             # obraz gatewaya, dane DNS, obrazy modułów dostawców
 ```
 
-Potrzebuje Podmana bez roota, Pythona 3.12+ z pydantic oraz GTK4 + libadwaita
-dla aplikacji. Hasła trafiają do pęku kluczy pulpitu (`secret-tool`) albo do
-plików 0600 na maszynie, która go nie ma.
+kiwi-proxy wymaga rootless Podmana oraz Pythona 3.12+ z pydantic. Aplikacja
+potrzebuje dodatkowo GTK4 i libadwaita. Hasła są przechowywane w pęku kluczy
+desktopu przez `secret-tool`. Na maszynie bez pęku kluczy trafiają do plików
+z uprawnieniami 0600, które może odczytać tylko twój użytkownik.
 
-## Użycie { #use }
+## Używanie { #use }
 
 ```bash
-kiwi-proxy add client-a socks5://user:pass@host:1080   # wyjście; nic jeszcze nie działa
-kiwi-proxy add tor-de --module tor --country de        # wyjście z modułu dostawcy
+kiwi-proxy add client-a socks5://user:pass@host:1080   # exit; nic jeszcze nie działa
+kiwi-proxy add tor-de --module tor --country de        # exit z modułu dostawcy
 kiwi-proxy list
-kiwi-proxy check client-a      # co świat przez nie widzi
-kiwi-proxy up client-a         # uruchom jego gateway i utrzymuj go
-kiwi-proxy down client-a       # zamknij go razem ze wszystkimi, którzy dołączyli
+kiwi-proxy check client-a      # co widzi przez niego świat
+kiwi-proxy up client-a         # uruchamia jego gateway i utrzymuje go
+kiwi-proxy down client-a       # zatrzymuje go razem ze wszystkimi, którzy z niego korzystają
 kiwi-proxy ps                  # działające gatewaye, niezależnie od tego, która aplikacja je uruchomiła
-kiwi-proxy reap                # zamknij gatewaye, których nikt nie używa
-kiwi-proxy-gui                 # "Kiwi Proxy" in the app grid
+kiwi-proxy reap                # zatrzymuje gatewaye, z których nikt nie korzysta
+kiwi-proxy-gui                 # „Kiwi Proxy” w siatce aplikacji
 ```
 
-Punkty końcowe to `socks5://user:pass@host:port`, `http://…`, `https://…` lub
-format dostawcy `host:port:user:pass`. `kiwi-proxy test ENDPOINT` sonduje
-jeden, niczego nie tworząc.
+Punkt końcowy to adres upstreamu. Możesz go zapisać jako
+`socks5://user:pass@host:port`, `http://…` albo `https://…` albo w formacie
+dostawcy `host:port:user:pass`. `kiwi-proxy test ENDPOINT` testuje punkt
+końcowy bez tworzenia exitu.
 
-### Wyjścia dla aplikacji hosta { #exits-for-host-applications }
+### Exity dla programów na hoście { #exits-for-host-applications }
 
-Każdy program na hoście może używać wyjścia przez opublikowany port SOCKS5,
-jeden port na wyjście:
+Program na hoście nie musi działać w kontenerze, żeby korzystać z exitu.
+kiwi-proxy może udostępnić exit jako port SOCKS5 na hoście, osobny port dla
+każdego exitu:
 
 ```bash
 kiwi-proxy add se socks5://10.64.0.1:1080 --expose 1081
@@ -65,45 +83,56 @@ kiwi-proxy up se && kiwi-proxy up nl
 curl --proxy socks5h://127.0.0.1:1082 https://ifconfig.co/json
 ```
 
-Port domyślnie nasłuchuje na `127.0.0.1`. Inny adres wymaga nazwy użytkownika
-(`--expose-user`) albo jawnego `--expose-open`.
-`systemctl --user enable --now kiwi-proxy@NAME` utrzymuje wyjście od
-zalogowania.
+Domyślnie port nasłuchuje tylko na `127.0.0.1`. Jeśli pozwolisz mu nasłuchiwać
+na innym adresie, musisz albo ustawić nazwę użytkownika opcją `--expose-user`,
+albo wprost zezwolić na otwarty dostęp opcją `--expose-open`. Żeby exit działał
+od chwili zalogowania, uruchom `systemctl --user enable --now kiwi-proxy@NAME`.
 
 ### DNS { #dns }
 
-- **Tryb resolvera** (domyślny): dnscrypt-proxy rozwiązuje nazwy przez DoH
-  przez wyjście (Google, Cloudflare, Quad9 lub Mullvad jako upstream), z
-  listami blokującymi (OISD) odświeżanymi codziennie.
-- **Tryb zdalny** (`--dns remote`): nazwy trafiają do samego upstreamu, dla
-  Tora i nazw `.onion`. Listy blokujące nadal obowiązują.
+- **Tryb resolvera** jest domyślny. dnscrypt-proxy rozwiązuje nazwy przez DNS
+  over HTTPS (DoH) i wysyła te zapytania przez exit. Serwerem DoH może być
+  Google, Cloudflare, Quad9 albo Mullvad. Stosowane są listy blokowania (OISD),
+  odświeżane codziennie.
+- **Tryb zdalny** (`--dns remote`) przekazuje nazwy do upstreamu, który sam je
+  rozwiązuje. Ten tryb jest przeznaczony dla Tora i nazw `.onion`. Listy
+  blokowania obowiązują także w nim.
 
 ### Zasady gatewaya { #rules-of-the-gateway }
 
-- UDP nigdzie nie wychodzi: bez QUIC, bez mediów WebRTC, bez DNS w czystym
-  tekście.
-- Dla świata wyjście to IPv4. Nazwa bez adresu IPv4 jest odrzucana.
-- Gateway uruchomiony przez konsumenta znika, gdy odejdzie jego ostatni
-  członek. Uruchomiony przez `kiwi-proxy up` zostaje do `kiwi-proxy down`.
-- Jedno wyjście, jeden gateway, dowolna liczba członków. Członkowie, którzy
-  muszą pozostać osobno, używają różnych wyjść.
+- UDP nie jest przekazywane. Oznacza to brak QUIC, brak mediów WebRTC i brak
+  DNS w postaci niezaszyfrowanej.
+- Exit łączy się ze światem zewnętrznym wyłącznie przez IPv4. Nazwa, która nie
+  ma adresu IPv4, jest odrzucana.
+- Gateway uruchomiony przez inną aplikację, np. kiwi-fox albo kiwi-custodia,
+  jest usuwany, gdy odłączy się od niego ostatni członek. Gateway uruchomiony
+  poleceniem `kiwi-proxy up` działa, dopóki nie wydasz polecenia
+  `kiwi-proxy down`.
+- Każdy exit ma dokładnie jeden gateway, z którego może korzystać dowolna
+  liczba członków. Członkowie, którzy muszą być od siebie oddzieleni, korzystają
+  z różnych exitów.
 
 ## Aplikacja { #the-app }
 
-**Kiwi Proxy** dodaje i edytuje wyjścia (SOCKS5, który ci przekazano, albo moduł
-dostawcy, z przeszukiwalną listą krajów lub wyborem węzłów), uruchamia je i
-zatrzymuje, udostępnia jedno jako port SOCKS5 na tym komputerze i kopiuje jego
-adres, sprawdza, co widzi świat, pokazuje, kto dołączył do gatewaya, i jego
-logi, a także instaluje i konfiguruje moduły dostawców.
+W aplikacji **Kiwi Proxy** dodajesz i edytujesz exity, albo z przekazanego ci
+proxy SOCKS5, albo z modułu dostawcy. Dla exitu z modułu wybierasz kraj
+z listy z wyszukiwarką albo konkretny węzeł z listy. Możesz uruchamiać
+i zatrzymywać exity, udostępnić exit jako port SOCKS5 na tym komputerze
+i skopiować jego adres oraz sprawdzić, co widzi świat zewnętrzny, gdy łączysz
+się przez ten exit. Aplikacja pokazuje też, którzy członkowie korzystają
+z gatewaya, wraz z ich logami, a także instaluje i konfiguruje moduły
+dostawców.
 
-## Na maszynie kiwi-server { #on-a-kiwi-server-machine }
+## Na maszynie z kiwi-server { #on-a-kiwi-server-machine }
 
-kiwi-proxy zawiera też moduł kiwi-server, który hostuje wyjścia dla całej
-sieci mesh (jeden gateway na wyjście, opublikowany pod adresem hosta w sieci
-mesh). Nie ma go jeszcze w drzewie kiwi-server i nie działał na żadnej
-maszynie, jak mówi jego dokumentacja. Moduły dostawców to mechanizm
-desktopowy i tam nie działają.
+Repozytorium kiwi-proxy zawiera też moduł dla kiwi-server. Dzięki niemu
+maszyna z kiwi-server udostępnia exity całej sieci mesh, czyli prywatnej
+sieci WireGuard, która łączy twoje maszyny z kiwi-server. Moduł uruchamia
+jeden gateway dla każdego exitu i udostępnia go pod adresem hosta w sieci
+mesh. Według jego dokumentacji modułu nie ma jeszcze w drzewie źródeł
+kiwi-server i nie był jeszcze uruchamiany na żadnej maszynie. Moduły dostawców
+działają tylko na desktopie i nie działają na maszynie z kiwi-server.
 
-Dalsza lektura: [architektura](https://github.com/derlocke-ng/kiwi-proxy/blob/main/docs/architecture.md),
-[konsumenci](https://github.com/derlocke-ng/kiwi-proxy/blob/main/docs/consumers.md),
+Więcej informacji: [architektura](https://github.com/derlocke-ng/kiwi-proxy/blob/main/docs/architecture.md),
+[programy korzystające z exitów](https://github.com/derlocke-ng/kiwi-proxy/blob/main/docs/consumers.md),
 [system wtyczek](https://github.com/derlocke-ng/kiwi-proxy/blob/main/docs/plugin-system.md).

@@ -34,7 +34,7 @@ sudo dd if=output/sorbet/sorbet.iso of=/dev/sdX bs=4M status=progress oflag=sync
 - ISO instaluje system na dysku wskazanym w `disk:` **bez pytania**, a więc
   kasuje ten dysk. Po zakończeniu instalacji **wyłącza maszynę**
   (`install.on_done: poweroff`, albo `reboot`, jeśli wolisz ponowne
-  uruchomienie). Opisuj swoje pendrive’y.
+  uruchomienie). Oznaczaj swoje pendrive’y.
 - Domyślnie nośnik instalacyjny zawiera **tylko system bazowy**: nazwę hosta,
   ustawienia sieci, użytkownika administracyjnego z kluczami SSH i zasady
   aktualizacji. Nie ma na nim żadnych sekretów stacku. Rolę maszyna dostaje

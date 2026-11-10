@@ -1,7 +1,7 @@
 # DNS, nomes e certificados
 
 Numa Kiwi Network, cada máquina e cada serviço tem um nome, como
-`cloud.papaya.home`, e abre-se por HTTPS com um certificado em que os teus
+`cloud.papaya.home`, e podes abri-lo por HTTPS com um certificado em que os teus
 dispositivos confiam. Esta página explica como os nomes são resolvidos dentro
 da rede, como são formados e de onde vêm os certificados. Os servidores DNS são
 Pi-holes, que também bloqueiam domínios indesejados com uma lista de bloqueio
@@ -62,7 +62,7 @@ TLD verdadeiro, e é por isso que a Kiwi Network deixou de o usar. O kiwi-server
 verifica o domínio que escolhes. `home`, `corp`, `mail`, `internal`, `arpa` e
 `test` são aceites sem qualquer aviso. `.local` é recusado, porque pertence ao
 mDNS. `.lan` dá origem a um aviso, porque os routers respondem eles próprios por
-esse domínio, e os TLD públicos também.
+esse domínio. Os TLD públicos também dão origem a um aviso.
 
 Os nomes *fora* do domínio da tua rede, de que precisas para um hub ou um relay
 público, recebem certificados Let's Encrypt se o proxy inverso do master for
@@ -72,9 +72,9 @@ público.
 
 Os proxies SOCKS5 da Mullvad têm endereços num intervalo privado, e esta
 funcionalidade permite usá-los pelo nome. Desde o kiwi-server 2.2.0, o Pi-hole
-do master responde por todos os **proxies SOCKS5 da Mullvad**, tanto pelo nome
-completo, como `de-fra-wg-socks5-001.relays.mullvad.net`, como por um nome
-curto, como `de-fra-001.mullvad.home`. O gluetun recusa respostas DNS que
+do master conhece todos os **proxies SOCKS5 da Mullvad**, tanto pelo nome
+completo, por exemplo `de-fra-wg-socks5-001.relays.mullvad.net`, como por um
+nome curto, por exemplo `de-fra-001.mullvad.home`. O gluetun recusa respostas DNS que
 apontem para endereços privados: é a sua proteção contra DNS rebinding. Sem
 estes registos, os nomes só seriam resolvidos pelos servidores DNS de recurso.
 Um temporizador na máquina (`km-mullvad-socks.timer`, de 6 em 6 horas) atualiza

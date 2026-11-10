@@ -237,20 +237,20 @@ plugins:
           DNS, names & certificates: DNS, nomes e certificados
           Overview: Visão geral
           The fleet file: O ficheiro fleet
-          Roles: Papéis
+          Roles: Funções
           Modules: Módulos
           Machines: Máquinas
-          Operations: Operações
-          Roadmap: Para onde vai
-          One machine without a fleet: Uma máquina sem fleet
+          Operations: Operação
+          Roadmap: Roteiro
+          One machine without a fleet: Uma máquina sem ficheiro fleet
           Hubs, not platforms: Hubs, não plataformas
-          The framework's apps: As apps do framework
+          The framework's apps: As aplicações do framework
           Armory, a distribution: Armory, uma distribuição
           Running your own hub: O teu próprio hub
           Desktop: Ambiente de trabalho
           Catalogs & publishing: Catálogos e publicação
           Client networks: Redes de clientes
-          Provider modules: Módulos de fornecedores
+          Provider modules: Módulos de fornecedor
           Project: Projeto
           Repositories & status: Repositórios e estado
           Icons & colours: Ícones e cores

@@ -149,7 +149,7 @@ escrito à mão, os comentários perdem-se.
     máquina arranca a partir dela, sem perguntar nada. Põe etiquetas nas tuas
     ISOs. É precisamente por isso que o `build` exige a definição `disk:`.
 
-- **O resultado contém segredos:** hashes de palavras-passe, chaves WireGuard,
+- **Os ficheiros gerados contêm segredos:** hashes de palavras-passe, chaves WireGuard,
   chaves TLS e chaves LUKS. Os ficheiros são escritos com o modo 0600, e o git
   ignora `output/`. Trata as ISOs feitas com `--offline` com o mesmo cuidado.
 - **As palavras-passe dos serviços são geradas** a partir de `secrets/seed`, se
@@ -176,7 +176,7 @@ virtual. Num exercício que simulava a avaria de um node, uma máquina Debian co
 o disco cifrado foi reconstruída em cerca de 14 minutos. Os backups de um node
 foram restaurados noutro (do papaya para o lychee). A MTU do túnel foi medida e
 afinada em ligações reais, incluindo ligações móveis. Os testes automáticos
-(CI) geram todas as funções, passam o shellcheck por todos os scripts e validam
+(CI) geram todas as funções, verificam todos os scripts com o shellcheck e validam
 todas as configurações Butane. Comparam também, byte a byte, quatro stacks de
 referência, as chamadas golden stacks, com o resultado guardado.
 

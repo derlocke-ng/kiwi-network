@@ -12,7 +12,7 @@ cifra as ligações, e *a mesh* é o nome que estas páginas dão à rede privad
 todas as tuas máquinas partilham. No centro da mesh está uma máquina, o
 *kiwi-master*. Todas as outras (nodes em casa ou no escritório, portáteis,
 telemóveis, routers) abrem elas próprias a ligação ao master e, a partir daí,
-chegam umas às outras através da mesh. A rede inteira está descrita num único
+conseguem chegar a todas as outras através da mesh. A rede inteira está descrita num único
 ficheiro, o ficheiro fleet (`fleet.yaml`), e é a partir dele que o
 [kiwi-server](../server/index.md) a constrói.
 
@@ -44,7 +44,7 @@ inclui os cinco módulos descritos a seguir. O Pi-hole, o Tor e o nginx partilha
 o namespace de rede do servidor WireGuard. Um namespace de rede é o conjunto
 próprio de interfaces, endereços e rotas de um contentor. Estes três serviços
 usam, portanto, a rede do servidor WireGuard em vez de terem uma rede sua, e é
-por isso que são reiniciados sempre que o servidor WireGuard é reiniciado.
+por isso que são reiniciados juntamente com ele.
 
 - **vpn-server** (wg-easy) é o servidor WireGuard. Todos os clientes e todos os
   nodes se ligam a ele, e é ele que emite as respetivas configurações
@@ -93,8 +93,8 @@ da mesh. Há duas definições que abrem mais portas:
   máquina com o disco cifrado desbloqueá-lo no arranque, e um anel é um
   servidor Tang com as suas próprias chaves.
 
-O kiwi-server não mexe no SSH: fica como o sistema operativo o configura, o
-que, por predefinição, significa que só se entra com chaves. O próprio
+O kiwi-server deixa o SSH tal como o sistema operativo o configura, o que, por
+predefinição, significa que só é possível iniciar sessão com chaves. O próprio
 kiwi-server usa o SSH para o `apply` e para o `status`.
 
 ## Grupos de clientes { #client-groups }
@@ -115,9 +115,9 @@ kiwi-server enroll fleet.yaml phone --group devices --qr   # um código QR para 
 kiwi-server enroll fleet.yaml anna  --group guests --split # só o tráfego da mesh passa pelo túnel
 ```
 
-Os membros de qualquer grupo também chegam à Internet pela saída do master, a
+Os membros de qualquer grupo também têm acesso à Internet pela saída do master, a
 não ser que definas `internet: false` para o grupo. Um cliente cujo endereço
-fica fora de todos os grupos (`10.8.0.x`) é um membro normal da mesh: chega a
+fica fora de todos os grupos (`10.8.0.x`) é um membro normal da mesh: tem acesso a
 tudo e pode abrir as páginas de administração, desde que `admin_from_mesh`
 esteja ativo.
 
@@ -143,7 +143,7 @@ A função `node` tem três presets, ou seja, três listas de módulos já pront
 | Preset | Em que se torna a máquina |
 |---|---|
 | `gateway` (predefinido) | Um gateway para a rede local (LAN). Os dispositivos da LAN que usam esta máquina como gateway predefinido chegam à Internet através da VPN e têm acesso à mesh. O Pi-hole é o servidor DNS da LAN e, se quiseres, também o seu servidor DHCP. O Transmission e o JDownloader, os programas para descarregar ficheiros, correm *dentro* do namespace de rede do cliente VPN, pelo que ficam sem qualquer rota enquanto o túnel estiver em baixo. O preset inclui ainda o nginx, o Portainer e SFTP. |
-| `cloud` | A tua própria cloud: Nextcloud com Collabora para ficheiros, calendários e documentos, e Vaultwarden para as palavras-passe. Estes serviços ficam atrás do nginx, e o Portainer também vem incluído. O Nextcloud é montado com os contentores do projeto AIO, sem o contentor master do AIO. |
+| `cloud` | A tua própria cloud: Nextcloud com Collabora para ficheiros, calendários e documentos, e Vaultwarden para as palavras-passe. Estes serviços ficam atrás do nginx, e o Portainer também vem incluído. O Nextcloud é construído a partir dos contentores do projeto AIO, sem o contentor master do AIO. |
 | `minimal` | Apenas o cliente VPN e o nginx. Os módulos que quiseres, acrescentas tu. |
 
 Os nodes também podem fazer backups, servir de servidor de backups e correr o

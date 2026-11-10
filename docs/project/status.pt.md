@@ -16,7 +16,7 @@ novembro de 2026.
 | [kiwi-server](https://github.com/derlocke-ng/kiwi-server) | constrói e gere a rede: gera ISOs de instalação a partir do ficheiro fleet e aplica a função de cada máquina por SSH | v2.42.0 | sim | GPL-3.0+ |
 | [kiwi-modules](https://github.com/derlocke-ng/kiwi-modules) | os 20 módulos e o programa que os gera, que transforma o ficheiro de uma máquina num pacote com a sua stack | v0.23.0 | não | GPL-3.0+ |
 | [kiwi-stack](https://github.com/derlocke-ng/kiwi-stack) | a parte que corre na própria máquina: instala lá um pacote e mantém-no a funcionar | v0.5.0 | não | GPL-3.0+ |
-| [mullvad-socks5](https://github.com/derlocke-ng/mullvad-socks5) | listas e registos DNS dos proxies SOCKS5 da Mullvad, refeitos de 6 em 6 horas | o ramo `list` | não | MIT (README) |
+| [mullvad-socks5](https://github.com/derlocke-ng/mullvad-socks5) | listas e registos DNS dos proxies SOCKS5 da Mullvad, atualizados de 6 em 6 horas | o ramo `list` | não | MIT (README) |
 
 ## Pessoas { #people }
 
@@ -52,15 +52,15 @@ novembro de 2026.
 
 Os próprios repositórios apontam estas lacunas:
 
-- **kiwi-server**: Ficou demonstrado que funciona em hardware real, em
-  outubro e novembro de 2026. Nesses testes, os backups de um node foram
+- **kiwi-server**: Foi testado com sucesso em hardware real, em outubro e
+  novembro de 2026. Nesses testes, os backups de um node foram
   restaurados noutro node, e a MTU do túnel foi afinada, incluindo para ligações
-  móveis. Há quatro acrescentos nos ramos `several-servers` do kiwi-server e do
-  kiwi-modules que ainda não foram publicados: vários servidores de backups, o
+  móveis. Há quatro novidades nos ramos `several-servers` do kiwi-server e do
+  kiwi-modules que ainda não foram publicadas: vários servidores de backups, o
   restauro automático de uma máquina reconstruída, um temporizador para eliminar
   os snapshots antigos e uma verificação de estado que reinicia a ligação ao
-  fornecedor de VPN comercial quando esta fica bloqueada. Ainda não ficou
-  demonstrado que a federação entre redes funciona. Tudo funciona apenas com
+  fornecedor de VPN comercial quando esta fica bloqueada. Ainda não se
+  demonstrou que a federação entre redes funciona. Tudo funciona apenas com
   IPv4, e a ISO de Debian só existe para amd64. O plano de controlo está
   concebido, mas ainda não implementado.
 - **kiwi-modules**: Os módulos OpenCloud, Immich e Paperless-ngx estão marcados
@@ -68,8 +68,8 @@ Os próprios repositórios apontam estas lacunas:
   integrado.
 - **kiwi-stack**: Não há forma de reverter para uma versão anterior. Só podes
   restaurar os dados e voltar a aplicar um pacote mais antigo.
-- **kiwi-framework**: Ainda faltam várias partes: o blogue, a aprovação na
-  moderação, seguir espaços que um hub não traz incluídos e os signers
+- **kiwi-framework**: Ainda faltam várias partes: o blogue, a aprovação pelos
+  moderadores, seguir espaços que um hub não traz incluídos e os signers
   NIP-07/NIP-46.
 - **kiwi-updater**: Está planeado um registo alojado de catálogos de confiança.
   As tags de versão das outras aplicações ainda não são assinadas. É por isso

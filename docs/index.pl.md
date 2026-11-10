@@ -62,8 +62,8 @@ hide:
 
 Internet bywa bezlitosny, a opieka nad własnymi serwerami to praca bez końca.
 Kiwi Network wykonuje ją za ciebie. Opisujesz swoje maszyny w jednym pliku,
-a rutynowe zadania wykonują się same. Włamania, awarie dysków i utrata sprzętu
-są uwzględnione od samego początku.
+a rutynowe zadania wykonują się same. Od początku zakłada się, że zdarzą się
+włamania, awarie dysków i utrata sprzętu, i jest na to przygotowany plan.
 
 - **Automatyczna instalacja.** Każda maszyna instaluje się bez nikogo przy
   klawiaturze: z własnego obrazu instalacyjnego albo bezpośrednio na wynajętym
@@ -87,7 +87,7 @@ Każda maszyna ma rolę. Od roli zależy, czym maszyna zajmuje się w sieci.
 | Rola | Co robi maszyna |
 |---|---|
 | `master` | Jedyna maszyna dostępna z internetu. Działa na niej serwer WireGuard. Ruch wychodzący wysyła przez dostawcę VPN albo bezpośrednio, a do tego udostępnia DNS z Pi-hole, Tor i strony administracyjne. Może też uruchamiać przekaźnik nostr i hub. |
-| `node` · `gateway` | Kieruje sieć domową lub biurową przez VPN. Pi-hole jest w niej serwerem DNS i DHCP, a do tego dochodzą stacja pobierania plików i SFTP. |
+| `node` · `gateway` | Kieruje sieć domową lub biurową przez VPN. Działają na nim Pi-hole jako serwer DNS i DHCP, stacja pobierania plików oraz SFTP. |
 | `node` · `cloud` | Uruchamia Nextcloud z pakietem Collabora oraz Vaultwarden. |
 | `node` · `minimal` | Ma tylko połączenie z siecią i nginx. Moduły dobierasz samodzielnie, na przykład kopie zapasowe, Tang, Immich, Paperless-ngx albo OpenCloud. |
 | `bare` | Ma tylko system podstawowy. |

@@ -1,9 +1,9 @@
 # DNS, nazwy i certyfikaty
 
 Każda maszyna i każda usługa w Kiwi Network ma nazwę, na przykład
-`cloud.papaya.home`, i otwierasz ją przez HTTPS z certyfikatem, któremu ufają
-twoje urządzenia. Na tej stronie znajdziesz opis tego, jak w sieci
-rozwiązywane są nazwy, jak są zbudowane i skąd biorą się certyfikaty. Serwerami
+`cloud.papaya.home`, a otwierasz ją przez HTTPS z certyfikatem, któremu ufają
+twoje urządzenia. Ta strona wyjaśnia, jak w sieci rozwiązywane są
+nazwy, jak się je tworzy i skąd biorą się certyfikaty. Serwerami
 DNS są Pi-hole’e, które przy okazji blokują niechciane domeny według wspólnej
 listy blokowania.
 
@@ -20,10 +20,10 @@ VPN client ───────────────────────
   pod adresem `10.8.0.1`.
 - **Pi-hole node’a** pyta najpierw Pi-hole’a mastera. Dzięki temu cała sieć
   korzysta z jednej listy blokowania, a każde zapytanie trafia do internetu
-  przez wyjście mastera, czyli jego połączenie z internetem. Następny w ściśle
-  ustalonej kolejności jest Quad9 (`9.9.9.9`, `149.112.112.112`, ustawiany
-  przez `fallback_dns`), więc odpowiada tylko wtedy, gdy master jest
-  niedostępny.
+  przez wyjście mastera, czyli jego połączenie z internetem. Kolejność jest ściśle
+  ustalona i Quad9 (`9.9.9.9`, `149.112.112.112`, ustawiany przez
+  `fallback_dns`) jest dopiero drugi, więc odpowiada tylko wtedy, gdy master
+  jest niedostępny.
 - **Pi-hole mastera** przekazuje zapytania do serwera DNS-over-TLS swojego
   klienta VPN. Domyślnie jest nim Quad9 (`dot_providers`).
 - **Nazwy w domenie twojej sieci** trafiają do mastera i nie są przekazywane
@@ -37,12 +37,12 @@ i uCore sama maszyna używa do rozwiązywania nazw Pi-hole’a z własnego stack
 **Sąsiedzi w tej samej sieci lokalnej.** Jeśli inne node’y z pliku fleet mają
 stały adres w podsieci danego node’a, Pi-hole i plik hosts tego node’a podają
 ich **adres w sieci lokalnej**. Ruch między dwiema maszynami w tej samej sieci
-lokalnej nie opuszcza jej wtedy. Master nadal odpowiada adresami w sieci mesh.
+lokalnej nie wychodzi wtedy poza nią. Master nadal odpowiada adresami w sieci mesh.
 
 ## Nazwy: `service.hostname.home` { #names-servicehostnamehome }
 
 Każdy host ma nazwę `<host>.<domain>`, na przykład `papaya.home`. Każda
-usługa, która na nim działa, dostaje nazwę pod nazwą hosta: `cloud.papaya.home`,
+usługa, która na nim działa, dostaje nazwę utworzoną z nazwy hosta: `cloud.papaya.home`,
 `vault.papaya.home`, `portainer.papaya.home`, `dl.lychee.home`, a na masterze
 `wg.sorbet.home`, `pihole.sorbet.home`, `hub.sorbet.home`,
 `relay.sorbet.home`. Każda nazwa zgłoszona przez moduł trafia do rekordów DNS
@@ -70,8 +70,8 @@ jest publiczne.
 ## Proxy SOCKS5 Mullvada po nazwie { #mullvad-socks5-proxies-by-name }
 
 Proxy SOCKS5 Mullvada mają adresy z prywatnego zakresu, a ta funkcja pozwala
-korzystać z nich po nazwie. Od wersji kiwi-server 2.2.0 Pi-hole mastera zna
-każde **proxy SOCKS5 Mullvada**, zarówno pod pełną nazwą, np.
+korzystać z nich po nazwie. Od wersji kiwi-server 2.2.0 Pi-hole mastera podaje
+adres każdego **proxy SOCKS5 Mullvada**, zarówno pod pełną nazwą, np.
 `de-fra-wg-socks5-001.relays.mullvad.net`, jak i pod krótką, np.
 `de-fra-001.mullvad.home`. gluetun odrzuca odpowiedzi DNS wskazujące na adresy
 prywatne, bo tak chroni się przed atakiem DNS rebinding. Bez tych rekordów
@@ -101,8 +101,8 @@ w swoim magazynie zaufanych certyfikatów.
 Jeśli ustawisz **ograniczenia nazw** (name constraints), CA może podpisywać
 tylko nazwy w domenie twojej sieci: `tls: { name_constraints: [home] }`.
 Przykładowy plik fleet to ustawia, ale wbudowana wartość domyślna nie ma
-żadnego ograniczenia. Z ograniczeniem skradziony `kiwiCA.key` jest
-bezużyteczny dla wszystkich innych nazw. Ma to znaczenie, bo CA ufa każda
+żadnego ograniczenia. Dzięki takiemu ograniczeniu skradziony
+`kiwiCA.key` nie przyda się do podpisania żadnej innej nazwy. Ma to znaczenie, bo CA ufa każda
 twoja maszyna.
 
 ```bash

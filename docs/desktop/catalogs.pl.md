@@ -1,7 +1,7 @@
 # Katalogi aplikacji i publikowanie
 
 Katalog aplikacji to lista aplikacji, które może zainstalować kiwi-updater.
-Jest repozytorium git, więc możesz go przeczytać, skopiować i zaproponować
+To repozytorium git, więc możesz go przeczytać, skopiować i zaproponować
 w nim zmiany. Ta strona opisuje katalog Kiwi, pokazuje, jak zrobić własny
 katalog, np. dla wszystkich desktopów, którymi się opiekujesz, i wyjaśnia, jak
 opublikować aplikację, żeby inni mogli ją zainstalować przez kiwi.
@@ -9,7 +9,7 @@ opublikować aplikację, żeby inni mogli ją zainstalować przez kiwi.
 ## Katalog Kiwi { #the-kiwi-catalog }
 
 [derlocke-ng/kiwi-catalog](https://github.com/derlocke-ng/kiwi-catalog) to
-katalog aplikacji Kiwi Network. Rejestruje się automatycznie, gdy instalujesz
+katalog aplikacji Kiwi Network. Jest rejestrowany automatycznie, gdy instalujesz
 kiwi-updater. Żeby zarejestrować go ręcznie, uruchom
 `kiwi catalog add https://github.com/derlocke-ng/kiwi-catalog.git`.
 
@@ -25,7 +25,7 @@ systemowy to część należąca do roota.
 | [kiwi-cli-tools-desktop](cli-tools.md) | v1.2.1 | user | `pweb`, `select-server`, `tethering`, `torlink` |
 | [kiwi-proxy](../clients/kiwi-proxy.md) | v0.7.3 | user | exity dla połączeń SOCKS5 i VPN. Exit to odizolowany kontener w rootless Podmanie |
 | [kiwi-fox](../clients/kiwi-fox.md) | v0.7.1 | user | odizolowane tożsamości przeglądarki, które korzystają z exitów kiwi-proxy |
-| [kiwi-custodia](../clients/kiwi-custodia.md) | v0.2.3 | user | boxy z dystrybucjami Linuksa (kontenery z dystrybucją Linuksa), których ruch przechodzi wyłącznie przez exit |
+| [kiwi-custodia](../clients/kiwi-custodia.md) | v0.2.3 | user | boxy (kontenery z dystrybucją Linuksa), których ruch przechodzi wyłącznie przez exit |
 | [kiwi-server](../server/index.md) | v2.42.0 | user | narzędzie, którym budujesz własną sieć i nią zarządzasz |
 | [syncman](syncman.md) | v0.4.1 | user | synchronizuje foldery w obu kierunkach |
 | [gnome-monitor](gnome-monitor.md) | v0.3.2 | user | zapisuje i przełącza układy ekranów w GNOME |
@@ -142,7 +142,7 @@ subskrypcji i śledzenia.
 
 ## Zaufanie { #trust }
 
-Katalog jest **wybierany ręcznie, ale nie audytowany**. Aplikacja trafia na
+Katalog jest **starannie dobierany, ale nie audytowany**. Aplikacja trafia na
 listę, bo ktoś uznał, że warto ją mieć. Nie oznacza to, że ktoś przejrzał jej
 kod. Zanim zainstalujesz aplikację, której nie znasz, przeczytaj wynik
 `kiwi info <app>`. Uruchom `kiwi info --installer <app>`, żeby zobaczyć

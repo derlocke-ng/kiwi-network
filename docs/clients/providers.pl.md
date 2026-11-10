@@ -1,47 +1,57 @@
 # Moduły dostawców
 
-Moduł dostawcy daje [kiwi-proxy](kiwi-proxy.md) wyjście, które tworzy sam,
-zamiast SOCKS5, który ci przekazano. Każdy żyje we własnym repozytorium, instaluje
-się przez kiwi-updater do katalogu modułów kiwi-proxy i jest zarządzany przez
-kiwi-proxy: ten buduje obraz modułu, uruchamia go, gdy potrzebuje go wyjście,
-i zamyka, gdy nie używa go już żaden gateway.
+W [kiwi-proxy](kiwi-proxy.md) exit to zapisane pod nazwą połączenie
+z upstreamem, przez które twoje boxy i przeglądarki wysyłają ruch. Zwykle jest
+to połączenie, które ci przekazano, np. proxy SOCKS5 prowadzące do sieci
+klienta. Moduł dostawcy jest na drugi przypadek: sam tworzy exit, przez Tor,
+subskrypcję VPN, 9proxy albo Mysterium. Zwłaszcza Tor i Mysterium służą do
+tego, żeby mieć więcej adresów IP do testów.
 
-| Moduł | Repozytorium | Wydanie | Wyjście | Wymaga |
+Każdy moduł ma własne repozytorium. kiwi-updater instaluje go do folderu
+modułów kiwi-proxy, a od tej chwili zarządza nim kiwi-proxy. kiwi-proxy buduje
+obraz kontenera modułu, uruchamia moduł, gdy potrzebuje go jakiś exit,
+i zatrzymuje go, gdy nie korzysta z niego już żaden gateway. Gateway to
+kontener, który kiwi-proxy uruchamia dla exitu, dopóki exit działa.
+
+| Moduł | Repozytorium | Wydanie | Exit | Wymaga |
 |---|---|---|---|---|
-| `tor` | [kiwi-plugin-tor](https://github.com/derlocke-ng/kiwi-plugin-tor) | v0.3.0 | sieć Tor, jeden obwód na wyjście, dowolny kraj wyjścia | niczego (za darmo) |
-| `vpn` | [kiwi-plugin-vpn](https://github.com/derlocke-ng/kiwi-plugin-vpn) | v0.2.2 | tunel WireGuard lub OpenVPN przez [gluetun](https://github.com/qdm12/gluetun) | subskrypcji VPN |
-| `9proxy` | [kiwi-plugin-9proxy](https://github.com/derlocke-ng/kiwi-plugin-9proxy) | v0.2.0 | wyjście rezydencjalne [9proxy](https://9proxy.com/) | konta 9proxy i jego własnościowego klienta (nieredystrybuowanego) |
-| `mysterium` | [kiwi-plugin-myst](https://github.com/derlocke-ng/kiwi-plugin-myst) | v0.5.2 | dVPN [Mysterium](https://mysterium.network/), z wyborem węzłów według kraju i typu IP | zarejestrowanej tożsamości konsumenta z saldem MYST |
+| `tor` | [kiwi-plugin-tor](https://github.com/derlocke-ng/kiwi-plugin-tor) | v0.3.0 | sieć Tor, z jednym obwodem na każdy exit i dowolnym krajem węzła wyjściowego | niczego (jest bezpłatny) |
+| `vpn` | [kiwi-plugin-vpn](https://github.com/derlocke-ng/kiwi-plugin-vpn) | v0.2.2 | tunel WireGuard albo OpenVPN przez [gluetun](https://github.com/qdm12/gluetun) | subskrypcji VPN |
+| `9proxy` | [kiwi-plugin-9proxy](https://github.com/derlocke-ng/kiwi-plugin-9proxy) | v0.2.0 | adres domowy (residential) z [9proxy](https://9proxy.com/) | konta 9proxy i własnościowego klienta 9proxy, który nie jest rozpowszechniany |
+| `mysterium` | [kiwi-plugin-myst](https://github.com/derlocke-ng/kiwi-plugin-myst) | v0.5.2 | dVPN [Mysterium](https://mysterium.network/) (zdecentralizowany VPN), z listą węzłów do wyboru według kraju i rodzaju adresu IP | zarejestrowanej tożsamości konsumenta z saldem MYST |
 
-Wszystkie cztery są na licencji GPL-3.0-or-later, są w
-[katalogu Kiwi](../desktop/catalogs.md) i deklarują `DEPENDS=kiwi-proxy`, więc
-kiwi najpierw instaluje kiwi-proxy. Tor i Mysterium to szybki sposób na więcej
-adresów IP wyjścia, na przykład do testów.
+Wszystkie cztery moduły są na licencji GPL-3.0-or-later i znajdują się
+w [katalogu Kiwi](../desktop/catalogs.md). Każdy deklaruje
+`DEPENDS=kiwi-proxy`, więc kiwi-updater najpierw instaluje kiwi-proxy. Tor
+i Mysterium to szybki sposób na zdobycie dodatkowych adresów IP exitów, np. do
+testów.
 
-## Instalacja i użycie { #install-and-use }
+## Instalacja i używanie { #install-and-use }
 
 ```bash
 kiwi install kiwi-plugin-tor
-kiwi-proxy module setup tor                      # zbuduj jego obraz (kiwi-proxy setup robi wszystkie)
+kiwi-proxy module setup tor                      # buduje jego obraz (kiwi-proxy setup buduje wszystkie)
 kiwi-proxy module list
-kiwi-proxy module countries tor                  # gdzie Tor może wychodzić
-kiwi-proxy add tor-de --module tor --country de  # wyjście z niego
-kiwi-custodia new test --exit tor-de             # kontener na nim, albo:
+kiwi-proxy module countries tor                  # w jakich krajach Tor może wychodzić
+kiwi-proxy add tor-de --module tor --country de  # exit z tego modułu
+kiwi-custodia new test --exit tor-de             # box na nim albo:
 kiwi-fox new test --exit tor-de                  # profil przeglądarki na nim
 ```
 
-W przypadku Tora kraj jest utrzymywany przez `StrictNodes`, więc obwód raczej
-zawiedzie, niż wyjdzie gdzie indziej. Wyjścia na module tor domyślnie
-przepuszczają dane uwierzytelniające SOCKS dla poszczególnych witryn z Tor
-Browser (`--socks-auth passthrough`).
+W przypadku exitu przez Tor kraj jest wymuszany opcją Tora `StrictNodes`.
+Obwód, który nie może wyjść w tym kraju, kończy się błędem i nigdy nie
+wychodzi w innym kraju. Exity z modułu tor przekazują dalej dane logowania
+SOCKS, które Tor Browser wysyła osobno dla każdej strony. Takie jest ich
+ustawienie domyślne (`--socks-auth passthrough`).
 
-## Jak to jest połączone { #how-it-is-wired }
+## Jak dostawca łączy się z gatewayem { #how-it-is-wired }
 
-**Każdy dostawca udostępnia SOCKS5 i nic więcej.** Kontener dostawcy
-potrzebuje własnej drogi na zewnątrz, więc nie może żyć w przestrzeni nazw
-gatewaya, gdzie odrzucane jest wszystko poza jednym celem. Spotykają się na
-mostku Podmana bez roota, `kf-providers`, gdzie każdy moduł dostaje stały
-adres:
+**Każdy dostawca oferuje SOCKS5 i nic poza tym.** Kontener dostawcy potrzebuje
+własnego połączenia z internetem. Nie może więc działać w sieciowej
+przestrzeni nazw (network namespace) gatewaya, bo tam odrzucany jest cały ruch
+poza ruchem do jednego celu. Zamiast tego dostawca i gateway są połączone
+przez sieć mostkową rootless Podmana, `kf-providers`, w której każdy moduł ma
+stały adres:
 
 ```
 provider container ──── kf-providers bridge ──── gateway ──── box / browser / tool
@@ -49,40 +59,47 @@ provider container ──── kf-providers bridge ──── gateway ──�
 SOCKS5 only
 ```
 
-- **Tor** już mówi SOCKS5. kiwi-proxy wysyła dane uwierzytelniające dla
-  każdego wyjścia, a `IsolateSOCKSAuth` Tora daje każdemu wyjściu własny
-  obwód.
-- **VPN i Mysterium** jadą tunelem, który nie mówi SOCKS5, więc mały adapter
-  microsocks dołącza do przestrzeni nazw sieciowych tunelu i oferuje SOCKS5,
-  który jedzie tym tunelem.
-- **9proxy** uruchamia klienta 9proxy, który otwiera port SOCKS5 na wyjściu
-  rezydencjalnym.
+- **Tor** sam oferuje SOCKS5. kiwi-proxy wysyła osobne dane logowania dla
+  każdego exitu, a opcja Tora `IsolateSOCKSAuth` daje wtedy każdemu exitowi
+  własny obwód, czyli własną drogę przez sieć Tor.
+- **VPN i Mysterium** korzystają z tunelu, a tunel nie oferuje SOCKS5. Dlatego
+  do sieciowej przestrzeni nazw tunelu dołącza mały adapter, microsocks.
+  Oferuje on SOCKS5 i wysyła ruch przez tunel.
+- **9proxy** uruchamia klienta 9proxy, który otwiera port SOCKS5 prowadzący do
+  adresu domowego.
 
-Jeden kontener dostawcy obsługuje każde wyjście na tym samym module i tej
-samej dzierżawie. Tunel, który traci sesję, zamyka się bezpiecznie (fail
-closed) i jest restartowany.
+Jeden kontener dostawcy obsługuje wszystkie exity korzystające z tego samego
+modułu i tej samej dzierżawy (lease). Dzierżawa to jeden z exitów do wyboru,
+które oferuje moduł, np. kraj serwera VPN albo węzeł Mysterium. Jeśli tunel
+straci sesję, działa w trybie fail-closed, czyli żaden ruch nie wychodzi,
+a tunel jest uruchamiany ponownie.
 
 ## Konfiguracja { #configuration }
 
-Stan każdego modułu leży w `~/.local/share/kiwi-proxy/modules-state/<module>/`,
-poza jakimkolwiek repozytorium:
+Stan każdego modułu jest przechowywany w
+`~/.local/share/kiwi-proxy/modules-state/<module>/`, poza jakimkolwiek
+repozytorium:
 
-- **vpn**: `vpn.json` z ustawieniami gluetun (`VPN_SERVICE_PROVIDER`,
-  `VPN_TYPE`, `WIREGUARD_ADDRESSES`, …; każdy klucz wielkimi literami trafia do
-  gluetun bez zmian), opcjonalna lista `leases` i opcjonalny katalog
-  `gluetun/` (na przykład `wireguard.conf` dla dostawcy `custom` w gluetun).
-  To jedna konfiguracja na maszynę: wyjścia na niej różnią się krajem serwera.
-- **9proxy**: `config/account.conf`. Umieść własnościowego klienta w
-  `module/containers/vendor/` wtyczki i dodaj `COPY vendor/ /opt/9proxy/` do jej
-  `Containerfile` przed `kiwi-proxy module setup 9proxy`. Bez niego obraz się
-  buduje, ale dostawca odmawia uruchomienia, zamiast otworzyć port.
-- **mysterium**: `kiwi-proxy module config mysterium keystore=/path/to/0x….json
-  --ask passphrase` albo *Configure…* w aplikacji Kiwi Proxy. Fraza dostępu
-  staje się sekretem Podmana. Jedna tożsamość utrzymuje jedno połączenie naraz.
+- **vpn**: Plik `vpn.json` zawiera ustawienia gluetun, np.
+  `VPN_SERVICE_PROVIDER`, `VPN_TYPE` i `WIREGUARD_ADDRESSES`. Każdy klucz
+  zapisany wielkimi literami jest przekazywany do gluetun bez zmian. Plik może
+  też zawierać listę `leases`. Opcjonalny folder `gluetun/` zawiera dodatkowe
+  pliki, np. `wireguard.conf` dla dostawcy `custom` w gluetun. Na maszynę
+  przypada jedna taka konfiguracja, a exity na niej różnią się krajem serwera.
+- **9proxy**: Plik konfiguracyjny to `config/account.conf`. Własnościowy
+  klient nie jest dołączony. Zanim uruchomisz
+  `kiwi-proxy module setup 9proxy`, umieść klienta w folderze
+  `module/containers/vendor/` wtyczki i dopisz `COPY vendor/ /opt/9proxy/` do
+  jej pliku `Containerfile`. Bez klienta obraz i tak się zbuduje, ale dostawca
+  odmówi uruchomienia i nie otworzy portu.
+- **mysterium**: Uruchom `kiwi-proxy module config mysterium keystore=/path/to/0x….json
+  --ask passphrase` albo użyj opcji *Configure…* w aplikacji Kiwi Proxy. Fraza
+  dostępu jest przechowywana jako sekret Podmana. Jedna tożsamość może mieć
+  naraz tylko jedno połączenie.
 
 ## Stan { #status }
 
-Tor nie wymaga konta. Mysterium zweryfikowano od początku do końca
-2026-11-07. Moduły VPN i 9proxy są kompletne i mają testy jednostkowe, ale nie
-zostały uruchomione od początku do końca z prawdziwą subskrypcją lub kontem,
-jak mówią ich README.
+Tor nie wymaga konta. Moduł Mysterium został sprawdzony w pełnym przebiegu,
+od początku do końca, 7 listopada 2026 roku. Według ich plików README moduły
+VPN i 9proxy są kompletne i mają testy jednostkowe, ale nie były jeszcze
+uruchamiane w pełnym przebiegu z prawdziwą subskrypcją lub kontem.

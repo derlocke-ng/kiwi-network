@@ -6,12 +6,12 @@ konfiguruje maszyny, więc nie musisz instalować i ustawiać każdej z nich
 ręcznie.
 
 Dla każdego hosta kiwi-server tworzy **instalacyjny obraz ISO do instalacji
-bezobsługowej**. Taki obraz instaluje Fedora CoreOS, uCore albo Debiana bez
-zadawania pytań, a potem wyłącza maszynę. Następnie kiwi-server przez SSH
+bezobsługowej**. Taki obraz bez zadawania pytań instaluje system Fedora
+CoreOS, uCore albo Debian, a potem wyłącza maszynę. Następnie kiwi-server przez SSH
 **stosuje** rolę maszyny, dzięki czemu staje się ona `kiwi-master` albo
-`kiwi-node`. Później dalej obsługuje twoje maszyny: dodaje klientów WireGuard,
+`kiwi-node`. Potem nadal zajmuje się twoimi maszynami: dodaje klientów WireGuard,
 odczytuje stan każdej maszyny, przechowuje sekrety (hasła i klucze), robi kopię
-zapasową plików sieci i odblokowuje zaszyfrowane dyski.
+zapasową pliku fleet i sekretów oraz odblokowuje zaszyfrowane dyski.
 
 kiwi-server jest dostępny jako narzędzie wiersza poleceń (CLI), `kiwi-server`,
 i jako aplikacja GTK4, **Kiwi Server**. Oba instalują się w `~/.local` i nie
@@ -107,7 +107,7 @@ są [planowani](roadmap.md#more-hosters-and-network-boot).
 |---|---|
 | `init [fleet.yaml]` | Zapisuje przykładowy plik fleet. `--domain` ustawia domenę, domyślnie `home`. |
 | `validate fleet.yaml [host…]` | Sprawdza plik fleet. Generuje przy tym każdy stack, więc wychodzą na jaw także błędy w modułach. |
-| `list` / `show fleet.yaml <host>` | Pierwsze wypisuje hosty i to, co już dla nich wygenerowano. Drugie pokazuje faktyczną konfigurację jednego hosta, z zamaskowanymi sekretami. |
+| `list` / `show fleet.yaml <host>` | Pierwsze polecenie wypisuje hosty i to, co już dla nich wygenerowano. Drugie pokazuje faktyczną konfigurację jednego hosta, z zamaskowanymi sekretami. |
 | `render fleet.yaml [host…]` | Zapisuje skrypty ról, stacki i konfiguracje instalacji w `output/<host>/`. |
 | `build fleet.yaml [host…]` | Generuje konfigurację, a potem buduje ISO. Domyślnie ISO zawiera tylko system bazowy, a z `--offline` całą rolę. |
 | `script fleet.yaml <host>` | Wypisuje skrypt dla dowolnej maszyny. Z `--offline` skrypt zawiera całą rolę. |
@@ -145,10 +145,10 @@ przepadną.
 
 !!! danger "Obrazy ISO czyszczą wskazany dysk"
     Instalacyjny obraz ISO czyści dysk, dla którego został zbudowany, gdy
-    tylko maszyna z niego wystartuje, i o nic nie pyta. Opisuj swoje obrazy
+    tylko maszyna z niego wystartuje, i o nic nie pyta. Oznaczaj swoje obrazy
     ISO. Właśnie dlatego `build` wymaga ustawienia `disk:`.
 
-- **Wynik zawiera sekrety.** Są to skróty haseł, klucze WireGuard, klucze TLS
+- **Pliki wynikowe zawierają sekrety.** Są to skróty haseł, klucze WireGuard, klucze TLS
   i klucze LUKS. Pliki są zapisywane z uprawnieniami 0600, a git ignoruje
   `output/`. Z obrazami ISO zbudowanymi z `--offline` obchodź się tak samo
   ostrożnie.

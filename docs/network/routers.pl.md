@@ -4,18 +4,18 @@ Ta strona pokazuje, jak przez router podłączyć do Kiwi Network całą sieć
 lokalną (LAN), na przykład domową albo biurową. Urządzenie w sieci mesh, czyli
 w prywatnej sieci WireGuard twoich maszyn, rozwiązuje każdą nazwę z twojej
 sieci i ma dostęp do każdego node’a. Urządzenia w sieci lokalnej za routerem
-mogą to samo, a żadne z nich nie musi uruchamiać WireGuard. Można to
+mogą robić to samo, a żadne z nich nie musi uruchamiać WireGuard. Można to
 skonfigurować na dwa sposoby:
 
 - **Router jest klientem w sieci mesh.** Router uruchamia WireGuard
   z konfiguracją wystawioną przez wg-easy, serwer WireGuard mastera
-  (`kiwi-server enroll fleet.yaml router --group routers`). Kieruje do tunelu
-  ruch do podsieci mesh (`10.8.0.0/16`). Taki tunel nazywa się *split*, bo
+  (`kiwi-server enroll fleet.yaml router --group routers`). Do tunelu kieruje
+  ruch przeznaczony dla podsieci mesh (`10.8.0.0/16`). Taki tunel nazywa się *split*, bo
   przechodzi przez niego tylko ruch do sieci mesh. Tunel *full* przenosi cały
   ruch, więc cała sieć lokalna łączy się z internetem przez wyjście mastera,
   czyli jego połączenie z internetem.
 - **Router ma trasę statyczną do node’a `gateway`.** Na routerze nie ma
-  tunelu. Ruch do podsieci mesh router wysyła do node’a w sieci lokalnej,
+  tunelu. Ruch przeznaczony dla podsieci mesh router wysyła do node’a w sieci lokalnej,
   na którym działa moduł `gateway`, a ten przekazuje go dalej przez swojego
   klienta VPN.
 
@@ -43,7 +43,7 @@ kiwi-server openwrt fleet.yaml --via lychee
 kiwi-server openwrt fleet.yaml --via 192.168.1.5
 ```
 
-Skopiuj wynik na router i uruchom go tam:
+Skopiuj wynik na router i tam go uruchom:
 
 ```bash
 kiwi-server openwrt fleet.yaml --wireguard secrets/router.conf > kiwi.sh
@@ -55,8 +55,8 @@ Skrypt instaluje pakiet WireGuard, jeśli go brakuje. Tworzy interfejs o nazwie
 `wg_mtu` z pliku fleet i ma jednego peera, mastera. Peer jest tworzony
 z opcją `route_allowed_ips`, więc trasy OpenWrt dodaje sam. Skrypt tworzy też
 strefę zapory sieciowej, do której sieć lokalna może przekazywać ruch,
-z maskaradą i MSS clamping. Na koniec dodaje regułę dnsmasq, która przekazuje
-domenę twojej sieci do mastera (`server=/home/10.8.0.1`). Z opcją `--full`
+z maskowaniem adresów (masquerading) i ograniczaniem MSS (MSS clamping). Na
+koniec dodaje regułę dnsmasq, która przekazuje domenę twojej sieci do mastera (`server=/home/10.8.0.1`). Z opcją `--full`
 dnsmasq wysyła każde zapytanie DNS do Pi-hole’a mastera. Każda sekcja, którą
 zapisuje skrypt, ma nazwę, więc ponowne uruchomienie skryptu zastępuje to, co
 zapisał poprzednio.
@@ -82,7 +82,7 @@ zapytań DNS o jedną konkretną domenę. Regułą DNS musi się więc zająć n
 Tunelu i tras statycznych możesz używać jednocześnie. Ruch do sieci mesh idzie
 wtedy przez tunel.
 
-## Każdy inny router { #any-other-router }
+## Inne routery { #any-other-router }
 
 W przypadku każdego innego routera wystarczą trzy rzeczy. Daj routerowi
 konfigurację klienta WireGuard albo dodaj trasę statyczną do `10.8.0.0/16`,

@@ -10,7 +10,7 @@ część.
 Ta prywatna sieć to **sieć mesh oparta na WireGuard**. WireGuard to
 oprogramowanie VPN, które szyfruje połączenia, a *siecią mesh* nazywamy w tej
 dokumentacji prywatną sieć, do której należą wszystkie twoje maszyny. W jej
-środku stoi jedna maszyna, *kiwi-master*. Każda inna maszyna (node’y w domu
+centrum jest jedna maszyna, *kiwi-master*. Każda inna maszyna (node’y w domu
 albo w biurze, laptopy, telefony, routery) sama nawiązuje połączenie
 z masterem i dzięki temu może przez sieć mesh połączyć się z pozostałymi. Całą
 sieć opisuje jeden plik, plik fleet (`fleet.yaml`), a narzędzie
@@ -42,7 +42,7 @@ sieć opisuje jeden plik, plik fleet (`fleet.yaml`), a narzędzie
 Master to maszyna, z którą łączą się wszystkie pozostałe. Jego rola, `master`,
 uruchamia pięć modułów opisanych poniżej. Pi-hole, Tor i nginx współdzielą
 z serwerem WireGuard sieciową przestrzeń nazw (network namespace), czyli osobny
-zestaw interfejsów, adresów i tras, jaki ma kontener. Te trzy usługi nie mają
+zestaw interfejsów, adresów i tras, jaki ma każdy kontener. Te trzy usługi nie mają
 więc własnej sieci, tylko korzystają z sieci serwera WireGuard. Z tego powodu
 są restartowane razem z nim.
 
@@ -76,7 +76,8 @@ zapasowe.
 
 ### Co jest dostępne z internetu { #what-is-reachable-from-the-internet }
 
-Domyślnie master ma otwarty do internetu **jeden port**: WireGuard na UDP 51820. Strony administracyjne da się otworzyć tylko z sieci mesh. Kolejne
+Domyślnie master ma otwarty do internetu **jeden port**: WireGuard na UDP
+51820. Strony administracyjne da się otworzyć tylko z sieci mesh. Kolejne
 porty otwierają dwa ustawienia:
 
 - `reverse-proxy.public: true` otwiera porty 80 i 443 i pobiera certyfikaty
@@ -90,9 +91,9 @@ porty otwierają dwa ustawienia:
   dyskiem może odblokować ten dysk przy starcie, a pierścień to jeden serwer
   Tang z własnymi kluczami.
 
-SSH pozostaje skonfigurowane tak, jak ustawił je system operacyjny, czyli
-domyślnie można się logować wyłącznie kluczem. Samo narzędzie kiwi-server
-używa SSH do poleceń `apply` i `status`.
+kiwi-server nie zmienia konfiguracji SSH, którą ustawił system operacyjny,
+więc domyślnie można się logować wyłącznie kluczem. Sam kiwi-server używa SSH
+do poleceń `apply` i `status`.
 
 ## Grupy klientów { #client-groups }
 
@@ -125,9 +126,9 @@ wyłączone.
 
 ## Node’y { #nodes }
 
-Node to maszyna w domu albo w biurze, na której działają twoje usługi. On też
-ma moduł vpn-client, ale tutaj moduł ten nie łączy się z komercyjnym dostawcą
-VPN, tylko z masterem. Używa do tego konfiguracji WireGuard, którą master
+Node to maszyna w domu albo w biurze, na której działają twoje usługi. Node też
+ma moduł vpn-client, ale tu nie łączy się on z komercyjnym dostawcą VPN,
+tylko z masterem. Używa do tego konfiguracji WireGuard, którą master
 wystawił dla tego node’a. Polecenie `kiwi-server enroll` zapisuje ją w pliku
 `secrets/<hostname>.conf`, a node korzysta z niej bez żadnych dodatkowych
 ustawień. Node nie potrzebuje portu otwartego do internetu, bo sam nawiązuje
@@ -145,9 +146,9 @@ Node’y mogą też robić kopie zapasowe, służyć jako serwer kopii zapasowyc
 i uruchamiać Tang. OpenCloud, Immich i Paperless-ngx są dołączone do
 wypróbowania. Zobacz [listę modułów](../server/modules.md).
 
-Z usług node’a można korzystać z jego sieci lokalnej oraz pod jego **adresem
-w sieci mesh** (na przykład `10.8.0.25`). Ruch z sieci mesh skierowany na ten
-adres, na porty 80 i 443, jest przekazywany do reverse proxy node’a.
+Usługi node’a są dostępne w jego sieci lokalnej oraz pod jego **adresem
+w sieci mesh** (na przykład `10.8.0.25`). Ruch z sieci mesh na porty 80 i 443
+pod tym adresem jest przekazywany do reverse proxy node’a.
 
 ## Nazwy { #names }
 
@@ -155,8 +156,8 @@ Nazwy maszyn trzymają się pewnej konwencji. **Mastery noszą nazwy potraw
 z owoców** (`crumble`, `sorbet`, `compote`, `chutney`, `strudel`, `cobbler`,
 `trifle`, `cider`), a **node’y nazwy owoców** (`papaya`, `lychee`, `guava`,
 `quince`, `damson`). Dzięki temu w każdej linii logu od razu widać, o jaki
-rodzaj maszyny chodzi. To tylko konwencja i zadziała każda nazwa. Usługa
-dostaje nazwę pod nazwą maszyny, na której działa: `cloud.papaya.home`,
+rodzaj maszyny chodzi. To tylko konwencja i zadziała każda nazwa. Nazwa
+usługi powstaje z nazwy maszyny, na której usługa działa: `cloud.papaya.home`,
 `vault.papaya.home`, `wg.sorbet.home`. Zobacz
 [DNS, nazwy i certyfikaty](dns.md).
 
@@ -174,11 +175,11 @@ trafia do internetu. Wyjście ma trzy tryby:
 Niezależnie od trybu wyjścia każdy master udostępnia sieci mesh także proxy
 SOCKS5 Tora.
 
-## Jedna sieć mesh na każdą sieć { #one-mesh-per-network }
+## Każda sieć Kiwi ma własną sieć mesh { #one-mesh-per-network }
 
-Każda sieć ma własną sieć mesh z osobnym zakresem adresów. Domyślny zakres to
+Każda sieć Kiwi ma własną sieć mesh z osobnym zakresem adresów. Domyślny zakres to
 `10.8.0.0/16`. Mastery i node’y mają adresy z `10.8.0.0/24`, a dalej idą grupy:
-guests w `.1`, pentest w `.2`, devices w `.3` i routers w `.4`. Druga sieć
+guests w `.1`, pentest w `.2`, devices w `.3` i routers w `.4`. Druga sieć Kiwi
 używa innego zakresu, na przykład `10.9.0.0/16`, żeby urządzenie należące do
 obu sieci mogło je odróżnić. Na razie zakresu nie ustawia się w jednym miejscu,
 tylko w kilku ustawieniach: `mesh_subnet`, w module vpn-server `server_ip`,
@@ -214,7 +215,7 @@ uruchamia się tylko w
 ## Cała sieć lokalna w sieci mesh { #a-whole-lan-in-the-mesh }
 
 Router może dołączyć do sieci mesh jako klient WireGuard w grupie `routers`.
-Druga możliwość to trasa statyczna, którą router wysyła ruch do podsieci mesh
-do node’a `gateway`. W obu przypadkach każde urządzenie w sieci lokalnej tego
+Router może też mieć trasę statyczną, która kieruje ruch przeznaczony dla
+podsieci mesh do node’a `gateway`. W obu przypadkach każde urządzenie w sieci lokalnej tego
 routera ma dostęp do każdego node’a, choć samo nie uruchamia WireGuard. Zobacz
 [Routery](routers.md).

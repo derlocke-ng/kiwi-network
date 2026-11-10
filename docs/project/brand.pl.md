@@ -1,10 +1,13 @@
 # Ikony i kolory
 
-Każda aplikacja Kiwi ma ten sam znak: **przekrój kiwi**, którego środek nosi
-glif aplikacji, we własnym kolorze. Ikony są w
-[derlocke-ng/kiwi-icons](https://github.com/derlocke-ng/kiwi-icons), razem ze
-[stroną podglądu](https://derlocke-ng.github.io/kiwi-icons/), która ma
-przełącznik stylu i motywu, palety oraz adresy URL do skopiowania.
+Ta strona opisuje ikony i kolory aplikacji Kiwi i podpowiada, skąd je wziąć,
+na przykład gdy piszesz aplikację do katalogu aplikacji Kiwi. Każda aplikacja
+Kiwi ma ten sam rodzaj ikony: **przekrój kiwi**, czyli owoc kiwi przecięty na
+pół. W środku owocu widać symbol aplikacji, a każda aplikacja ma własny kolor.
+Ikony są w repozytorium
+[derlocke-ng/kiwi-icons](https://github.com/derlocke-ng/kiwi-icons). Na jego
+[stronie z podglądem](https://derlocke-ng.github.io/kiwi-icons/) możesz
+przełączać styl i motyw, obejrzeć palety i skopiować adresy URL.
 
 <div class="kiwi-icons-row" markdown>
 ![kiwi-updater](../assets/icons/kiwi-updater.svg){ width=56 }
@@ -19,28 +22,33 @@ przełącznik stylu i motywu, palety oraz adresy URL do skopiowania.
 
 ## Trzy style { #three-styles }
 
+Każda ikona istnieje w trzech stylach:
+
 | Styl | Wygląd |
 |---|---|
-| **classic** (domyślny) | dopracowana ikona GTK: skórka, miąższ, pestki i środek |
-| **flat** | bez skórki, większy środek |
-| **night** | odwrócony znak liniowy na ciemnym kole |
+| **classic** (domyślny) | dopracowana ikona GTK ze skórką, miąższem, pestkami i środkiem |
+| **flat** | bez skórki, z większym środkiem |
+| **night** | odwrócony rysunek konturowy na ciemnym kole |
 
-## Układ { #layout }
+## Układ repozytorium { #layout }
 
-| Ścieżka | Co |
+Repozytorium kiwi-icons zawiera te pliki:
+
+| Ścieżka | Co to jest |
 |---|---|
-| `svg/<style>/<icon>.svg` | wzorce (viewBox 128×128) |
-| `png/<style>/<size>/<icon>.png` | rendery w 16, 32, 48, 64, 128, 256 i 512 px |
-| `icons.json` | indeks do odczytu maszynowego: id, nazwy, opisy, kolory, szablony URL |
+| `svg/<style>/<icon>.svg` | pliki źródłowe (viewBox 128×128) |
+| `png/<style>/<size>/<icon>.png` | wersje PNG w rozmiarach 16, 32, 48, 64, 128, 256 i 512 px |
+| `icons.json` | indeks do odczytu maszynowego z identyfikatorami, nazwami, opisami, kolorami i szablonami adresów URL |
 | `palette/kiwi-palette.css`, `.json` | sześć kolorów na aplikację: `rim`, `flesh`, `core`, `ink`, `deep`, `text` |
 
 ## W aplikacji { #in-an-app }
 
-Większość aplikacji Kiwi dostarcza bajt w bajt identyczną kopię klasycznego
-SVG i wskazuje ją przez `ICON=` w swoim `kiwi.manifest`. gnome-monitor i
-syncman używają ikon `kiwi-os` i `kiwi-cloud`, a kiwi-custodia ma własną.
-kiwi-updater od wersji 2.2 bierze ją z własnego klona aplikacji, więc przy
-instalacji nic nie jest pobierane. Aplikacja z programem uruchamiającym
-`.desktop` instaluje ją też w motywie ikon hicolor.
+Większość aplikacji Kiwi zawiera identyczną co do bajtu kopię ikony SVG
+w stylu classic i wskazuje ten plik wpisem `ICON=` w swoim `kiwi.manifest`.
+gnome-monitor używa ikony `kiwi-os`, a syncman ikony `kiwi-cloud`.
+kiwi-custodia ma własną ikonę. kiwi-updater od wersji 2.2 bierze ikonę
+z własnego klonu aplikacji, więc przy instalacji niczego nie pobiera.
+Aplikacja z plikiem uruchamiającym `.desktop` instaluje też ikonę w motywie
+ikon hicolor.
 
 kiwi-icons nie ma jeszcze informacji o licencji.

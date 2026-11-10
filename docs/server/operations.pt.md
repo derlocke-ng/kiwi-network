@@ -64,7 +64,7 @@ kiwi-server backup fleet.yaml --local /mnt/usb   # ou uma cópia numa pasta, a q
 
 ## Backup dos dados das máquinas { #backing-up-the-machines-data }
 
-Os dados das máquinas são guardados com o restic, um programa de backups. Um
+O backup dos dados das máquinas é feito com o restic, um programa de backups. Um
 node guarda os backups: dá-lhe o módulo `backup-server`, que corre um servidor
 REST do restic. Cada máquina de que queres fazer backup recebe o módulo
 `backup`, com uma definição que aponta para esse servidor:
@@ -120,13 +120,13 @@ restaurados no lychee.
   `kiwi-server prune fleet.yaml --every week` (ou `day`) instala no teu
   computador um temporizador (timer) de utilizador do systemd. O teu computador
   é o único sítio onde estão as chaves que têm permissão para apagar. Se uma
-  execução falhar, é feita no início de sessão seguinte. O `kiwi-server status`
+  execução ficar por fazer, é feita quando voltares a iniciar sessão. O `kiwi-server status`
   mostra cada cópia de backup e avisa quando os snapshots antigos de um node de
   backups não são eliminados há três semanas.
 - **Uma ligação bloqueada ao fornecedor de VPN comercial recupera sozinha.** O
   gluetun, o contentor do cliente VPN, passa a ter uma verificação de estado
   (health check), que confirma regularmente se a ligação continua a funcionar.
-  Quando a ligação falha durante cinco minutos, o contentor é terminado e, ao
+  Quando a verificação falha durante cinco minutos, o contentor é terminado e, ao
   arrancar de novo, escolhe outro servidor.
 
 ## Discos cifrados e desbloqueio { #encrypted-disks-and-unlocking }
@@ -172,7 +172,7 @@ acrescenta os seus próprios cabeçalhos a cada pacote, pelo que um túnel
 transporta pacotes mais pequenos do que a ligação por baixo dele, e uma ligação
 móvel transporta-os ainda mais pequenos. Um pacote grande demais para uma das
 ligações do percurso é descartado ou fragmentado, e as ligações ficam
-bloqueadas. A Kiwi resolve isto de três maneiras:
+bloqueadas. A Kiwi Network resolve isto de três maneiras:
 
 - **Duas definições.** `wg_mtu` é a MTU do gluetun (o cliente VPN), das
   configurações de cliente emitidas pelo wg-easy (o servidor WireGuard) e da

@@ -47,7 +47,7 @@ A maior parte das aplicações Kiwi traz uma cópia exata, byte a byte, de um SV
 do estilo classic e indica esse ficheiro com `ICON=` no seu `kiwi.manifest`. O
 gnome-monitor usa o ícone `kiwi-os` e o syncman usa o ícone `kiwi-cloud`. O
 kiwi-custodia tem um ícone próprio. A partir da versão 2.2, o kiwi-updater vai
-buscar o ícone ao seu clone da aplicação, pelo que nada é descarregado durante
+buscar o ícone ao clone da aplicação que já tem, pelo que nada é descarregado durante
 a instalação. Uma aplicação que tenha um lançador `.desktop` instala também o
 ícone no tema de ícones hicolor.
 

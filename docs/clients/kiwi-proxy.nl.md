@@ -1,18 +1,28 @@
 # kiwi-proxy
 
-Verzegelde SOCKS5- en VPN-exits in rootless Podman, voor browsers, testtools,
-applicaties op de host en kiwi-server-machines.
+kiwi-proxy is bedoeld voor mensen die in de netwerken van veel klanten werken en
+elk netwerk via een eigen VPN- of SOCKS-verbinding bereiken. Je slaat elke
+verbinding op als **exit** met een naam, en start die alleen als je hem nodig
+hebt. Elke exit is afgeschermd van de andere, en een programma dat een exit
+gebruikt, kan het netwerk alleen via die exit bereiken. Tien klanten betekenen
+dus niet tien VPN-verbindingen tegelijk op de host. Browsers, testtools,
+programma’s op de host en kiwi-server-machines kunnen een exit gebruiken.
+kiwi-proxy draait in rootless Podman, dus in containers die zonder rootrechten
+als je eigen gebruiker draaien.
 
 - Repository: [derlocke-ng/kiwi-proxy](https://github.com/derlocke-ng/kiwi-proxy), GPL-3.0-or-later
-- Nieuwste release: **v0.7.3**. Het staat in de [Kiwi-catalogus](../desktop/catalogs.md), gebruikersscope.
-- Een CLI (`kiwi-proxy`), een GTK4-app (**Kiwi Proxy**) en systemd-gebruikersunits.
-  Het is de proxy-engine die vroeger in kiwi-fox zat, afgesplitst zodat hij meer
-  dan één app bedient.
+- Nieuwste release: **v0.7.3**. Staat in de [Kiwi-catalogus](../desktop/catalogs.md), scope user.
+- Bestaat uit een opdrachtregeltool (`kiwi-proxy`), een GTK4-app
+  (**Kiwi Proxy**) en systemd-units voor je eigen gebruiker. Het is de
+  proxy-engine die vroeger in kiwi-fox zat. Hij is naar een eigen project
+  verhuisd, zodat meer dan één app hem kan gebruiken.
 
-Een **exit** is één upstream, met een naam: een SOCKS5 die je hebt gekregen, of
-een die een [providermodule](providers.md) maakt (Tor, een VPN-tunnel, 9proxy,
-Mysterium). Een exit is alleen gegevens. Als je hem opstart, ontstaat er een
-**gateway**:
+Een **exit** is een opgeslagen verbinding naar een upstream, met een eigen naam.
+De upstream is de proxy waar het verkeer naartoe wordt gestuurd. Dat is een
+SOCKS5-proxy die je hebt gekregen, of een die een [providermodule](providers.md)
+voor je aanmaakt via Tor, een VPN-tunnel, 9proxy of Mysterium. Een exit op
+zichzelf is alleen een opgeslagen item, en er draait niets voor. Start je een
+exit, dan start kiwi-proxy er een **gateway**-container voor:
 
 ```
 gateway container   owns the network namespace
@@ -21,43 +31,50 @@ gateway container   owns the network namespace
                     dnscrypt-proxy 127.0.0.2:53: DNS through the same exit, with blocklists
 ```
 
-Wat zich ook bij de namespace van de gateway voegt (een kiwi-fox-browser, een
-kiwi-custodia-box, een toolcontainer), heeft geen andere route dan die upstream.
-Als de gateway uitvalt, verliezen zijn leden hun route.
+De gateway-container heeft een eigen netwerk-namespace: een eigen set
+netwerkinterfaces, adressen en routes, met eigen firewallregels. Een browser
+van kiwi-fox, een box van kiwi-custodia of een container met tools sluit zich
+bij deze namespace aan en wordt zo lid van de gateway. Vanaf dat moment leidt
+de enige route naar de upstream van de exit. Valt de gateway uit, dan hebben
+zijn leden geen route meer. Dat heet fail-closed: bij een storing valt de
+verbinding weg, en er gaat nooit een andere weg open.
 
 ## Installeren { #install }
 
 ```bash
 kiwi install kiwi-proxy      # kiwi-fox en kiwi-custodia nemen het mee
-kiwi-proxy setup             # de gateway-image, DNS-gegevens, images van providermodules
+kiwi-proxy setup             # het gateway-image, DNS-gegevens, images van providermodules
 ```
 
-Het vereist rootless Podman, Python 3.12+ met pydantic, en GTK4 + libadwaita voor
-de app. Wachtwoorden gaan naar de sleutelbos van de desktop (`secret-tool`), of
-naar bestanden met 0600 op een machine zonder sleutelbos.
+kiwi-proxy heeft rootless Podman nodig en Python 3.12+ met pydantic. De app
+heeft daarnaast GTK4 en libadwaita nodig. Wachtwoorden worden via `secret-tool`
+in de sleutelbos van de desktop bewaard. Op een machine zonder sleutelbos komen
+ze in bestanden met modus 0600, die alleen je eigen gebruiker kan lezen.
 
-## Gebruik { #use }
+## Gebruiken { #use }
 
 ```bash
 kiwi-proxy add client-a socks5://user:pass@host:1080   # een exit; er draait nog niets
-kiwi-proxy add tor-de --module tor --country de        # een exit van een providermodule
+kiwi-proxy add tor-de --module tor --country de        # een exit uit een providermodule
 kiwi-proxy list
-kiwi-proxy check client-a      # wat de wereld erdoorheen ziet
+kiwi-proxy check client-a      # wat de buitenwereld erdoorheen ziet
 kiwi-proxy up client-a         # de gateway starten en laten draaien
-kiwi-proxy down client-a       # hem afbreken, met iedereen die aansloot
-kiwi-proxy ps                  # draaiende gateways, welke app ze ook startte
-kiwi-proxy reap                # gateways afbreken die niemand gebruikt
-kiwi-proxy-gui                 # "Kiwi Proxy" in het app-overzicht
+kiwi-proxy down client-a       # afbreken, samen met alles wat erop zit
+kiwi-proxy ps                  # draaiende gateways, door welke app ook gestart
+kiwi-proxy reap                # gateways opruimen die niemand gebruikt
+kiwi-proxy-gui                 # "Kiwi Proxy" in het overzicht van apps
 ```
 
-Endpoints zijn `socks5://user:pass@host:port`, `http://…`, `https://…`, of het
-leveranciersformaat `host:port:user:pass`. `kiwi-proxy test ENDPOINT` test er een
-zonder iets aan te maken.
+Een eindpunt is het adres van een upstream. Je schrijft het als
+`socks5://user:pass@host:port`, `http://…` of `https://…`, of in het formaat
+van de aanbieder, `host:port:user:pass`. `kiwi-proxy test ENDPOINT` test een
+eindpunt zonder een exit aan te maken.
 
-### Exits voor applicaties op de host { #exits-for-host-applications }
+### Exits voor programma’s op de host { #exits-for-host-applications }
 
-Elk programma op de host kan een exit gebruiken via een gepubliceerde
-SOCKS5-poort, één poort per exit:
+Een programma op de host hoeft niet in een container te draaien om een exit te
+gebruiken. kiwi-proxy kan een exit als SOCKS5-poort op de host aanbieden, met
+één poort per exit:
 
 ```bash
 kiwi-proxy add se socks5://10.64.0.1:1080 --expose 1081
@@ -66,45 +83,57 @@ kiwi-proxy up se && kiwi-proxy up nl
 curl --proxy socks5h://127.0.0.1:1082 https://ifconfig.co/json
 ```
 
-De poort luistert standaard op `127.0.0.1`. Een ander adres vereist een
-gebruikersnaam (`--expose-user`) of een expliciete `--expose-open`.
-`systemctl --user enable --now kiwi-proxy@NAME` houdt een exit vanaf het inloggen
-in de lucht.
+Standaard luistert de poort alleen op `127.0.0.1`. Laat je hem op een ander
+adres luisteren, dan moet je ofwel met `--expose-user` een gebruikersnaam
+instellen, ofwel met `--expose-open` uitdrukkelijk open toegang toestaan. Wil je
+een exit actief hebben vanaf het moment dat je inlogt, voer dan
+`systemctl --user enable --now kiwi-proxy@NAME` uit.
 
 ### DNS { #dns }
 
-- **Resolvermodus** (de standaard): dnscrypt-proxy zoekt op via DoH door de exit
-  (Google, Cloudflare, Quad9 of Mullvad als upstream), met blokkeerlijsten (OISD)
+- **Resolver-modus** is de standaard. dnscrypt-proxy zoekt namen op met DNS over
+  HTTPS (DoH) en stuurt die verzoeken via de exit. De DoH-resolver kan Google,
+  Cloudflare, Quad9 of Mullvad zijn. Er worden blokkeerlijsten (OISD) toegepast,
   die dagelijks worden ververst.
-- **Remote-modus** (`--dns remote`): namen gaan naar de upstream zelf, voor Tor
-  en `.onion`-namen. De blokkeerlijsten gelden nog steeds.
+- **Remote-modus** (`--dns remote`) geeft de namen door aan de upstream, die ze
+  zelf opzoekt. Deze modus is bedoeld voor Tor en `.onion`-namen. Ook in deze
+  modus gelden de blokkeerlijsten.
 
 ### Regels van de gateway { #rules-of-the-gateway }
 
-- UDP kan nergens heen: geen QUIC, geen WebRTC-media, geen DNS in platte tekst.
-- Voor de wereld is een exit IPv4. Een naam zonder IPv4-adres wordt geweigerd.
-- Een gateway die een gebruiker opstartte, verdwijnt wanneer zijn laatste lid
-  vertrekt. Een gateway die met `kiwi-proxy up` is gestart, blijft tot
-  `kiwi-proxy down`.
-- Eén exit, één gateway, een willekeurig aantal leden. Leden die gescheiden moeten
-  blijven, gebruiken verschillende exits.
+- UDP wordt niet doorgestuurd. Dus geen QUIC, geen media via WebRTC en geen DNS
+  in platte tekst.
+- Een exit bereikt de buitenwereld alleen via IPv4. Een naam zonder IPv4-adres
+  wordt geweigerd.
+- Een gateway die door een andere app is gestart, zoals kiwi-fox of
+  kiwi-custodia, wordt opgeruimd zodra het laatste lid weggaat. Een gateway die
+  je met `kiwi-proxy up` hebt gestart, blijft draaien tot je
+  `kiwi-proxy down` uitvoert.
+- Elke exit heeft precies één gateway, en daar kunnen willekeurig veel leden bij
+  aansluiten. Leden die van elkaar gescheiden moeten blijven, gebruiken
+  verschillende exits.
 
 ## De app { #the-app }
 
-**Kiwi Proxy** voegt exits toe en bewerkt ze (een SOCKS5 die je hebt gekregen, of
-een providermodule, met een doorzoekbare landenlijst of nodekiezer), start en
-stopt ze, biedt er een aan als SOCKS5-poort op deze computer en kopieert het adres
-ervan, controleert wat de wereld ziet, toont wie zich bij een gateway heeft
-gevoegd en hun logs, en installeert en configureert providermodules.
+In de app **Kiwi Proxy** voeg je exits toe en bewerk je ze, op basis van een
+SOCKS5-proxy die je hebt gekregen of van een providermodule. Voor een exit uit
+een module kies je uit een doorzoekbare lijst met landen of uit een lijst met
+nodes. Je kunt exits starten en stoppen, een exit als SOCKS5-poort op deze
+computer aanbieden en het adres kopiëren, en controleren wat de buitenwereld
+ziet als je er verbinding via maakt. De app laat ook zien welke leden bij een
+gateway zijn aangesloten en wat hun logs zijn, en je installeert en configureert
+er providermodules mee.
 
 ## Op een kiwi-server-machine { #on-a-kiwi-server-machine }
 
-kiwi-proxy bevat ook een kiwi-server-module die exits voor de hele mesh host (één
-gateway per exit, gepubliceerd op het mesh-adres van de host). Die staat nog niet
-in de boom van kiwi-server en heeft nog niet op een machine gedraaid, zoals de
-documentatie ervan zegt. Providermodules zijn een desktopmechanisme en draaien
-daar niet.
+In de repository van kiwi-proxy zit ook een module voor kiwi-server. Daarmee
+biedt een kiwi-server-machine exits aan voor de hele mesh, het besloten
+WireGuard-netwerk waarin al je kiwi-server-machines zitten. De module draait
+één gateway per exit en biedt die aan op het mesh-adres van de host. Volgens de
+documentatie zit de module nog niet in de broncode van kiwi-server en is ze nog
+op geen enkele machine gedraaid. Providermodules werken alleen op de desktop en
+draaien niet op een kiwi-server-machine.
 
 Verder lezen: [architectuur](https://github.com/derlocke-ng/kiwi-proxy/blob/main/docs/architecture.md),
-[consumers](https://github.com/derlocke-ng/kiwi-proxy/blob/main/docs/consumers.md),
+[gebruikers van kiwi-proxy](https://github.com/derlocke-ng/kiwi-proxy/blob/main/docs/consumers.md),
 [pluginsysteem](https://github.com/derlocke-ng/kiwi-proxy/blob/main/docs/plugin-system.md).

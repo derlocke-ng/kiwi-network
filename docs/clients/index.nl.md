@@ -1,19 +1,24 @@
-# Werken met veel klantnetwerken
+# Werken in veel klantnetwerken
 
-Tien klanten op afstand betekent vaak tien VPN's of SOCKS-eindpunten, één om het
-netwerk van elke klant te bereiken. Ze allemaal op de host draaien is een
-rommeltje: tien tunnels tegelijk, routes die met elkaar vechten, en het ene
-netwerk dat in het volgende lekt. De Kiwi-desktopapps geven ieder in plaats
-daarvan een **verzegelde exit**: een container waarvan de enige route die ene
-upstream is. Je tools sluiten aan op de exit die ze nodig hebben, en verder
-verandert er niets op de host.
+Werk je op afstand voor veel klanten, dan heb je meestal voor het netwerk van
+elke klant een aparte VPN- of SOCKS-verbinding nodig. Tien klanten betekenen dan
+tien verbindingen. Als ze allemaal op de host draaien, gaat dat mis: er staan
+tien tunnels tegelijk open, hun routes zitten elkaar in de weg, en verkeer voor
+het netwerk van de ene klant kan in dat van een andere terechtkomen.
+
+Met de desktop-apps van Kiwi werk je in het netwerk van elke klant afgeschermd
+van de rest. De host raakt niet vol met tunnels en routes, en er draaien geen
+tien VPN-verbindingen tegelijk. Elke verbinding krijgt een eigen container, en
+de enige route uit die container leidt naar die ene klant. Zo’n verbinding heet
+een **exit**. Je programma’s draaien in een container of een browserprofiel dat
+de exit gebruikt die ze nodig hebben, en verder verandert er niets op de host.
 
 | App | Wat het doet |
 |---|---|
-| [**kiwi-proxy**](kiwi-proxy.md) | De motor. Een **exit** is één upstream met een naam: een SOCKS5 die je hebt gekregen, of een die een providermodule maakt. Als je hem opstart, ontstaat er een **gateway**, een netwerknamespace waarvan de enige route die upstream is. Apps op de host kunnen hem als lokale SOCKS5-poort gebruiken |
-| [**kiwi-custodia**](kiwi-custodia.md) | **Distroboxen op een exit**: Fedora, Ubuntu, Debian, Kali, Arch, openSUSE, Rocky of Alpine in een rootless container met een eigen homemap. *Alles* in de box vertrekt via de exit: pakketbeheerders, games, statische binary's die nooit van een proxy hebben gehoord |
-| [**kiwi-fox**](kiwi-fox.md) | **Browserprofielen op een exit**: Camoufox, Firefox of Tor Browser, elk profiel met eigen opslag |
-| [**Providermodules**](providers.md) | Exits via Tor, een VPN (gluetun), 9proxy of Mysterium. Tor en Mysterium zijn de snelle weg naar meer exit-IP's, handig om te testen |
+| [**kiwi-proxy**](kiwi-proxy.md) | De basis waarop de andere apps bouwen. Een **exit** is een opgeslagen verbinding naar een upstream, met een eigen naam. De upstream is de proxy waar je verkeer naartoe wordt gestuurd: een SOCKS5-proxy die je van de klant hebt gekregen, of een die een providermodule aanmaakt. Start je een exit, dan maakt kiwi-proxy er een **gateway** voor aan. Een gateway is een netwerk-namespace (een eigen set netwerkinterfaces, adressen en routes, met een eigen firewall) waarvan de enige route naar die upstream leidt. Programma’s op de host kunnen een exit gebruiken via een lokale SOCKS5-poort |
+| [**kiwi-custodia**](kiwi-custodia.md) | **Linux-distributies in boxen die een exit gebruiken.** Een box is een rootless container (een container die zonder rootrechten draait) met Fedora, Ubuntu, Debian, Kali, Arch, openSUSE, Rocky of Alpine en een eigen thuismap. *Al* het netwerkverkeer van de box gaat via de exit. Dat geldt ook voor pakketbeheerders, games en statisch gelinkte programma’s die proxy-instellingen negeren |
+| [**kiwi-fox**](kiwi-fox.md) | **Browserprofielen die een exit gebruiken.** Elk profiel draait Camoufox, Firefox of Tor Browser en heeft een eigen opslag |
+| [**Providermodules**](providers.md) | Modules die exits aanmaken via Tor, een VPN (met gluetun), 9proxy of Mysterium. Met Tor en Mysterium kom je snel aan extra IP-adressen, wat handig is om te testen |
 
 ```
  client A: socks5://…  ─┐                                   ┌─ box "client-a" (Fedora: ssh, ansible, dnf …)
@@ -22,42 +27,52 @@ verandert er niets op de host.
                                                is the exit
 ```
 
-## Hoe het schoon blijft { #how-it-stays-clean }
+## Hoe de exits gescheiden blijven { #how-it-stays-clean }
 
-- **Fail-closed.** De firewall van een gateway laat alles vallen behalve die ene
-  upstream. Als de gateway uitvalt, verliest alles wat erop aangesloten was zijn
-  route. De killswitch is het ontbreken van een route, geen software die iets
-  moet opmerken.
-- **Er draait niets wat niet gebruikt wordt.** Een gateway die een box of browser
-  heeft opgestart, verdwijnt wanneer de laatste vertrekt. Alleen exits die je met
-  `kiwi-proxy up` start, blijven draaien.
-- **Gescheiden blijft gescheiden.** Wat op dezelfde exit zit, deelt die (één IP,
-  één namespace). Klanten die elkaar niet mogen tegenkomen, krijgen verschillende
-  exits, en elke box heeft een eigen homemap, dus SSH-sleutels en browserprofielen
-  lopen niet door elkaar.
-- **Geen root, geen hostroutes.** Alles draait in rootless Podman, en het eigen
-  netwerk van de host blijft onaangeroerd.
-- **Ook DNS gaat via de exit.** Standaard worden namen via DoH door de exit
-  opgezocht, met lijsten voor advertentieblokkering. Voor de **interne
-  hostnamen** van een klant geef je de namen in plaats daarvan door aan de kant
-  van de klant met `--dns remote` (ook de modus voor Tor en `.onion`-namen).
+- **Een gateway is fail-closed.** Bij een storing valt de verbinding weg, en er
+  gaat nooit een andere weg open. De firewall in een gateway gooit alles weg wat
+  niet naar de ene upstream van de gateway gaat. Valt de gateway uit, dan heeft
+  alles wat eraan hangt geen verbinding meer. Geen enkel programma hoeft de
+  storing op te merken en erop te reageren, want zonder gateway is er gewoon
+  geen route.
+- **Alleen wat je gebruikt, draait.** Start een box of een browser een gateway,
+  dan wordt die gateway weer opgeruimd zodra de laatste box of browser die hem
+  gebruikt, is gestopt. Alleen exits die je zelf met `kiwi-proxy up` start,
+  blijven draaien.
+- **Klanten blijven gescheiden.** Boxen en browsers op dezelfde exit delen die
+  exit, dus ze hebben hetzelfde IP-adres en dezelfde netwerk-namespace. Klanten
+  die elkaar niet mogen zien, krijgen verschillende exits. Elke box heeft
+  bovendien een eigen thuismap, dus de SSH-sleutels en browserprofielen van de
+  ene klant zijn niet beschikbaar in de box van een andere klant.
+- **Geen rootrechten en geen routes op de host.** Alles draait in rootless
+  Podman, dat containers als je eigen gebruiker draait. Aan het netwerk van de
+  host zelf verandert niets.
+- **Ook DNS-verzoeken gaan via de exit.** Standaard worden namen opgezocht met
+  DNS over HTTPS (DoH) via de exit, en lijsten met reclamedomeinen worden
+  geblokkeerd. Wil je de **interne hostnamen** van een klant opzoeken, gebruik
+  dan `--dns remote`. De namen worden dan doorgegeven aan de kant van de klant
+  en daar opgezocht. Tor en `.onion`-namen hebben deze modus ook nodig.
 
-## Beperkingen { #limits }
+## Grenzen { #limits }
 
-Deze komen uit de repository's:
+Deze grenzen staan in de repository’s zelf:
 
-- **Alleen TCP, alleen IPv4.** UDP kan nergens heen (geen QUIC, geen
-  WebRTC-media), en IPv6 krijgt geen route.
-- **Eén VPN-configuratie per machine.** De VPN-providermodule bevat één
-  gluetun-configuratie (één `vpn.json`, één eigen WireGuard-configuratie), en de
-  exits ervan verschillen alleen in serverland. Voor de eigen VPN's van meerdere
-  klanten naast elkaar is vandaag een SOCKS5-eindpunt per klant de weg.
-- **Een box is netwerkbewaring, geen sandbox.** Hij deelt je beeldscherm,
-  sessiebus en klembord, net als distrobox. Wat hij niet kan, is het netwerk
-  bereiken anders dan via zijn exit.
-- **Mysterium:** één identiteit heeft één verbinding tegelijk.
+- **Alleen TCP en alleen IPv4.** UDP wordt niet doorgestuurd, dus QUIC en media
+  via WebRTC werken niet. Voor IPv6 is er geen route.
+- **Eén VPN-configuratie per machine.** De providermodule voor VPN heeft één
+  gluetun-configuratie, met één `vpn.json` en één eigen WireGuard-configuratie.
+  De exits ervan verschillen alleen in het land van de server. Heb je de eigen
+  VPN’s van meerdere klanten tegelijk nodig, dan is een SOCKS5-eindpunt per
+  klant op dit moment de manier om dat te doen.
+- **Een box beperkt het netwerk, maar is geen sandbox.** Net als een
+  distrobox-container deelt hij je scherm, je sessiebus en je klembord. Wat hij
+  niet kan, is het netwerk op een andere manier bereiken dan via zijn exit.
+- **Mysterium:** één identiteit kan maar één verbinding tegelijk hebben.
 
 ## Aan de slag { #get-started }
+
+De volgende commando’s installeren de apps, slaan de SOCKS5-proxy van één klant
+op als exit, en openen een shell in een Fedora-box die deze exit gebruikt:
 
 ```bash
 kiwi install kiwi-custodia            # neemt kiwi-proxy mee
@@ -65,5 +80,5 @@ kiwi-custodia setup                   # images en DNS-gegevens
 
 kiwi-proxy add client-a socks5://user:pass@jump.client-a.example:1080 --dns remote
 kiwi-custodia new client-a --exit client-a --distro fedora
-kiwi-custodia enter client-a          # een shell waarvan de enige weg naar buiten de SOCKS5 van klant A is
+kiwi-custodia enter client-a          # een shell die alleen via de SOCKS5 van klant A naar buiten kan
 ```

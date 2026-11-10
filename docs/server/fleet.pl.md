@@ -23,8 +23,8 @@ będzie potem wykonywać.
 ## Przykład { #example }
 
 Ten plik fleet opisuje trzy maszyny. Pierwsza to master, czyli maszyna,
-z którą łączą się wszystkie pozostałe, na VPS-ie z Debianem (wynajętym
-serwerze wirtualnym). Druga to node `gateway`, który kieruje ruch sieci
+z którą łączą się wszystkie pozostałe. Działa na VPS-ie z Debianem, czyli na
+wynajętym serwerze wirtualnym. Druga to node `gateway`, który kieruje ruch sieci
 lokalnej przez VPN. Trzecia to node `cloud` z Nextcloud i Vaultwarden.
 
 ```yaml
@@ -77,7 +77,7 @@ W przykładzie nie ma haseł usług. Każde hasło, którego nie podasz, kiwi-se
 generuje z seeda zapisanego w `secrets/seed`, a polecenie
 `kiwi-server secrets show fleet.yaml papaya` wypisuje hasła tego hosta.
 
-W przykładzie nie ma też plików konfiguracyjnych WireGuard dla node’ów.
+W przykładzie nie wskazano też plików konfiguracyjnych WireGuard node’ów.
 `kiwi-server enroll` zapisuje konfigurację node’a w `secrets/<hostname>.conf`,
 a klient VPN node’a znajduje ją tam bez żadnego wpisu w pliku fleet. Z tego
 samego pliku odczytywany jest adres node’a w sieci mesh. Sieć mesh to prywatna
@@ -111,7 +111,7 @@ używa wbudowanej wartości z tej tabeli.
   poda tylko te klucze, które się różnią. Wyjątkiem są listy
   `admin.ssh_keys`, `debian.packages`, `debian.kernel_arguments` i listy
   `coreos.*`. Wpisy hosta w tych listach są *dopisywane* do wartości
-  domyślnych, a nie je zastępują.
+  domyślnych, zamiast je zastępować.
 - Role zbudowane z modułów, `master` i `node`, trzymają swoje ustawienia
   w bloku nazwanym tak jak rola (`master:` albo `node:`). W tym bloku są
   najpierw **ustawienia stacku**, a potem **po jednym bloku na każdy moduł**.
@@ -120,7 +120,7 @@ używa wbudowanej wartości z tej tabeli.
 - Lista `modules:` w tym bloku **zastępuje** listę modułów presetu. Preset to
   gotowa lista modułów. Moduły, których wymagają moduły z listy, są dodawane
   automatycznie.
-- **Ustawienia plikowe**, na przykład certyfikaty i pliki konfiguracyjne,
+- **Ustawienia wskazujące pliki**, na przykład certyfikaty i pliki konfiguracyjne,
   podaje się jako ścieżki względem pliku fleet. kiwi-server kopiuje zawartość
   tych plików do skryptu roli hosta, czyli skryptu, który konfiguruje maszynę
   do jej roli.

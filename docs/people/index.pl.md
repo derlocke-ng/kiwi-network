@@ -16,15 +16,14 @@ urządzeniu przed wysłaniem. Pozostałe części Kiwi Network łączą twoje ma
 Huby łączą ludzi. Poszczególne aplikacje opisuje strona
 [Aplikacje frameworka](apps.md).
 
-Armory to pierwszy hub zbudowany na tym frameworku. Jest jednym z możliwych
-przykładów, a zarazem szablonem, który inne społeczności kopiują, żeby zbudować
-własny hub.
+Armory to pierwszy hub zbudowany na tym frameworku. To jeden przykład, a zarazem
+szablon, który inne społeczności kopiują, żeby zbudować własny hub.
 
 Oprogramowanie mieści się w trzech repozytoriach:
 
 | Repozytorium | Czym jest |
 |---|---|
-| [**kiwi-framework**](https://github.com/derlocke-ng/kiwi-framework) | Ogólne oprogramowanie, z którego powstaje każdy hub. Zawiera tożsamość i konta, przekaźniki i synchronizację, znajomych i udostępnianie, moderację, zestaw komponentów interfejsu, strony huba oraz dziesięć aplikacji. Samego frameworka nie da się otworzyć jako strony internetowej. Hubem staje się dopiero w dystrybucji. Aktualna wersja to v0.32.1, a licencja to GPL-3.0-or-later. |
+| [**kiwi-framework**](https://github.com/derlocke-ng/kiwi-framework) | Ogólne oprogramowanie, z którego powstaje każdy hub. Zawiera tożsamość i konta, przekaźniki i synchronizację, znajomych i udostępnianie, moderację, zestaw komponentów interfejsu, strony huba oraz dziesięć aplikacji. Samego frameworka nie da się otworzyć jako strony internetowej. Hub powstaje z niego dopiero w dystrybucji. Aktualna wersja to v0.32.1, a licencja to GPL-3.0-or-later. |
 | [**Armory**](armory.md) | Pierwsza **dystrybucja**, czyli konkretny hub zbudowany na frameworku. Dokłada nazwę, domyślne przekaźniki i wszystkie dziesięć aplikacji, każdą pod własną nazwą. To szablon, który forkujesz, żeby zrobić własny hub. Licencja: GPL-3.0-or-later. **Działa pod adresem:** [derlocke-ng.github.io/armory](https://derlocke-ng.github.io/armory/) |
 | [**kiwi-web-catalog**](hubs.md#kiwi-web-catalog) | Katalog, czyli repozytorium git z listą hubów i ich aplikacji. Ma ten sam format co [kiwi-catalog](../desktop/catalogs.md) dla desktopu. |
 
@@ -126,7 +125,7 @@ przepadają więc tylko wtedy, gdy zniknie każde urządzenie, które je miało,
 - Twój klucz jest przechowywany w pamięci przeglądarki. Wszystkie strony GitHub
   Pages jednego konta mają wspólny origin, a przeglądarki rozdzielają pamięć
   stron właśnie według originu. Hub pod własną domeną lub subdomeną jest więc
-  mocniejszym rozwiązaniem.
+  bezpieczniejszym rozwiązaniem.
 - Przy bezpośrednim przesyłaniu plików i w trakcie rozmowy obie przeglądarki
   poznają nawzajem swoje adresy IP. Oba adresy widzą też serwery STUN, które
   pomagają zestawić połączenie. Domyślnie są to serwery STUN firm Google

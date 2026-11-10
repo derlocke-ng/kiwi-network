@@ -1,8 +1,8 @@
 # O ficheiro fleet
 
 O ficheiro fleet, `fleet.yaml`, é onde descreves todas as máquinas da tua Kiwi
-Network. Para cada máquina, indica que sistema operativo recebe, para que serve
-e como estão configurados os seus serviços. O kiwi-server constrói todas as
+Network. Para cada máquina, o ficheiro indica que sistema operativo ela recebe, para
+que serve e como estão configurados os seus serviços. O kiwi-server constrói todas as
 máquinas a partir desta descrição: escreves uma vez o que queres e não tens de
 configurar nenhuma máquina à mão.
 
@@ -108,8 +108,8 @@ kiwi-server usa o valor incorporado que aparece nesta tabela.
 
 ## Como as definições se combinam { #how-settings-combine }
 
-- Uma máquina sobrepõe-se às predefinições **chave a chave**, por isso só tem de
-  indicar as chaves que são diferentes. A exceção são as listas
+- As definições de uma máquina sobrepõem-se às predefinições **chave a chave**,
+  por isso basta indicar as chaves que são diferentes. A exceção são as listas
   `admin.ssh_keys`, `debian.packages`, `debian.kernel_arguments` e as listas
   `coreos.*`: as entradas que uma máquina põe nestas listas são *acrescentadas*
   às predefinidas, em vez de as substituírem.
@@ -119,9 +119,9 @@ kiwi-server usa o valor incorporado que aparece nesta tabela.
   stack é o conjunto de contentores que uma máquina corre para os seus módulos,
   e as definições da stack aplicam-se a todos eles.
 - Uma lista `modules:` dentro desse bloco **substitui** a lista de módulos do
-  preset. Um preset é uma lista de módulos já pronta. Os módulos de que os
-  módulos indicados dependem são acrescentados automaticamente.
-- **As definições de ficheiros**, como certificados e ficheiros de
+  preset. Um preset é uma lista de módulos já pronta. Se os módulos indicados
+  precisarem de outros, estes são acrescentados automaticamente.
+- **As definições que apontam para ficheiros**, como certificados e ficheiros de
   configuração, indicam-se com caminhos relativos ao ficheiro fleet. O
   kiwi-server copia o conteúdo desses ficheiros para o script da função da
   máquina, que é o script que prepara a máquina para a sua função.

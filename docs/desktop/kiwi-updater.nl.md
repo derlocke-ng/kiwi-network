@@ -1,96 +1,115 @@
 # kiwi-updater
 
-`kiwi` installeert en werkt opensource-apps bij vanuit **git-catalogi** op Fedora
-Silverblue, Bluefin en andere ostree-systemen. Een app is een git-repo met een
-`kiwi.manifest` en een `install.sh`. kiwi kloont hem, checkt de nieuwste
-release-tag uit, voert de installer uit, en houdt hem op de achtergrond bij,
-zichzelf inbegrepen.
+kiwi-updater installeert opensource-apps op je desktop en houdt ze up-to-date.
+Het commando heet `kiwi`. De apps komen uit **git-catalogi**, en het werkt op
+Fedora Silverblue, Bluefin en andere ostree-systemen. Een catalogus is een
+git-repository met een lijst van apps. Een app is een git-repository met een
+bestand `kiwi.manifest` en een script `install.sh`. kiwi kloont de repository
+van de app, checkt de nieuwste release-tag uit en voert de installer uit. Daarna
+werkt het de app op de achtergrond bij, en zichzelf op dezelfde manier.
 
-Er zijn geen accounts, geen winkel en geen leverancier. Een catalogus is een repo
-die je kunt lezen, forken en waar je een pull request naar kunt sturen.
+Je hebt geen account nodig, en er is geen appwinkel en geen leverancier. Een
+catalogus is een repository die je kunt lezen en forken, en waarvoor je een
+pull request kunt sturen.
 
 - Repository: [derlocke-ng/kiwi-updater](https://github.com/derlocke-ng/kiwi-updater), GPL-3.0-or-later
 - Nieuwste release: **v2.4.0**, een beveiligingsrelease
-- **`kiwi`** is de CLI. Hij vereist `git`, coreutils, `util-linux` en `awk`,
-  allemaal in de basisimage, plus `ssh-keygen` voor handtekeningcontroles.
-- **Kiwi Apps** (`kiwi-gui`) is de GTK4-app: zoeken, filters, een detailweergave
-  per app met icoon, schermafbeeldingen en afhankelijkheden. Hij toont de
-  installer en de diff van een update voordat hij een van beide uitvoert, en zet
-  je klikken in een wachtrij. Zijn gegevens komen van de CLI; iconen en
-  schermafbeeldingen worden uit de clones van de apps gelezen, dus daarvoor wordt
-  niets opgehaald.
+- **`kiwi`** is de opdrachtregeltool (CLI). Die heeft `git`, coreutils,
+  `util-linux` en `awk` nodig, die allemaal in het basisimage zitten. Om
+  handtekeningen te controleren is ook `ssh-keygen` nodig.
+- **Kiwi Apps** (`kiwi-gui`) is de desktop-app, gebouwd met GTK4. Je kunt de
+  apps doorzoeken en filteren, en elke app heeft een detailweergave met icoon,
+  schermafbeeldingen en afhankelijkheden. Kiwi Apps toont je de installer
+  voordat het een app installeert, en wat een update verandert voordat het een
+  app bijwerkt. Klik je meerdere acties na elkaar aan, dan zet Kiwi Apps ze in
+  een wachtrij. De gegevens komen van de CLI. Iconen en schermafbeeldingen leest
+  Kiwi Apps uit de lokale klonen van de apps, dus om ze te tonen wordt niets
+  gedownload.
 
 ## Installeren { #install }
 
+kiwi werkt met twee scopes. De user-scope is alles in je thuismap en heeft nooit
+root nodig. De system-scope is een deel dat van root is, voor apps die root
+nodig hebben. Bij de installatie kies je hoeveel van de system-scope je wilt:
+
 ```bash
-# aanbevolen: gebruikersscope plus de systeemscope van root, één wachtwoordvraag
+# aanbevolen: user-scope plus de system-scope van root, één keer het wachtwoord invoeren
 curl -fsSL https://raw.githubusercontent.com/derlocke-ng/kiwi-updater/main/get-kiwi.sh | bash
 
-# minimaal: 100 % op gebruikersniveau, alleen ~/.local, nooit root en nooit een wachtwoord
+# minimaal: 100 % gebruikersniveau, alleen ~/.local, nooit root en nooit een wachtwoord
 curl -fsSL https://raw.githubusercontent.com/derlocke-ng/kiwi-updater/main/get-kiwi.sh | bash -s -- --minimal
 
-# helemaal niets zonder wachtwoord: elke systeemwijziging vraagt om een wachtwoord
+# niets zonder wachtwoord: elke wijziging aan het systeem vraagt om een wachtwoord
 curl -fsSL https://raw.githubusercontent.com/derlocke-ng/kiwi-updater/main/get-kiwi.sh | bash -s -- --with-system=manual
 ```
 
-De [Kiwi-catalogus](catalogs.md) wordt bij de installatie geregistreerd. Ga
-meteen naar `kiwi list` of open **Kiwi Apps**.
+De installatie registreert de [Kiwi-catalogus](catalogs.md), dus je kunt meteen
+`kiwi list` uitvoeren of **Kiwi Apps** openen.
 
-Apps die alleen uit bestanden in je homemap bestaan (de CLI-tools, ensconce,
-syncman), zijn compleet met de minimale installatie. Een app met een root-helft,
-zoals kiwi-killswitch, heeft de systeemscope nodig. Op een minimale installatie
-richt `kiwi install kiwi-killswitch` die ter plekke in met één wachtwoord.
+Sommige apps bestaan alleen uit bestanden in je thuismap, bijvoorbeeld de
+CLI-tools, ensconce en syncman. Die apps zijn bij de minimale installatie
+compleet. Een app met een deel dat als root draait, zoals kiwi-killswitch,
+heeft de system-scope nodig. Bij een minimale installatie richt
+`kiwi install kiwi-killswitch` de system-scope op dat moment in en vraagt het
+één keer om je wachtwoord.
 
-## Commando's { #commands }
+## Commando’s { #commands }
 
 ```bash
 kiwi list [--check]          # elke app die deze machine kent
-kiwi search vpn              # een app zoeken in elke geregistreerde catalogus
+kiwi search vpn              # een app zoeken in alle geregistreerde catalogi
 kiwi info kiwi-killswitch    # wat het is, wat het installeert, of het root nodig heeft
-kiwi install <app>           # een naam, of expliciet --all
+kiwi install <app>           # een naam, of uitdrukkelijk --all
 kiwi update [<app>]          # alles met een nieuwe release
 kiwi uninstall <app>         # --purge verwijdert ook de configuratie
 kiwi check                   # exitcode 10 als er voor iets een update is
 
-kiwi add <https-url>         # één repo rechtstreeks volgen, zonder catalogus
+kiwi add <https-url>         # één repository rechtstreeks volgen, zonder catalogus
 kiwi catalog add|list|remove # catalogi beheren
 kiwi sync                    # catalogi nu verversen
 kiwi self-update
-kiwi trust --system <app>    # de vastgepinde ondertekeningssleutel van een systeemapp vergeten
+kiwi trust --system <app>    # de vastgezette ondertekeningssleutel van een systeemapp vergeten
 ```
 
-Voordat je iets uitvoert, en als er iets misgaat:
+Met de volgende commando’s zie je wat een app gaat doen voordat je hem
+uitvoert, en ze helpen als er iets misgaat:
 
 ```bash
-kiwi info --installer <app>  # het script dat een installatie zou uitvoeren, vóór het draait
+kiwi info --installer <app>  # het script dat een installatie zou uitvoeren, vooraf
 kiwi diff <app>              # wat een update zou veranderen, inclusief de installer
-kiwi pin <app> v1.2.0        # daar blijven; kiwi unpin <app> om weer releases te volgen
+kiwi pin <app> v1.2.0        # daar blijven; met kiwi unpin <app> weer releases volgen
 kiwi install <app> --dry-run # scope, URL, ref, pad van de installer, en verder niets
-kiwi doctor                  # verouderde locks, versieverschillen, kapotte lijstbestanden, timers
+kiwi doctor                  # achtergebleven locks, versieverschillen, kapotte lijstbestanden, timers
 ```
 
 ## Releases zijn tags { #releases-are-tags }
 
-Een app volgt zijn nieuwste **versietag**, een die overeenkomt met
-`^v?[0-9]+(\.[0-9]+){0,3}$` (`v1`, `v1.2`, `1.2.3`, `v1.2.3.4`). Pre-releases en
-tijdelijke tags halen een release nooit in. Een repo zonder versietag volgt zijn
-standaardbranch. `ref=<tag>` op een lijstregel vraagt om een specifieke tag.
+kiwi gebruikt git-tags als releases. Een app volgt haar nieuwste
+**versietag**. Een versietag is een tag die past op
+`^v?[0-9]+(\.[0-9]+){0,3}$`, bijvoorbeeld `v1`, `v1.2`, `1.2.3` of `v1.2.3.4`.
+Tags voor voorlopige versies en tijdelijke tags passen daar niet op, dus ze
+worden nooit in plaats van een release gebruikt. Een repository zonder
+versietag volgt haar standaardbranch. Wil je één bepaalde versie, zet dan
+`ref=<tag>` achter de regel van de app in een lijst.
 
 ## Afhankelijkheden { #dependencies }
 
-`DEPENDS=` in een manifest noemt wat een app nodig heeft. Een woord dat een app
-is in je eigen catalogus of lijst, wordt bij de installatie **eerst**
-geïnstalleerd, in dezelfde scope. `kiwi install kiwi-plugin-tor` neemt
-bijvoorbeeld kiwi-proxy mee. Elk ander woord is een programma, gecontroleerd met
-`command -v`.
+De regel `DEPENDS=` in een manifest noemt wat een app nodig heeft. Is een woord
+op die regel de naam van een app in je eigen catalogus of lijst, dan installeert
+kiwi die app **eerst**, in dezelfde scope, op het moment dat je de app
+installeert die haar nodig heeft. `kiwi install kiwi-plugin-tor` installeert
+bijvoorbeeld ook kiwi-proxy. Elk ander woord behandelt kiwi als de naam van een
+programma, en met `command -v` controleert het of dat programma aanwezig is.
 
-## Eén app, twee helften { #one-app-two-halves }
+## Eén app, twee delen { #one-app-two-halves }
 
-Sommige apps zijn alleen een binary in `~/.local/bin`. Andere, zoals een
-VPN-killswitch, zijn een root-daemon **en** een desktopapp **en** een
-GNOME-extensie. De helften worden met verschillende rechten geïnstalleerd, want
-**root mag nooit een bestand uitvoeren dat de gebruiker kan schrijven**. De app
-declareert het:
+Sommige apps zijn maar één programma in `~/.local/bin`. Andere, zoals een
+VPN-killswitch, bestaan uit een daemon die als root draait **en** een
+desktop-app **en** een GNOME-extensie. Zo’n app heeft twee delen, een
+gebruikersdeel en een systeemdeel, en die worden met verschillende rechten
+geïnstalleerd. De reden: **root mag nooit een bestand uitvoeren waarin de
+gebruiker kan schrijven**. De app geeft haar onderdelen en scopes op in haar
+manifest:
 
 ```ini
 COMPONENTS=daemon cli gui gnome-extension
@@ -98,64 +117,81 @@ SCOPES=user system
 ROOT_REASON=installs a root firewall daemon, its D-Bus policy and two systemd units
 ```
 
-Een catalogus vermeldt die app één keer, en kiwi installeert elke helft correct.
-Voordat hij om je wachtwoord vraagt, toont hij de `ROOT_REASON`.
+Een catalogus noemt zo’n app maar één keer, en kiwi installeert elk deel in de
+juiste scope. Voordat kiwi om je wachtwoord vraagt, toont het je de
+`ROOT_REASON`.
 
 | Onderdeel | Waar | Waarom |
 |---|---|---|
-| `kiwi`, Kiwi Apps, gebruikersapps | `~/.local` | geen root nodig; overleeft een ostree-rebase |
-| de eigen kopie van kiwi voor root | `/usr/local/bin`, gekloond naar `/var/lib/kiwi-updater/repos/` | root voert nooit een bestand uit dat jij kunt schrijven |
-| systeemapps | `/var/lib`, `/etc` | schrijfbaar op ostree, eigendom van root |
-| lijsten | `~/.config/kiwi-updater/apps.list`, `/etc/kiwi-updater/apps.list` | de eigen vermeldingen van een machine gaan voor elke catalogus |
-| vastgepinde ondertekeningssleutels | `/etc/kiwi-updater/signers/<app>` | zie hieronder |
+| `kiwi`, Kiwi Apps, gebruikersapps | `~/.local` | heeft geen root nodig, en blijft staan als het systeem naar een ander ostree-image wordt omgezet (rebase) |
+| de eigen kopie van kiwi voor root | `/usr/local/bin`, gekloond naar `/var/lib/kiwi-updater/repos/` | root voert nooit een bestand uit waarin jij kunt schrijven |
+| systeemapps | `/var/lib`, `/etc` | deze mappen zijn op ostree-systemen beschrijfbaar en zijn van root |
+| lijsten | `~/.config/kiwi-updater/apps.list`, `/etc/kiwi-updater/apps.list` | de regels in de eigen lijst van een machine gaan voor op elke catalogus |
+| vastgezette ondertekeningssleutels | `/etc/kiwi-updater/signers/<app>` | zie het volgende deel |
 
-De onveranderlijke `/usr` wordt nooit aangeraakt.
+kiwi verandert nooit iets in de onveranderlijke `/usr`.
 
 ## Root, wachtwoorden en handtekeningen { #root-passwords-and-signatures }
 
-| | Heeft root nodig | Vraagt om een wachtwoord |
+De tabel laat zien welke acties root nodig hebben en welke om een wachtwoord
+vragen.
+
+| | Root nodig | Vraagt om een wachtwoord |
 |---|---|---|
-| alles in de gebruikersscope | nee | nee |
-| een systeemapp **bijwerken** | ja | **nee**, voor een release die ondertekend is met de sleutel die root voor die app heeft vastgepind. **Ja** voor een niet-ondertekende release, en altijd in de modus `manual` |
-| een systeemapp **installeren** of **deïnstalleren** | ja | ja |
+| alles in de user-scope | nee | nee |
+| een systeemapp **bijwerken** | ja | **nee**, als de release is ondertekend met de sleutel die root voor die app heeft vastgezet. **Ja**, als de release niet is ondertekend, en altijd in de modus `manual` |
+| een systeemapp **installeren** of **verwijderen** | ja | ja |
 
-Sinds 2.4.0:
+Sinds versie 2.4.0 gelden deze regels:
 
-- **Ondertekende releases.** Root pint per systeemapp één SSH-ondertekeningssleutel
-  vast, de eerste die hij ziet (trust on first use). Een release-tag die met die
-  sleutel is ondertekend, wordt zonder wachtwoord bijgewerkt. Een niet-ondertekende
-  release vraagt om een wachtwoord en meldt dat hij niet geverifieerd kon worden.
-  Een tag die met een andere sleutel is ondertekend, of een niet-ondertekende tag
-  na ondertekende tags, wordt geweigerd tot je `kiwi trust --system <app>`
-  uitvoert. Dit geldt voor de systeemscope.
-- **Root installeert alleen bronnen die in zijn eigen lijsten staan**:
-  `/etc/kiwi-updater/apps.list` en catalogi die voor root zijn geregistreerd. Voor
-  al het andere installeert kiwi de gebruikershelft en noemt hij de opdracht
-  `kiwi add --system <https-url>` die je moet uitvoeren. Kiwi Apps biedt
-  *Register and Install* aan.
-- **Alleen https.** `http://`-bronnen worden overal geweigerd.
+- **Ondertekende releases.** Voor elke systeemapp zet root één
+  SSH-ondertekeningssleutel vast. Een sleutel vastzetten betekent: hem onthouden
+  en vanaf dan alleen die sleutel accepteren. Root zet de eerste sleutel vast die
+  het voor de app ziet; dat heet trust on first use. Is een release-tag
+  ondertekend met de vastgezette sleutel, dan wordt de update zonder wachtwoord
+  geïnstalleerd. Is een release niet ondertekend, dan vraagt kiwi om je
+  wachtwoord en meldt het dat het de release niet kon verifiëren. kiwi weigert
+  een tag die met een andere sleutel is ondertekend, en het weigert een
+  niet-ondertekende tag als eerdere tags wel ondertekend waren. Dat blijft zo
+  tot je `kiwi trust --system <app>` uitvoert. Deze regels gelden voor de
+  system-scope.
+- **Root installeert alleen uit bronnen die het zelf in zijn lijsten heeft.**
+  Die bronnen zijn `/etc/kiwi-updater/apps.list` en de catalogi die voor root
+  zijn geregistreerd. Komt een app uit een andere bron, dan installeert kiwi
+  alleen het gebruikersdeel en noemt het het commando
+  `kiwi add --system <https-url>` dat je moet uitvoeren. Kiwi Apps biedt in dat
+  geval de knop *Register and Install* aan, die de bron voor root registreert en
+  de app installeert.
+- **Alleen https.** kiwi weigert overal bronnen met `http://`.
 
-Systeemupdates zonder wachtwoord lopen via één helper met een vast doel,
-`/usr/local/libexec/kiwi-system-update`. Een polkit-regel staat hem toe voor
-actieve `wheel`-sessies, en hij accepteert app-namen alleen als selectie uit de
-eigen lijsten van root.
+Systeemupdates zonder wachtwoord worden uitgevoerd door één hulpprogramma,
+`/usr/local/libexec/kiwi-system-update`, dat alleen voor dit ene doel bestaat.
+Een polkit-regel staat gebruikers in de groep `wheel` toe het uit te voeren als
+hun sessie actief is. Het hulpprogramma accepteert alleen namen van apps, en
+een naam kan alleen een app uit de eigen lijsten van root kiezen.
 
 ## Updates op de achtergrond { #background-updates }
 
-Er is één timer, en die is van jou: `kiwi-updater.timer` draait
-`kiwi update --all` zes uur na de vorige run (tien minuten na het opstarten, met
-wat willekeurige vertraging). Hij werkt gebruikershelften rechtstreeks bij, en
-systeemhelften via de helper hierboven. Er is geen root-timer. In de modus
-`manual` wachten systeemhelften op je volgende interactieve `kiwi update`.
+Er is één timer voor updates op de achtergrond, en dat is een systemd-timer
+voor je eigen gebruiker. Hij draait dus als jouw gebruiker en niet als root.
+`kiwi-updater.timer` voert `kiwi update --all` uit zes uur na de vorige keer en
+tien minuten na het opstarten, met wat willekeurige vertraging. Daarbij worden
+gebruikersdelen rechtstreeks bijgewerkt, en systeemdelen via het hulpprogramma
+hierboven. Er is geen timer voor root. In de modus `manual` werkt de timer geen
+systeemdelen bij. Die wachten tot je zelf `kiwi update` uitvoert.
 
 ## Vertrouwen { #trust }
 
-Een app installeren **voert de `install.sh` van die repo uit**, en een app die de
-systeemscope declareert, voert hem uit **als root**. Catalogi zijn samengesteld,
-niet geaudit. Voeg de catalogi toe die je vertrouwt, zoals je een
-pakketrepository zou toevoegen, en gebruik `kiwi info --installer`, `kiwi diff`
-en `kiwi pin` om met open ogen te beslissen. Een handtekening beperkt *wie mag
-publiceren*. Ze zegt niets over *wat het gepubliceerde doet*.
+Installeer je een app, dan **voert kiwi het `install.sh` uit de repository van
+die app uit**. Geeft de app de system-scope op, dan voert kiwi dat script
+**als root** uit. Catalogi zijn samengesteld, niet gecontroleerd: iemand heeft
+de apps uitgekozen, maar dat betekent niet dat hun code is nagekeken. Voeg
+alleen catalogi toe die je vertrouwt, zoals je dat ook bij een
+pakketrepository zou doen. Met `kiwi info --installer`, `kiwi diff` en
+`kiwi pin` zie je wat een app doet voordat je beslist. Een handtekening bepaalt
+*wie een release mag publiceren*. Over *wat de gepubliceerde release doet*, zegt
+ze niets.
 
-Nog gepland: een gehost register van vertrouwde catalogi (`kiwi catalog browse`)
-met vingerafdrukken van ondertekenaars per vermelding.
+Eén ding is nog gepland: een gehost register van vertrouwde catalogi, met het
+commando `kiwi catalog browse` en met de vingerafdrukken van de ondertekenaars
+bij elk item.

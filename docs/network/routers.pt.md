@@ -11,8 +11,8 @@ que cada um deles tenha de correr o WireGuard. Há duas maneiras de o conseguir:
   configuração emitida pelo wg-easy, o servidor WireGuard do master
   (`kiwi-server enroll fleet.yaml router --group routers`), e encaminha a
   sub-rede da mesh (`10.8.0.0/16`) para o túnel. A isto chama-se um túnel
-  *split*, porque só o tráfego destinado à mesh passa por ele. Um túnel *full*
-  leva o tráfego todo, pelo que a LAN inteira chega à Internet pela saída do
+  *split*, porque só o tráfego destinado à mesh passa por ele. Num túnel *full*
+  passa todo o tráfego, e a LAN inteira chega à Internet pela saída do
   master, ou seja, pela ligação do master à Internet.
 - **O router tem uma rota estática para um node gateway.** O router não tem
   túnel nenhum. Envia o tráfego destinado à sub-rede da mesh para um node da
@@ -20,7 +20,7 @@ que cada um deles tenha de correr o WireGuard. Há duas maneiras de o conseguir:
   cliente VPN.
 
 Em ambos os casos basta uma regra de DNS, sem entradas para cada máquina. A
-regra reencaminha as consultas sobre o domínio da tua rede (`*.home`) para o
+regra reencaminha as consultas relativas ao domínio da tua rede (`*.home`) para o
 Pi-hole do master, que conhece os nomes de todas as máquinas e de todos os
 serviços. No DNS do router, nada mais muda.
 

@@ -10,12 +10,12 @@ operacyjnych, które kiwi-server potrafi zainstalować.
 | Rola | Czym staje się maszyna | Moduły |
 |---|---|---|
 | `bare` | Tylko systemem bazowym z użytkownikiem administracyjnym, SSH i automatycznymi aktualizacjami | brak |
-| `master` | **kiwi-master**. Przez niego wchodzi się do sieci WireGuard, a ruch sieci do internetu przekazuje on dalej przez komercyjny VPN (podwójny przeskok, double hop). Działają na nim też Pi-hole jako DNS blokujący reklamy, Tor i strony administracyjne | `vpn-client`, `vpn-server`, `dns`, `tor`, `reverse-proxy` |
+| `master` | **kiwi-master**. Łączą się z nim wszyscy uczestnicy sieci WireGuard, a ruch z sieci do internetu przekazuje on dalej przez komercyjny VPN (podwójny przeskok, double hop). Działają na nim też Pi-hole jako DNS blokujący reklamy, Tor i strony administracyjne | `vpn-client`, `vpn-server`, `dns`, `tor`, `reverse-proxy` |
 | `node`, preset `gateway` | **kiwi-node**, który kieruje ruch sieci lokalnej (LAN) przez VPN. Działają na nim też Pi-hole, przekazywanie zapytań DHCP (DHCP relay), stacja pobierania plików i SFTP | `vpn-client`, `dns`, `dhcp-relay`, `reverse-proxy`, `downloader`, `gateway`, `portainer`, `sftp` |
 | `node`, preset `cloud` | **kiwi-node** z Nextcloud i Vaultwarden | `vpn-client`, `reverse-proxy`, `cloud`, `vault`, `portainer` |
 | `node`, preset `minimal` | **kiwi-node** z dwoma podstawowymi modułami, do których dodajesz potrzebne ci moduły | `vpn-client`, `reverse-proxy` |
 
-Rola `node` występuje w kilku presetach. Preset to gotowa lista modułów.
+Rola `node` ma kilka presetów. Preset to gotowa lista modułów.
 Starsze nazwy ról `node-gw` i `node-cloud` nadal działają i oznaczają presety
 `gateway` i `cloud`.
 
@@ -40,8 +40,8 @@ sieciowych, który widzi kontener. Te trzy usługi są więc dostępne pod adres
 mastera w sieci mesh, czyli w prywatnej sieci WireGuard. Kontenery na masterze
 mają nazwy `km-…` i są podłączone do sieci `knet-master` (`172.64.0.0/24`).
 
-Na masterze mogą też działać `nostr-relay` i `hub` (dla
-[huba dla ludzi](../people/hubs.md)), `portainer` oraz `backup`. Żeby ich
+Na masterze mogą też działać `nostr-relay` i `hub` (do prowadzenia
+[huba społeczności](../people/hubs.md)), `portainer` oraz `backup`. Żeby ich
 używać, dodaj je do listy `modules:` mastera. Przekaźnik i hub działają
 wyłącznie na masterach.
 
@@ -99,5 +99,5 @@ Rola bez modułów wykonuje całą pracę sama w `ks_role_apply()`. Może przy t
 korzystać z biblioteki `roles/common/lib.sh`, która pochodzi z kiwi-stack.
 Ustawienia zadeklarowane w `role.yaml` są dostępne w skrypcie jako zmienne
 `KS_ROLE_<KEY>`. Skrypt działa jako root z `set -euo pipefail`. Testy projektu
-generują konfigurację każdej roli z drzewa i sprawdzają ją programem
+generują konfigurację każdej roli w repozytorium i sprawdzają ją programem
 shellcheck.
