@@ -1,18 +1,21 @@
-# Uma máquina, sem fleet
+# Uma máquina, sem ficheiro fleet
 
-O kiwi-server é construído a partir de duas ferramentas mais pequenas, e podes
-usá-las sozinhas:
+O kiwi-server gere um conjunto inteiro de máquinas. Se só quiseres correr uma
+stack numa única máquina, não precisas dele. Uma stack é o conjunto de
+contentores e serviços que uma máquina corre. O kiwi-server é feito de duas
+ferramentas mais pequenas, e podes usá-las por si só:
 
 | Repositório | O que é |
 |---|---|
-| [**kiwi-modules**](https://github.com/derlocke-ng/kiwi-modules) | Os módulos e o seu renderizador: **entra um ficheiro de máquina, sai um pacote de stack**. v0.23.0, GPL-3.0-or-later |
-| [**kiwi-stack**](https://github.com/derlocke-ng/kiwi-stack) | O lado da máquina: o comando e a biblioteca `kiwi-stack`, que põem um pacote no CoreOS, no uCore ou no Debian e o mantêm a correr. v0.5.0, GPL-3.0-or-later |
+| [**kiwi-modules**](https://github.com/derlocke-ng/kiwi-modules) | Os módulos e o programa que gera a configuração a partir deles. Lê **o ficheiro de uma máquina e escreve um pacote com a stack**, ou seja, uma pasta com a configuração gerada da stack dessa máquina. v0.23.0, GPL-3.0-or-later |
+| [**kiwi-stack**](https://github.com/derlocke-ng/kiwi-stack) | A parte que corre na máquina. É composta pelo comando `kiwi-stack` e por uma biblioteca, que instalam um pacote numa máquina CoreOS, uCore ou Debian e o mantêm a funcionar. v0.5.0, GPL-3.0-or-later |
 
-Usa-as quando quiseres uma stack numa máquina sem o resto: um node que configuras
-à mão, um módulo que estás a desenvolver, ou uma máquina que renderiza a sua
-própria stack. O kiwi-server inclui ambas no seu repositório, fixadas por tag.
-Uma máquina configurada de uma maneira ou de outra fica idêntica, e ambas derivam
-os mesmos segredos da mesma seed.
+Usa estas duas ferramentas quando quiseres uma stack numa máquina sem o resto
+do kiwi-server: por exemplo, para um node que configuras à mão, para um módulo
+que estás a desenvolver ou para uma máquina que gera a sua própria stack. O
+kiwi-server traz uma cópia de cada uma, fixada numa tag de versão. Quer prepares
+a máquina com o kiwi-server, quer com as duas ferramentas, o resultado é
+idêntico, e as duas vias derivam os mesmos segredos da mesma seed.
 
 ```
 machine.yaml ──kiwi-modules render──▶ bundle/ ──copy──▶ sudo kiwi-stack apply bundle/
@@ -21,20 +24,26 @@ machine.yaml ──kiwi-modules render──▶ bundle/ ──copy──▶ sudo
                                       quadlets/  configs  → kiwi-stack.target, verify
 ```
 
-## Renderizar uma máquina { #render-a-machine }
+## Gerar a configuração de uma máquina { #render-a-machine }
+
+Os comandos abaixo instalam o kiwi-modules, criam uma seed e geram, a partir do
+ficheiro de máquina de exemplo, um pacote. A última linha copia o pacote para a
+máquina e aplica-o lá.
 
 ```bash
 git clone https://github.com/derlocke-ng/kiwi-modules && cd kiwi-modules
 ./install.sh install                       # ~/.local/bin/kiwi-modules
 mkdir -p sh3/secrets && head -c 32 /dev/urandom > sh3/secrets/seed
-cp examples/sh3.yaml sh3/                  # edita: ficheiros TLS, a configuração WireGuard
+cp examples/sh3.yaml sh3/                  # a editar: os ficheiros TLS, a configuração WireGuard
 kiwi-modules render sh3/sh3.yaml -o sh3/sh3.bundle
 scp -r sh3/sh3.bundle sh3:/tmp/ && ssh sh3 sudo kiwi-stack apply /tmp/sh3.bundle
 ```
 
-Precisa de Python 3 com PyYAML e Jinja2. `kiwi-modules modules -v` lista todos os
-módulos e definições, e `kiwi-modules profiles` lista os papéis e as suas
-predefinições.
+O kiwi-modules precisa do Python 3 com o PyYAML e o Jinja2.
+`kiwi-modules modules -v` lista todos os módulos e definições, e
+`kiwi-modules profiles` lista as funções e os respetivos presets.
+
+Um ficheiro de máquina descreve uma única máquina, como neste exemplo:
 
 ```yaml
 # um node cloud
@@ -54,16 +63,19 @@ dns_records:                    # os nomes da rede
   - [10.8.0.1, gate.home]
   - [10.8.0.25, cloud.sh3.home]
 master_ip: 10.8.0.1
-ca_cert: ca.pem                 # de confiança dentro dos contentores e no anfitrião
+ca_cert: ca.pem                 # de confiança dentro dos contentores e na máquina
 seed: secrets/seed              # as palavras-passe geradas derivam dela
 ```
 
-O kiwi-modules não tem uma autoridade de certificação própria, por isso uma
-renderização autónoma precisa dos ficheiros do certificado TLS e da chave. A
-configuração WireGuard é encontrada em `secrets/<hostname>.conf` quando o ficheiro
-de máquina não indica nenhuma.
+O kiwi-modules não tem uma autoridade de certificação própria. Por isso, quando
+geras a configuração de uma máquina sem o kiwi-server, tens de fornecer tu os
+ficheiros do certificado TLS e da chave. Se o ficheiro de máquina não indicar
+nenhuma configuração WireGuard, o kiwi-modules procura-a em
+`secrets/<hostname>.conf`.
 
-## Pô-la na máquina { #put-it-on-the-machine }
+## Instalar na máquina { #put-it-on-the-machine }
+
+Na máquina, instala o kiwi-stack e aplica o pacote:
 
 ```bash
 git clone https://github.com/derlocke-ng/kiwi-stack && cd kiwi-stack
@@ -72,14 +84,17 @@ sudo kiwi-stack apply /tmp/sh3.bundle
 kiwi-stack status
 ```
 
-Precisa de bash e systemd, mais podman 4.4+ com catatonit (ou docker com o plugin
-compose), conforme o `runtime` do pacote. No Debian instala o próprio podman.
+O kiwi-stack precisa do bash e do systemd. Precisa também do runtime de
+contentores indicado em `runtime` no pacote: ou o podman 4.4 ou mais recente,
+com o catatonit, ou o docker com o plugin compose. No Debian, o kiwi-stack
+instala o podman sozinho.
 
-O `apply` faz o que um papel do kiwi-server faz com uma stack (ver
-[Máquinas](machines.md#apply)), exceto definir o nome de anfitrião e o fuso
-horário. É repetível: o mesmo pacote outra vez não muda nada. Não há reversão. Os
-dados regressam com `kiwi-stack restore` a partir do módulo backup, e uma
-configuração mais antiga aplicando um pacote mais antigo.
+O `apply` faz com uma stack o mesmo que uma função do kiwi-server (vê
+[Máquinas](machines.md#apply)), só que não define o nome da máquina nem o fuso
+horário. Podes repeti-lo à vontade: aplicar outra vez o mesmo pacote não muda
+nada. Não há forma de reverter para uma versão anterior. Para recuperares
+dados, usa o `kiwi-stack restore` do módulo backup. Para voltares a uma
+configuração mais antiga, aplica um pacote mais antigo.
 
 Na máquina, os nomes continuam a dizer `kiwi-server` (`/etc/kiwi-server/stack.env`,
 `/var/lib/kiwi-server/`), de propósito: as ferramentas

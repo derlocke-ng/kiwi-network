@@ -180,22 +180,21 @@ plugins:
         nav_translations:
           Home: Start
           Network: Netwerk
-          How it works: Hoe het werkt
+          How it works: Zo werkt het
           DNS, names & certificates: DNS, namen en certificaten
           Overview: Overzicht
-          The fleet file: Het fleet-bestand
+          The fleet file: Het fleetbestand
           Roles: Rollen
           Operations: Beheer
-          Roadmap: Waar het heen gaat
           One machine without a fleet: Eén machine zonder fleet
-          Hubs, not platforms: Hubs, geen platforms
+          Hubs, not platforms: Hubs in plaats van platforms
           The framework's apps: De apps van het framework
           Armory, a distribution: Armory, een distributie
           Running your own hub: Je eigen hub draaien
           Catalogs & publishing: Catalogi en publiceren
           Client networks: Klantnetwerken
           Provider modules: Providermodules
-          Repositories & status: Repository's en status
+          Repositories & status: Repository’s en status
           Icons & colours: Iconen en kleuren
           Contributing: Bijdragen
       - locale: pl

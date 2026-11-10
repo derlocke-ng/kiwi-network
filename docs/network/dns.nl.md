@@ -103,7 +103,7 @@ kiwi-server opbouwt, wordt de CA in de trust store geïnstalleerd.
 
 Stel je **naambeperkingen** (name constraints) in, dan kan de CA alleen namen
 onder het domein van de fleet ondertekenen: `tls: { name_constraints: [home] }`.
-De voorbeeldfleet doet dat, maar standaard is er geen beperking ingebouwd. Met
+In het voorbeeldfleetbestand staat die beperking, maar standaard is er geen. Met
 de beperking heeft iemand die `kiwiCA.key` steelt er niets aan voor welke
 andere naam dan ook. Dat is belangrijk, want elke machine vertrouwt de CA.
 

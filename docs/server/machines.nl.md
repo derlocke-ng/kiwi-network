@@ -36,7 +36,7 @@ sudo dd if=output/sorbet/sorbet.iso of=/dev/sdX bs=4M status=progress oflag=sync
   uit** (`install.on_done: poweroff`, of `reboot` om haar in plaats daarvan te
   herstarten). Zet een label op je USB-sticks.
 - Standaard staat op het installatiemedium **alleen het basissysteem**: de
-  hostnaam, de netwerkinstellingen, de beheerder met de SSH-sleutels en het
+  hostnaam, de netwerkinstellingen, het beheerdersaccount met de SSH-sleutels en het
   updatebeleid. Er staan geen secrets van de stack op. De machine krijgt haar
   rol pas later, als je `apply` uitvoert.
 - Met `--offline` komen de hele rol en de secrets op de ISO. Dat is bedoeld
@@ -77,8 +77,8 @@ Bij een rol die uit modules is opgebouwd, geeft het rolscript de stack door aan
 modules draait. `kiwi-stack` doorloopt dan deze stappen:
 
 1. Het installeert of activeert podman 4.4+ of docker en zorgt dat de
-   servicegebruiker bestaat. Op Debian komen bij podman ook `netavark`,
-   `aardvark-dns` en `catatonit`.
+   servicegebruiker bestaat. Op Debian worden samen met podman ook
+   `netavark`, `aardvark-dns` en `catatonit` geïnstalleerd.
 2. Het laadt kernelmodules en stelt sysctls in. Zit Pi-hole in de stack, dan
    wordt aardvark-dns van podman naar poort 5533 verplaatst, en zoekt de host
    zelf namen op via de Pi-hole van de stack. Ook voegt het de mesh toe aan de
@@ -105,7 +105,7 @@ er niets is veranderd.
 ## Eerste keer opstarten { #first-boot }
 
 Bij de eerste keer opstarten voert `kiwi-role.service` het rolscript
-`/var/lib/kiwi-server/role.sh` één keer uit. Het start zodra het netwerk
+`/var/lib/kiwi-server/role.sh` één keer uit. De service start zodra het netwerk
 actief is en wacht tot 120 seconden op DNS. Het bestand `role.done` geeft aan
 dat de rol klaar is, en wordt pas geschreven als elke container draait. Mislukt
 het script, dan laat het het bestand `/var/lib/kiwi-server/role.failed` achter,
@@ -125,7 +125,7 @@ instelt, in lokale tijd.
 | Doelsysteem | Installeert updates | Herstart |
 |---|---|---|
 | `coreos` | Zincati, doorlopend | alleen in het venster (`strategy = "periodic"`) |
-| `ucore` | `rpm-ostreed-automatic.timer` downloadt en klaarzet ze (staging) | `kiwi-staged-reboot.timer` in het venster |
+| `ucore` | `rpm-ostreed-automatic.timer` downloadt ze en zet ze klaar (staging) | `kiwi-staged-reboot.timer` in het venster |
 | `debian` | unattended-upgrades, dagelijks | `kiwi-reboot-if-required.timer` in het venster, als een update een herstart vereist |
 
 Met `updates.days: []` mag de herstart op elke dag plaatsvinden, en met
@@ -159,7 +159,7 @@ sudo kiwi-stack apply DIR       # een stackbundel, zonder rolscript
 De bestanden van de stack staan in `docker_dir` (standaard
 `/home/user/docker`), en de instellingen in `/etc/kiwi-server/stack.env`. De
 systemd-units zijn `kiwi-stack.service`, `kiwi-stack-vpn-restart.timer` en
-`kiwi-stack-update.timer`, plus de units die een module eventueel toevoegt.
+`kiwi-stack-update.timer`, plus de units die modules zelf toevoegen.
 
 ## Wat er wordt gegenereerd { #what-a-render-produces }
 

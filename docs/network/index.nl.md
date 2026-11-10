@@ -39,12 +39,12 @@ netwerk aan de hand van dat bestand op.
 
 ## De master { #the-master }
 
-De master is de machine waarmee alle andere verbinding maken. De rol `master`
-draait de vijf modules die hieronder staan. Pi-hole, Tor en nginx delen de
+De master is de machine waarmee alle andere verbinding maken. Bij de rol
+`master` horen de vijf modules hieronder. Pi-hole, Tor en nginx delen de
 netwerk-namespace van de WireGuard-server. Een netwerk-namespace is de eigen set
 netwerkinterfaces, adressen en routes van een container. Deze drie diensten
 hebben dus geen eigen netwerk, maar gebruiken dat van de WireGuard-server.
-Daarom worden ze ook altijd samen met de WireGuard-server herstart.
+Daarom worden ze samen met de WireGuard-server herstart.
 
 - **vpn-server** (wg-easy) is de WireGuard-server. Elke client en elke node
   maakt er verbinding mee, en de server geeft hun WireGuard-configuraties uit.
@@ -63,8 +63,7 @@ Daarom worden ze ook altijd samen met de WireGuard-server herstart.
   mesh-adres van de master, `10.8.0.1`. Zie
   [DNS, namen en certificaten](dns.md).
 - **tor** biedt de clients in de mesh een SOCKS5-proxy aan op `10.8.0.1:9050`.
-  Tor mag zijn entrynodes en Tor-exitnodes alleen in een vaste groep landen
-  kiezen (standaard `de,ch,at,nl,fr`, afgedwongen met `StrictNodes`).
+  Tor kiest zijn entrynodes en Tor-exitnodes alleen uit een vaste reeks landen (standaard `de,ch,at,nl,fr`, afgedwongen met `StrictNodes`).
 - **reverse-proxy** (nginx) levert de beheerpagina’s `wg.<master>` en
   `pihole.<master>`, de webinterfaces van wg-easy en Pi-hole. Ze zijn alleen
   binnen de mesh te openen, en alleen door clients die beheerpagina’s mogen
@@ -155,9 +154,9 @@ node.
 
 ## Namen { #names }
 
-Voor de namen van machines geldt een afspraak. **Masters heten naar
+Voor de namen van machines geldt een afspraak. **Masters zijn vernoemd naar
 fruitgerechten** (`crumble`, `sorbet`, `compote`, `chutney`, `strudel`,
-`cobbler`, `trifle`, `cider`) en **nodes naar vruchten** (`papaya`, `lychee`,
+`cobbler`, `trifle`, `cider`) en **nodes naar fruitsoorten** (`papaya`, `lychee`,
 `guava`, `quince`, `damson`). Zo zie je aan elke logregel om wat voor machine
 het gaat. Meer dan een afspraak is het niet: elke naam werkt. Een dienst krijgt
 een naam onder de naam van de machine waarop hij draait: `cloud.papaya.home`,
@@ -173,7 +172,7 @@ uit de mesh op internet komt. Die uitgang kent drie modi:
 |---|---|---|
 | **provider** | Via een commerciële VPN-provider (gluetun). Dit is de double hop, en zo richt de preset voor de master het in. | gebouwd |
 | **direct** | Rechtstreeks via de eigen internetverbinding van de master. Voor deze modus som je de modules van de master op zonder `vpn-client`. | gebouwd |
-| **master** | Via *de master van een ander netwerk*. Jouw master is daar een client, in een groep die wel op internet mag maar verder nergens bij kan. Dit heet multi-hop. | ontworpen; hiervoor moet je machines over netwerken heen kunnen toevoegen, en dat is federatie |
+| **master** | Via *de master van een ander netwerk*. Jouw master is daar een client, in een groep die wel op internet mag maar verder nergens bij kan. Dit heet multi-hop. | ontworpen; hiervoor moeten apparaten over netwerkgrenzen heen kunnen worden toegevoegd, en dat is federatie |
 
 Welke uitgangsmodus een master ook heeft, hij biedt de mesh altijd ook de
 SOCKS5-proxy van Tor aan.
@@ -184,11 +183,11 @@ Elk netwerk heeft een eigen mesh met een eigen adresbereik. Standaard is dat
 `10.8.0.0/16`. Masters en nodes zitten in `10.8.0.0/24`, en daarna komen de
 groepen: guests in `.1`, pentest in `.2`, devices in `.3` en routers in `.4`.
 Een tweede netwerk gebruikt een ander bereik, bijvoorbeeld `10.9.0.0/16`, zodat
-een apparaat dat bij beide netwerken hoort ze uit elkaar kan houden. Op dit
-moment is het bereik nog niet één instelling, maar verspreid over meerdere
-(`mesh_subnet`, bij de vpn-server `server_ip`, `wg_subnet`,
-`wg_default_address` en `groups`, en bij Tor `socks_policy_accept`). Het
-fleetbestand stelt ze allemaal in.
+een apparaat dat bij beide netwerken hoort ze uit elkaar kan houden. Het bereik is
+op dit moment geen losse instelling, maar zit verspreid over meerdere
+instellingen (`mesh_subnet`, bij de vpn-server `server_ip`, `wg_subnet`,
+`wg_default_address` en `groups`, en bij Tor `socks_policy_accept`). In het
+fleetbestand worden ze allemaal ingesteld.
 
 ## Adressering { #addressing }
 

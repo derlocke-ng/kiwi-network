@@ -9,7 +9,7 @@ installeren.
 
 | Rol | Wat de machine wordt | Modules |
 |---|---|---|
-| `bare` | Alleen het basissysteem, met een beheerder, SSH en automatische updates | geen |
+| `bare` | Alleen het basissysteem, met een beheerdersaccount, SSH en automatische updates | geen |
 | `master` | De **kiwi-master**. Hier komen alle WireGuard-verbindingen van het netwerk binnen, en het internetverkeer van het netwerk gaat van hier door een commerciële VPN verder (de double hop). Daarnaast draaien er Pi-hole voor DNS dat reclame blokkeert, Tor en de beheerpagina’s | `vpn-client`, `vpn-server`, `dns`, `tor`, `reverse-proxy` |
 | `node`, preset `gateway` | Een **kiwi-node** die het verkeer van een lokaal netwerk (LAN) door de VPN stuurt. Er draaien ook Pi-hole, een DHCP-relay, een downloadstation en SFTP | `vpn-client`, `dns`, `dhcp-relay`, `reverse-proxy`, `downloader`, `gateway`, `portainer`, `sftp` |
 | `node`, preset `cloud` | Een **kiwi-node** waarop Nextcloud en Vaultwarden draaien | `vpn-client`, `reverse-proxy`, `cloud`, `vault`, `portainer` |
@@ -42,7 +42,7 @@ containers op een master heten `km-…` en hangen aan het netwerk `knet-master`
 (`172.64.0.0/24`).
 
 Op een master kunnen ook `nostr-relay` en `hub` draaien (voor een
-[hub voor mensen](../people/hubs.md)), en `portainer` en `backup`. Wil je ze
+[hub voor de mensen in je netwerk](../people/hubs.md)), en `portainer` en `backup`. Wil je ze
 gebruiken, zet ze dan in de lijst `modules:` van de master. De relay en de hub
 draaien alleen op masters.
 

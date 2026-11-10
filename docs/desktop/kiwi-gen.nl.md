@@ -1,72 +1,84 @@
 # kiwi-gen: Kiwi Key Generator
 
-Een beheerder in de browser voor **SSH-sleutels, SSH-certificaten en
-TLS-certificaten**. Alles wordt lokaal aangemaakt en opgeslagen in een
-versleutelde kluis, en er wordt niets naar een server gestuurd.
+kiwi-gen is een webpagina waarmee je **SSH-sleutels, SSH-certificaten en
+TLS-certificaten** in je browser aanmaakt en beheert. Alles wordt op je eigen
+computer gemaakt en daar in een versleutelde kluis bewaard, en er gaat niets
+naar een server.
 
 - Repository: [derlocke-ng/kiwi-gen](https://github.com/derlocke-ng/kiwi-gen), MIT
-- Live: [derlocke-ng.github.io/kiwi-gen](https://derlocke-ng.github.io/kiwi-gen/)
-- Het is een statische webpagina, geen kiwi-updater-app. Er zijn geen release-tags.
+- Online: [derlocke-ng.github.io/kiwi-gen](https://derlocke-ng.github.io/kiwi-gen/)
+- Het is een statische webpagina, geen app voor kiwi-updater. Er zijn geen
+  release-tags.
 
-Gebruik het voor de SSH-sleutels in je fleet-bestand, een CA voor je eigen
-diensten, of clientcertificaten, allemaal offline gegenereerd in de browser.
+Je kunt er de SSH-sleutels mee maken voor je fleetbestand (het bestand dat elke
+machine van je Kiwi Network beschrijft), een certificaatautoriteit (CA) voor je
+eigen diensten, of clientcertificaten. Alles wordt offline in de browser
+gegenereerd.
 
 ## Functies { #features }
 
-**Kluis.** Sleutels en certificaten worden in één versleutelde kluis bewaard:
-AES-256-GCM, met de sleutel afgeleid van je hoofdwachtwoord via PBKDF2-SHA256 met
-600.000 iteraties. De kluis wordt versleuteld opgeslagen in de localStorage van
-de browser en alleen in het geheugen ontsleuteld zolang hij ontgrendeld is.
-Exporteer hem als bestand om er een back-up van te maken of hem te verplaatsen.
-Je kunt bestaande sleutels en certificaten importeren (een certificaat met zijn
-sleutel en keten wordt één item), een andere kluis samenvoegen, notities
-toevoegen, zoeken, en zien wat binnenkort verloopt.
+**Kluis.** Sleutels en certificaten staan samen in één versleutelde kluis. Die
+is versleuteld met AES-256-GCM, en de sleutel daarvoor wordt met PBKDF2-SHA256
+in 600.000 iteraties afgeleid van je hoofdwachtwoord. De kluis staat versleuteld
+in de localStorage van de browser. Ze wordt alleen in het geheugen ontsleuteld,
+en alleen zolang ze ontgrendeld is. Wil je een back-up van de kluis maken of
+haar verhuizen, exporteer haar dan als bestand. Je kunt bestaande sleutels en
+certificaten importeren, en een certificaat met bijbehorende sleutel en keten
+wordt als één item bewaard. Je kunt ook een andere kluis met de jouwe
+samenvoegen, notities toevoegen, zoeken en zien wat binnenkort verloopt.
 
-**SSH-sleutels.** Ed25519, ECDSA (P-256/384/521) en RSA (3072/4096), in echt
-OpenSSH-formaat dat `ssh`, `ssh-keygen` en `ssh-add` accepteren. Optionele
-wachtzinnen worden versleuteld zoals `ssh-keygen` dat doet (bcrypt-KDF,
-aes256-ctr), en de SHA256-vingerafdruk wordt getoond.
+**SSH-sleutels.** kiwi-gen maakt sleutels van het type Ed25519, ECDSA
+(P-256/384/521) en RSA (3072/4096). Ze worden in het echte OpenSSH-formaat
+geschreven, dat `ssh`, `ssh-keygen` en `ssh-add` accepteren. Een wachtzin is
+optioneel. Stel je er een in, dan wordt de sleutel op dezelfde manier
+versleuteld als `ssh-keygen` dat doet (bcrypt-KDF, aes256-ctr). De
+SHA256-vingerafdruk van de sleutel wordt getoond.
 
-**SSH-certificaten.** Maak een SSH-CA aan of laad er een, en onderteken daarna
-gebruikers- of hostcertificaten. Je krijgt kant-en-klare regels voor
-`sshd_config` en `known_hosts`.
+**SSH-certificaten.** Je kunt een SSH-CA aanmaken of een bestaande laden, en
+daarmee gebruikerscertificaten of hostcertificaten ondertekenen. kiwi-gen geeft
+je de bijpassende regels voor `sshd_config` en `known_hosts`, klaar voor
+gebruik.
 
-**TLS-certificaten.** Maak een root- of tussen-CA aan (ECDSA of RSA), of laad een
-bestaande. Geef servercertificaten uit (hostnamen, wildcards, IP's) of
-clientcertificaten, en onderteken CSR's van elders zodat de privésleutel nooit
-hierheen hoeft te komen. Het maakt full-chain-bestanden en `.p12`-bundels.
-Certificaten doorstaan `openssl verify -x509_strict` en voldoen aan de eisen van
-Apple voor TLS-servercertificaten.
+**TLS-certificaten.** Je kunt een root-CA of een tussen-CA aanmaken (ECDSA of
+RSA), of een bestaande laden. Met de CA geef je servercertificaten uit voor
+hostnamen, wildcards en IP-adressen, of clientcertificaten. Je kunt ook een
+certificaataanvraag (CSR) ondertekenen die ergens anders is gemaakt, zodat de
+privésleutel nooit in kiwi-gen hoeft te komen. kiwi-gen maakt bestanden met de
+volledige keten en `.p12`-bundels. De certificaten doorstaan
+`openssl verify -x509_strict` en voldoen aan de eisen van Apple voor
+TLS-servercertificaten.
 
-**Inspecteren en converteren.** Lees certificaten, CSR's, sleutels en
-SSH-certificaten (PEM of DER), controleer of een sleutel bij een certificaat
-hoort, converteer privésleutels tussen PKCS#8, PKCS#1 en OpenSSH (waarbij je een
-wachtzin kunt toevoegen of verwijderen), en converteer publieke sleutels tussen SSH
-en PEM.
+**Bekijken en omzetten.** kiwi-gen leest certificaten, CSR’s, sleutels en
+SSH-certificaten in PEM- of DER-formaat. Het kan controleren of een sleutel bij
+een certificaat hoort. Het zet privésleutels om tussen PKCS#8, PKCS#1 en het
+OpenSSH-formaat, en kan daarbij een wachtzin toevoegen of verwijderen. Ook
+publieke sleutels zet het om tussen het SSH- en het PEM-formaat.
 
-## Het draaien { #running-it }
+## Gebruiken { #running-it }
 
-Open `index.html` in een moderne browser (het werkt direct vanaf schijf), of
-serveer de map:
+Open `index.html` in een moderne browser. Dat werkt rechtstreeks vanaf de
+schijf, zonder webserver. Je kunt de map ook via een webserver aanbieden:
 
 ```bash
 git clone https://github.com/derlocke-ng/kiwi-gen.git && cd kiwi-gen
 python3 -m http.server 8000      # daarna http://localhost:8000
 ```
 
-WebCrypto werkt alleen in beveiligde contexten: HTTPS, `localhost` of `file://`.
-Gewone HTTP vanaf een andere machine werkt niet.
+De WebCrypto-functies van de browser werken alleen in een beveiligde context:
+een pagina die via HTTPS is geladen, vanaf `localhost` of vanaf `file://`. Open
+je de pagina via gewoon HTTP vanaf een andere machine, dan werkt ze niet.
 
 ## Hoe het werkt { #how-it-works }
 
-Alle cryptografie gebruikt de
+Alle cryptografische bewerkingen doet de
 [Web Crypto API](https://developer.mozilla.org/docs/Web/API/Web_Crypto_API) van
-de browser. De codering voor OpenSSH, X.509, PKCS#8, PKCS#10 en PKCS#12 zit in
-één bestand zonder afhankelijkheden, `kiwi-crypto.js`. Er is geen buildstap en
-er wordt niets van een CDN geladen. Een Content-Security-Policy blokkeert alle
-netwerkverzoeken, zodat sleutels de pagina niet kunnen verlaten.
+de browser. De code die de formaten OpenSSH, X.509, PKCS#8, PKCS#10 en PKCS#12
+codeert, staat in één bestand, `kiwi-crypto.js`, zonder afhankelijkheden. Er is
+geen buildstap, en de pagina laadt niets van een CDN. Een
+Content-Security-Policy blokkeert alle netwerkverzoeken, dus sleutels kunnen de
+pagina niet verlaten.
 
-Een webpagina kan niet als SSH-agent optreden. Laad de sleutels die je maakt in
-je gewone `ssh-agent` met `ssh-add`. De kluis is maar zo veilig als je
-hoofdwachtwoord en je browserprofiel. Ed25519 vereist een actuele browser
-(Chrome 137+, Firefox 129+, Safari 17+).
+Een webpagina kan niet als SSH-agent werken. Wil je de sleutels gebruiken die je
+maakt, laad ze dan met `ssh-add` in je gewone `ssh-agent`. De kluis is zo
+veilig als je hoofdwachtwoord en je browserprofiel. Voor Ed25519 heb je een
+recente browser nodig (Chrome 137+, Firefox 129+, Safari 17+).

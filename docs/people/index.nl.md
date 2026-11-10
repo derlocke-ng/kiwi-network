@@ -1,22 +1,36 @@
 # Hubs, geen platforms
 
-Het netwerk verbindt je machines. **Hubs** verbinden mensen. Een hub is een set
-webapps (een open markt, een feed, chat, bestanden delen, gedeelde lijsten, een
-wachtwoordbeheerder, een agenda) die volledig in de browser draaien en
-synchroniseren via [nostr](https://nostr.com)-relays die de gemeenschap kiest. Er
-is geen accountserver en geen backend in het midden, en alles wat privé is, wordt
-op het apparaat versleuteld voordat het vertrekt. Iedereen kan een hub draaien
-voor elke gemeenschap. Zie [de apps van het framework](apps.md).
+**kiwi-framework** is software waarmee elke community haar eigen **hub** kan
+draaien. Een hub is een website met een reeks apps voor de leden van de
+community: een open markt, een feed, chat, bestanden delen, gedeelde lijsten,
+een wachtwoordbeheerder en een agenda. Iedereen kan een hub draaien voor welke
+community dan ook. Die community is dan niet afhankelijk van een centraal
+platform dat de accounts en gegevens van iedereen in handen heeft.
 
-Drie repository's vormen het geheel:
+De apps draaien volledig in de browser. Ze synchroniseren via
+[nostr](https://nostr.com)-relays: servers die ondertekende berichten opslaan en
+doorgeven. De community kiest zelf welke relays haar hub gebruikt. Er is geen
+accountserver en geen backend tussen de browser en de relays, en alles wat
+privé is, wordt op het apparaat versleuteld voordat het wordt verstuurd. De
+andere onderdelen van Kiwi Network verbinden je machines, hubs verbinden mensen.
+Elke app wordt beschreven in [De apps van het framework](apps.md).
+
+Armory is de eerste hub die met het framework is gebouwd. Het is één voorbeeld,
+en tegelijk het sjabloon dat andere community’s kopiëren om hun eigen hub te
+bouwen.
+
+De software staat in drie repository’s:
 
 | Repository | Wat het is |
 |---|---|
-| [**kiwi-framework**](https://github.com/derlocke-ng/kiwi-framework) | De motor: identiteit en accounts, relays en synchronisatie, mensen en delen, moderatie, de designkit, de hubpagina's en tien apps. Het levert niets wat een gebruiker op zichzelf opent. v0.32.1, GPL-3.0-or-later |
-| [**Armory**](armory.md) | De eerste **distributie**: een hub gebouwd met het framework, met een naam, standaardrelays en alle tien apps gemount onder eigen namen. Het sjabloon om te forken voor je eigen hub. GPL-3.0-or-later. **Live:** [derlocke-ng.github.io/armory](https://derlocke-ng.github.io/armory/) |
-| [**kiwi-web-catalog**](hubs.md#kiwi-web-catalog) | Een git-catalogus van hubs en hun apps, in dezelfde vorm als de [kiwi-catalog](../desktop/catalogs.md) voor de desktop |
+| [**kiwi-framework**](https://github.com/derlocke-ng/kiwi-framework) | De algemene software waaruit elke hub wordt gebouwd. Ze bevat identiteit en accounts, relays en synchronisatie, vrienden en delen, moderatie, de designkit, de pagina’s van de hub en tien apps. Het framework zelf kun je niet als website openen: pas een distributie maakt er een hub van. De huidige versie is v0.32.1, de licentie is GPL-3.0-or-later. |
+| [**Armory**](armory.md) | De eerste **distributie**, dat wil zeggen een hub die met het framework is gebouwd. Armory voegt een naam, standaardrelays en alle tien apps toe, elk onder een eigen naam. Het is het sjabloon om te forken voor je eigen hub. De licentie is GPL-3.0-or-later. **Online:** [derlocke-ng.github.io/armory](https://derlocke-ng.github.io/armory/) |
+| [**kiwi-web-catalog**](hubs.md#kiwi-web-catalog) | Een catalogus, een git-repository met een lijst van hubs en hun apps. Het formaat is hetzelfde als dat van de [kiwi-catalog](../desktop/catalogs.md) voor de desktop. |
 
-## Hoe het in elkaar past { #how-it-fits-together }
+## Hoe het in elkaar zit { #how-it-fits-together }
+
+Het schema laat zien hoe het framework een hub in je browser wordt, en met
+welke servers de browser daarna praat.
 
 ```
 kiwi-framework  (engine: shared data layer, React UI, hub pages, apps)
@@ -35,88 +49,103 @@ any static host (GitHub Pages)  or  the hub container (nginx + HUB_* settings)
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## De begrippen { #the-words }
+## De begrippen op deze pagina { #the-words }
 
-- **Hub**: wat een distributie oplevert. Statische bestanden, dus er een hosten
-  is een map serveren. Elke hub heeft een startpagina, instellingen en een
-  accountpagina.
-- **Distributie**: een hub gebouwd op het framework, met een naam en uiterlijk,
-  standaardrelays, en een gekozen set apps op gekozen spaces. Alles wat een fork
-  verandert, staat in één bestand, `distribution.js`, plus de vertalingen ervan.
-- **App**: een map met een manifest die in elke distributie past. Apps praten
-  alleen met de publieke API van het framework en raken opslag of sleutels nooit
-  rechtstreeks aan.
-- **Space**: een benoemde gemeenschap met een eigenaar, eigen moderators en,
-  optioneel, eigen relays (gemodelleerd naar de gemodereerde communities van
-  NIP-72). Een andere hub kan dezelfde space bedienen door het adres ervan te
-  noemen.
-- **Mount**: app-code op een space, met een eigen naam, route en icoon. Eén app
-  kan vele keren gemount worden. *Trading Post* van Armory is de `market`-app van
-  het framework, gemount op de space `tradingpost` van Armory.
+- **Hub**: de website die een community gebruikt. Een hub krijg je door een
+  distributie te bouwen. Hij bestaat alleen uit statische bestanden, dus een hub
+  hosten betekent een map met bestanden aanbieden. Elke hub heeft een
+  startpagina, een pagina met instellingen en een accountpagina.
+- **Distributie**: het framework samen met de keuzes die er één bepaalde hub van
+  maken: een naam en uiterlijk, standaardrelays, en een selectie apps op
+  gekozen spaces. Fork je een distributie, dan staat alles wat je verandert in
+  één bestand, `distribution.js`, en in de vertalingen daarvan.
+- **App**: een map met een manifestbestand. Een app kan aan elke distributie
+  worden toegevoegd. Apps gebruiken alleen de openbare API van het framework en
+  komen nooit rechtstreeks aan de opslag of de sleutels.
+- **Space**: een community met een naam, een eigenaar, eigen moderatoren en, als
+  ze dat wil, eigen relays. Spaces zijn gebaseerd op de gemodereerde
+  community’s van nostr (NIP-72). Een andere hub kan dezelfde space aanbieden
+  door het adres van de space op te geven.
+- **Mount**: één app die voor één space wordt gebruikt. Elke mount heeft een
+  eigen naam, een eigen route (het adres binnen de hub) en een eigen icoon. Eén
+  app kan vele keren worden gekoppeld. *Trading Post* van Armory is bijvoorbeeld
+  de app `market` van het framework, gekoppeld aan de space `tradingpost` van
+  Armory.
 
-Twee mensen op verschillende distributies zijn vrienden, delen en chatten precies
-zoals op één distributie, omdat identiteit en gegevens nostr-events zijn, niet
-van de hub.
+Twee mensen die hubs van verschillende distributies gebruiken, kunnen vrienden
+zijn, dingen delen en chatten, precies alsof ze dezelfde hub gebruiken. Dat kan
+omdat de identiteit en de gegevens van iemand uit nostr-events bestaan:
+ondertekende berichten die op relays staan. Ze horen niet bij een hub.
 
 ## Accounts en sleutels { #accounts-and-keys }
 
-- Elk apparaat krijgt bij het eerste bezoek een sleutel, bewaard in de browser.
-- Een **account** is een gebruikersnaam en wachtwoord, gebouwd op gewone
-  nostr-events zonder enig register: het wachtwoord wordt met scrypt opgerekt en
-  ontgrendelt je sleutel. Niemand kan een account overnemen of overschrijven
-  zonder het wachtwoord. Er is **geen wachtwoordherstel**.
-- Je kunt ook inloggen met een bestaande nostr-sleutel (`nsec`, hex of
-  `ncryptsec`). Signers via een browserextensie en op afstand (NIP-07, NIP-46)
-  zijn gepland, niet gebouwd.
-- Eén account werkt in alle apps van de hub en op elk apparaat waarop je inlogt.
+- De eerste keer dat je een hub op een apparaat opent, maakt de browser een
+  sleutel voor dat apparaat aan en bewaart die.
+- Een **account** is een gebruikersnaam met een wachtwoord. Het is opgebouwd uit
+  gewone nostr-events, en er is geen register van accounts. Je wachtwoord wordt
+  met scrypt opgerekt, een functie die met opzet traag rekent, en het resultaat
+  ontgrendelt je sleutel. Zonder het wachtwoord kan niemand een account
+  overnemen of overschrijven. Je wachtwoord herstellen kan **niet**.
+- Je kunt ook inloggen met een nostr-sleutel die je al hebt, als `nsec`, hex of
+  `ncryptsec`. Inloggen via een browserextensie (NIP-07) of een signer op
+  afstand (NIP-46) is gepland, maar nog niet gebouwd.
+- Eén account werkt in alle apps van de hub en op elk apparaat waarop je
+  inlogt.
 
 ## Privacymodel { #privacy-model }
 
-**Wat versleuteld is.** Inhoud wordt in de browser verzegeld voordat hij ergens
-heen gaat: AES-256-GCM met sleutels afgeleid via HKDF. Privéberichten zijn
-NIP-17-berichten in NIP-59-gift-wraps. Bestanden krijgen elk een willekeurige
-AES-256-GCM-sleutel voordat ze naar een mediaserver gaan, en foto's worden
-opnieuw gecodeerd, waardoor cameragegevens wegvallen. De Vault is verzegeld met
-een eigen wachtzin (scrypt + AES-256-GCM). Gesprekken gaan van browser naar
-browser, versleuteld door WebRTC.
+**Wat versleuteld is.** De browser versleutelt inhoud voordat hij die ergens
+naartoe stuurt. Dat gebeurt met AES-256-GCM, met sleutels die met HKDF worden
+afgeleid. Privéberichten zijn NIP-17-berichten in NIP-59-gift-wraps. Een gift
+wrap is een tweede laag versleuteling, zodat een relay alleen ziet dat een of
+andere sleutel een ingepakt bericht heeft ontvangen. Elk bestand wordt met een
+eigen willekeurige AES-256-GCM-sleutel versleuteld voordat het naar een
+mediaserver gaat. Foto’s worden eerst opnieuw gecodeerd, waardoor de metadata
+die camera’s toevoegen verdwijnt. De Vault is versleuteld met een eigen wachtzin
+(scrypt + AES-256-GCM). Gesprekken gaan rechtstreeks van browser naar browser en
+worden door WebRTC versleuteld.
 
-**Lokaal eerst.** Elke schrijfactie gaat eerst naar de eigen database van de
-browser, daarna naar de relays. Leesacties komen van het apparaat, dus de apps
-werken offline. Als een apparaat opnieuw verbinding maakt, zet het terug wat een
-relay vergeten is: gegevens gaan alleen verloren als elk apparaat dat ze had weg
-is *en* er geen back-up is.
+**Eerst lokaal.** Alles wat je schrijft, wordt eerst in de eigen database van
+de browser opgeslagen en daarna naar de relays gestuurd. De apps lezen uit die
+database op het apparaat, dus ze werken ook offline. Komt een apparaat weer
+online, dan stuurt het de relay alle gegevens die de relay niet meer heeft.
+Gegevens gaan dus alleen verloren als elk apparaat dat ze had weg is *en* er
+geen back-up is.
 
-**Wat anderen kunnen zien.** De repository's zijn expliciet over de grenzen:
+**Wat anderen kunnen zien.** De repository’s noemen de grenzen zelf:
 
-- Relays zien metadata: wie naar welke adressen schrijft, wanneer, hoeveel, en
-  vanaf welk IP-adres. Gebruik een VPN of Tor als dat ertoe doet.
-- De sleutel van een space is geen geheim. Hij houdt de berichten van een
-  gemeenschap uit het zicht. Likes, meldingen en wie waarop reageerde, zijn
-  zichtbaar voor relays.
-- DevBoard-notities en moderatiemeldingen zijn bewust openbaar.
+- Relays zien metadata: wie naar welke adressen schrijft, wanneer, hoeveel en
+  vanaf welk IP-adres. Gebruik een VPN of Tor als dat voor jou belangrijk is.
+- De sleutel van een space is geen geheim. Hij zorgt er alleen voor dat de
+  berichten van een community niet openlijk te lezen zijn. Relays kunnen likes,
+  meldingen en wie waarop reageerde wel zien.
+- Briefjes op DevBoard en meldingen voor moderatie zijn bewust openbaar.
 - Je sleutel staat in de opslag van de browser. Alle GitHub Pages-sites van één
-  account delen een origin, dus een hub op een eigen (sub)domein is de sterkere
-  opzet.
-- Directe overdrachten en gesprekken onthullen de IP-adressen van de twee
-  browsers aan elkaar en aan de STUN-servers (standaard die van Google en
-  Cloudflare; een hub kan eigen servers instellen).
-- "Geen server van ons" betekent: geen enkele in het kritieke pad. De apps
-  gebruiken nog steeds de relays, mediaservers en, voor de agenda, de
-  CalDAV-server die jij of je hub kiest.
+  account hebben dezelfde origin, en browsers scheiden de opslag van websites
+  per origin. Een hub op een eigen domein of subdomein is daarom veiliger.
+- Bij een rechtstreekse bestandsoverdracht of een gesprek leren de twee
+  browsers elkaars IP-adres kennen, en de STUN-servers die helpen de verbinding
+  op te zetten, zien ook beide adressen. Standaard zijn dat de STUN-servers van
+  Google en Cloudflare. Een hub kan eigen servers instellen.
+- “Geen server van ons” betekent dat de apps van geen enkele server van het
+  project afhankelijk zijn. Ze gebruiken wel relays, mediaservers en, voor de
+  agenda, een CalDAV-server. Welke dat zijn, kies je zelf of kiest je hub.
 
 ## Moderatie { #moderation }
 
-Drie lagen: je eigen blokkeerlijst (versleuteld, alleen jij kunt hem lezen),
-meldingen (openbaar, ondertekend), en het eigen beleid van de relays. Een space
-heeft moderators. Een melding van een moderator klapt een bericht meteen in.
-Anders zijn er drie meldingen nodig van mensen die niet geblokkeerd zijn.
-Berichten kunnen als 18+ of als advertentie worden gemarkeerd, en die zijn alleen
-zichtbaar voor mensen met een account.
+Moderatie werkt op drie niveaus. Het eerste is je eigen blokkeerlijst, die
+versleuteld is zodat alleen jij hem kunt lezen. Het tweede zijn meldingen, die
+openbaar en ondertekend zijn. Het derde is het beleid van elke relay.
+
+Elke space heeft moderatoren. Meldt een moderator een bericht, dan wordt het
+meteen ingeklapt. Anders wordt een bericht ingeklapt na drie meldingen van
+mensen die niet geblokkeerd zijn. Een bericht kan als 18+ of als advertentie
+worden gemarkeerd, en gemarkeerde berichten zijn alleen zichtbaar voor mensen
+met een account.
 
 ## Verder lezen { #read-on }
 
 - [Armory en zijn apps](armory.md)
 - [Je eigen hub draaien](hubs.md)
-- De eigen [architectuur](https://github.com/derlocke-ng/kiwi-framework/blob/main/docs/architecture.md)
-  en het [wire-protocol](https://github.com/derlocke-ng/kiwi-framework/blob/main/docs/protocol.md)
-  van het framework
+- De eigen documentatie van het framework over de [architectuur](https://github.com/derlocke-ng/kiwi-framework/blob/main/docs/architecture.md)
+  en het [protocol](https://github.com/derlocke-ng/kiwi-framework/blob/main/docs/protocol.md)

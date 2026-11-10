@@ -11,10 +11,10 @@ hide:
 
 # Kiwi Network
 
-<p class="kiwi-lede">Je eigen privénetwerk: een master aan de poort, nodes erachter, elke machine van jou. Gebouwd uit één bestand, met één deur naar het internet.</p>
+<p class="kiwi-lede">Een opensource Linux-omgeving die je zelf beheert: je servers, je apparaten en je desktop samen in één privénetwerk. Ze installeert zichzelf, houdt zichzelf up-to-date, maakt elke nacht een back-up en is opnieuw op te bouwen als er iets kapotgaat.</p>
 
-[Hoe het werkt](network/index.md){ .md-button .md-button--primary }
-[Bouw er een](server/index.md){ .md-button }
+[Zo werkt het](network/index.md){ .md-button .md-button--primary }
+[Zelf opzetten](server/index.md){ .md-button }
 
 </div>
 
@@ -22,37 +22,37 @@ hide:
 
 <a href="network/">
 <strong>Het netwerk</strong>
-<span>Eén master, veel nodes, één WireGuard-mesh. Clientgroepen, een double-hop-exit, DNS en certificaten van jezelf.</span>
-<em>Hoe het werkt →</em>
+<span>Je servers en apparaten in één privé WireGuard-netwerk. Eén server is bereikbaar vanaf internet, de andere blijven thuis.</span>
+<em>Zo werkt het →</em>
 </a>
 
 <a href="server/">
 <strong>kiwi-server</strong>
-<span>Het fleet-bestand, installatie-ISO's, toepassen via SSH, aanmelden, back-ups, ontgrendelen. CLI en GTK-app.</span>
-<em>Bouw een netwerk →</em>
+<span>Het programma waarmee je het netwerk opbouwt en beheert: één bestand voor al je machines, automatische installatie, back-ups en ontgrendelen.</span>
+<em>Een netwerk opzetten →</em>
 </a>
 
 <a href="server/modules/">
 <strong>Modules</strong>
-<span>Alle 20: WireGuard, Pi-hole, Tor, Nextcloud, Vaultwarden, back-ups, Tang, Immich, Paperless-ngx en meer.</span>
-<em>Wat een node kan zijn →</em>
+<span>De 20 diensten die een machine kan draaien, van WireGuard en Pi-hole tot Nextcloud, Vaultwarden, back-ups en Immich.</span>
+<em>Wat een node kan draaien →</em>
 </a>
 
 <a href="people/">
 <strong>Hubs</strong>
-<span>kiwi-framework: open markten, feeds, chat en delen op nostr, verzegeld in de browser. Armory is de eerste.</span>
-<em>Hubs, geen platforms →</em>
+<span>Met kiwi-framework heeft een community haar eigen hub, met een open markt, een feed en chat, en zonder centraal platform.</span>
+<em>Hubs voor community’s →</em>
 </a>
 
 <a href="desktop/">
 <strong>De desktop</strong>
-<span>kiwi-updater en de apps voor Fedora Atomic: killswitch, verzegelde exits voor klantnetwerken, inrichting, synchronisatie.</span>
-<em>Apps uit git →</em>
+<span>Een werkstation met Fedora Atomic en apps uit git: een VPN-killswitch, afgeschermde verbindingen voor klantnetwerken, inrichting en synchronisatie.</span>
+<em>Desktop-apps →</em>
 </a>
 
 <a href="project/status/">
 <strong>Status</strong>
-<span>Elke repository, de release ervan en de bekende hiaten, beschreven zoals ze zijn.</span>
+<span>Alle repository’s met hun huidige release en wat er nog ontbreekt.</span>
 <em>Hoe het ervoor staat →</em>
 </a>
 
@@ -60,40 +60,47 @@ hide:
 
 ## Het idee { #the-idea }
 
-Kiwi Network is een volledig geautomatiseerde Linux-omgeving om in te leven en te
-werken: beveiligd, degelijk en veilig voor een ruw leven online. Je machines
-zorgen voor zichzelf.
+Op internet moet je op alles voorbereid zijn, en eigen servers onderhouden is
+werk dat nooit af is. Kiwi Network neemt dat werk van je over. Je beschrijft je
+machines in één bestand, en het routinewerk gaat vanzelf. Met inbraken, kapotte
+schijven en kwijtgeraakte machines is vanaf het begin rekening gehouden.
 
-- **Ze installeren zichzelf.** Per machine een ISO die zonder tussenkomst
-  installeert, of rechtstreeks op een gehuurde server via de API van de provider
-  (vandaag netcup, meer [gepland](server/roadmap.md#more-hosters-and-network-boot)).
-- **Ze houden zichzelf actueel.** Updates worden doorlopend geïnstalleerd, en
-  herstarts wachten op het venster dat je instelt.
-- **Ze maken zelf back-ups.** Elke nacht, versleuteld en alleen toevoegend, naar
-  je eigen back-upnodes. Ook van het fleet-bestand en zijn geheimen wordt een
-  back-up gemaakt.
-- **Ze komen weer overeind.** Versleutelde schijven ontgrendelen via Tang, of op
-  afstand als er iets mis is, en een opnieuw opgebouwde machine komt terug uit
-  het fleet-bestand en haar back-up.
+- **Automatische installatie.** Elke machine wordt geïnstalleerd zonder dat er
+  iemand achter het toetsenbord zit: vanaf een eigen installatie-image, of
+  rechtstreeks op een gehuurde server via de API van de hostingprovider. Op dit
+  moment wordt netcup ondersteund, meer providers zijn
+  [gepland](server/roadmap.md#more-hosters-and-network-boot).
+- **Automatische updates.** Updates worden automatisch geïnstalleerd. Een
+  machine herstart alleen in de uren die je daarvoor hebt vrijgegeven.
+- **Elke nacht een back-up.** Elke machine stuurt een versleutelde back-up naar
+  een back-upserver van jezelf. Ze kan back-ups alleen toevoegen, niet
+  verwijderen, dus een indringer kan ze niet wissen. Ook van het fleetbestand
+  en de secrets wordt een back-up gemaakt.
+- **Herstel als het erop aankomt.** De schijven zijn versleuteld. Bij het
+  opstarten ontgrendelen de machines ze zelf, of je ontgrendelt ze op afstand.
+  Moet een machine opnieuw worden opgebouwd, dan komt de configuratie uit het
+  fleetbestand en komen de gegevens uit de back-up.
 
 ## De machines { #the-machines }
 
-| Rol | Wat de machine wordt |
+Elke machine heeft een rol. Die bepaalt wat de machine in het netwerk doet.
+
+| Rol | Wat de machine doet |
 |---|---|
-| `master` | de poort: WireGuard, een double-hop- of directe exit, Pi-hole, Tor, de beheerpagina's, en optioneel een nostr-relay en een hub |
-| `node` · `gateway` | een LAN via de VPN, met Pi-hole als DNS en DHCP, een downloadstation en SFTP |
-| `node` · `cloud` | Nextcloud met Collabora, en Vaultwarden |
-| `node` · `minimal` | de tunnel en nginx, voor modules naar keuze: back-ups, Tang, Immich, Paperless-ngx, OpenCloud |
-| `bare` | alleen het basissysteem |
+| `master` | De enige machine die bereikbaar is vanaf internet. Ze draait de WireGuard-server, stuurt uitgaand verkeer via een VPN-provider of rechtstreeks naar internet, en levert DNS met Pi-hole, Tor en de beheerpagina’s. Daarnaast kan ze een nostr-relay en een hub draaien. |
+| `node` · `gateway` | Stuurt een thuis- of kantoornetwerk door de VPN, met Pi-hole als DNS- en DHCP-server, een downloadstation en SFTP. |
+| `node` · `cloud` | Draait Nextcloud met Collabora, en Vaultwarden. |
+| `node` · `minimal` | Heeft alleen de verbinding met het netwerk en nginx. De modules kies je zelf, bijvoorbeeld back-ups, Tang, Immich, Paperless-ngx of OpenCloud. |
+| `bare` | Heeft alleen het basissysteem. |
 
 Masters zijn vernoemd naar fruitgerechten (sorbet, crumble, compote), nodes naar
-vruchten (papaya, lychee, quince). De master is de enige machine die vanaf het
-internet bereikbaar moet zijn, en standaard publiceert hij één poort: WireGuard,
-UDP 51820.
+vruchten (papaya, lychee, quince). De master is de enige machine die bereikbaar
+moet zijn vanaf internet. Standaard staat er precies één poort open: WireGuard,
+op UDP 51820.
 
 ```bash
-kiwi install kiwi-server            # of vanuit een clone: ./install.sh install
+kiwi install kiwi-server            # of vanuit een kloon: ./install.sh install
 kiwi-server init && $EDITOR fleet.yaml
-kiwi-server build fleet.yaml        # per machine een ISO die zonder tussenkomst installeert
+kiwi-server build fleet.yaml        # per machine een ISO die zonder toezicht installeert
 kiwi-server apply fleet.yaml papaya # de rol, via SSH
 ```

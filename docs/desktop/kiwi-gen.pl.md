@@ -1,71 +1,84 @@
 # kiwi-gen: Kiwi Key Generator
 
-Działający w przeglądarce menedżer **kluczy SSH, certyfikatów SSH i
-certyfikatów TLS**. Wszystko jest tworzone i przechowywane lokalnie w
-zaszyfrowanym sejfie i nic nie jest wysyłane na żaden serwer.
+kiwi-gen to strona internetowa, która tworzy **klucze SSH, certyfikaty SSH
+i certyfikaty TLS** w twojej przeglądarce i nimi zarządza. Wszystko powstaje
+na twoim własnym komputerze i jest tam przechowywane w zaszyfrowanym sejfie,
+a nic nie jest wysyłane na żaden serwer.
 
 - Repozytorium: [derlocke-ng/kiwi-gen](https://github.com/derlocke-ng/kiwi-gen), MIT
-- Na żywo: [derlocke-ng.github.io/kiwi-gen](https://derlocke-ng.github.io/kiwi-gen/)
-- To statyczna strona WWW, a nie aplikacja kiwi-updater. Nie ma tagów wydań.
+- Działa pod adresem: [derlocke-ng.github.io/kiwi-gen](https://derlocke-ng.github.io/kiwi-gen/)
+- To statyczna strona internetowa, a nie aplikacja instalowana przez
+  kiwi-updater. Nie ma tagów wydań.
 
-Używaj go do kluczy SSH w twoim pliku fleet, CA dla twoich własnych usług lub
-certyfikatów klienta, wszystko generowane offline w przeglądarce.
+Możesz w niej utworzyć klucze SSH do pliku fleet (pliku, który opisuje każdą
+maszynę twojej sieci Kiwi Network), urząd certyfikacji (CA) dla własnych
+usług albo certyfikaty klienckie. Wszystko to powstaje w przeglądarce, bez
+połączenia z internetem.
 
 ## Funkcje { #features }
 
-**Sejf.** Klucze i certyfikaty są trzymane w jednym zaszyfrowanym sejfie:
-AES-256-GCM, z kluczem wyprowadzanym z twojego hasła głównego przez
-PBKDF2-SHA256 przy 600 000 iteracji. Sejf jest przechowywany zaszyfrowany w
-localStorage przeglądarki i odszyfrowywany tylko w pamięci, gdy jest
-odblokowany. Wyeksportuj go jako plik, żeby zrobić kopię zapasową lub go
-przenieść. Możesz importować istniejące klucze i certyfikaty (certyfikat z
-kluczem i łańcuchem staje się jednym elementem), scalić inny sejf, dodawać
-notatki, wyszukiwać i sprawdzać, co wkrótce wygasa.
+**Sejf.** Klucze i certyfikaty są przechowywane w jednym zaszyfrowanym sejfie.
+Jest on szyfrowany algorytmem AES-256-GCM, a klucz szyfrowania jest
+wyprowadzany z twojego hasła głównego funkcją PBKDF2-SHA256 przy 600 000
+iteracji. Sejf jest zapisany w postaci zaszyfrowanej w localStorage
+przeglądarki. Odszyfrowuje się go tylko w pamięci i tylko wtedy, gdy jest
+odblokowany. Żeby zrobić kopię zapasową sejfu albo go przenieść, wyeksportuj go
+do pliku. Możesz importować istniejące klucze i certyfikaty, a certyfikat
+razem z kluczem i łańcuchem zapisuje się jako jedna pozycja. Możesz też
+scalić z twoim sejfem inny sejf, dodawać notatki, wyszukiwać i sprawdzać, co
+wkrótce wygasa.
 
-**Klucze SSH.** Ed25519, ECDSA (P-256/384/521) i RSA (3072/4096), w
-prawdziwym formacie OpenSSH akceptowanym przez `ssh`, `ssh-keygen` i
-`ssh-add`. Opcjonalne frazy dostępu są szyfrowane tak, jak robi to
-`ssh-keygen` (bcrypt KDF, aes256-ctr), a odcisk SHA256 jest wyświetlany.
+**Klucze SSH.** kiwi-gen tworzy klucze Ed25519, ECDSA (P-256/384/521) i RSA
+(3072/4096). Zapisuje je w prawdziwym formacie OpenSSH, który przyjmują `ssh`,
+`ssh-keygen` i `ssh-add`. Fraza dostępu jest opcjonalna. Jeśli ją ustawisz,
+klucz jest szyfrowany tak samo, jak robi to `ssh-keygen` (bcrypt KDF,
+aes256-ctr). Wyświetlany jest odcisk klucza SHA256.
 
-**Certyfikaty SSH.** Utwórz CA SSH lub wczytaj istniejący, potem podpisuj
-certyfikaty użytkowników lub hostów. Dostajesz gotowe linie `sshd_config` i
-`known_hosts`.
+**Certyfikaty SSH.** Możesz utworzyć urząd certyfikacji SSH albo wczytać
+istniejący, a potem podpisywać nim certyfikaty użytkowników i hostów. kiwi-gen
+podaje gotowe do użycia wiersze dla `sshd_config` i `known_hosts`.
 
-**Certyfikaty TLS.** Utwórz główny lub pośredni CA (ECDSA lub RSA) albo
-wczytaj istniejący. Wystawiaj certyfikaty serwerów (nazwy hostów, wildcardy,
-adresy IP) lub klientów i podpisuj CSR-y z innych miejsc, żeby klucz prywatny
-nigdy nie musiał tu trafić. Tworzy pliki z pełnym łańcuchem i paczki `.p12`.
-Certyfikaty przechodzą `openssl verify -x509_strict` i spełniają wymagania
-Apple dla certyfikatów serwerów TLS.
+**Certyfikaty TLS.** Możesz utworzyć główny albo pośredni urząd certyfikacji
+(ECDSA lub RSA) albo wczytać istniejący. Za pomocą CA wystawiasz certyfikaty
+serwerów dla nazw hostów, symboli wieloznacznych i adresów IP albo certyfikaty
+klienckie. Możesz też podpisać żądanie podpisania certyfikatu (CSR) utworzone
+gdzie indziej, dzięki czemu klucz prywatny w ogóle nie musi trafiać do
+kiwi-gen. kiwi-gen tworzy pliki z pełnym łańcuchem i paczki `.p12`. Certyfikaty
+przechodzą `openssl verify -x509_strict` i spełniają wymagania Apple dla
+certyfikatów serwerów TLS.
 
-**Inspekcja i konwersja.** Odczytuj certyfikaty, CSR-y, klucze i certyfikaty
-SSH (PEM lub DER), sprawdzaj, czy klucz pasuje do certyfikatu, konwertuj
-klucze prywatne między PKCS#8, PKCS#1 i OpenSSH (dodając lub usuwając frazę
-dostępu) oraz klucze publiczne między SSH i PEM.
+**Podgląd i konwersja.** kiwi-gen odczytuje certyfikaty, żądania CSR, klucze
+i certyfikaty SSH w formacie PEM lub DER. Potrafi sprawdzić, czy klucz pasuje
+do certyfikatu. Konwertuje klucze prywatne między formatami PKCS#8, PKCS#1
+i OpenSSH, a przy okazji może dodać albo usunąć frazę dostępu. Konwertuje też
+klucze publiczne między formatami SSH i PEM.
 
 ## Uruchamianie { #running-it }
 
-Otwórz `index.html` w nowoczesnej przeglądarce (działa prosto z dysku) albo
-serwuj folder:
+Otwórz `index.html` w nowoczesnej przeglądarce. Działa to bezpośrednio
+z dysku, bez serwera WWW. Możesz też serwować cały folder:
 
 ```bash
 git clone https://github.com/derlocke-ng/kiwi-gen.git && cd kiwi-gen
 python3 -m http.server 8000      # potem http://localhost:8000
 ```
 
-WebCrypto działa tylko w bezpiecznych kontekstach: HTTPS, `localhost` lub
-`file://`. Zwykłe HTTP z innej maszyny nie zadziała.
+Funkcje WebCrypto przeglądarki działają tylko w bezpiecznym kontekście, czyli
+na stronie wczytanej przez HTTPS, z `localhost` albo z `file://`. Jeśli
+otworzysz stronę przez zwykłe HTTP z innej maszyny, nie zadziała.
 
 ## Jak to działa { #how-it-works }
 
-Cała kryptografia korzysta z
+Wszystkie operacje kryptograficzne wykonuje
 [Web Crypto API](https://developer.mozilla.org/docs/Web/API/Web_Crypto_API)
-przeglądarki. Kodowanie OpenSSH, X.509, PKCS#8, PKCS#10 i PKCS#12 jest w
-jednym pliku bez zależności, `kiwi-crypto.js`. Nie ma kroku budowania i nic nie
-jest ładowane z CDN. Content-Security-Policy blokuje wszystkie żądania
-sieciowe, więc klucze nie mogą opuścić strony.
+przeglądarki. Kod, który koduje formaty OpenSSH, X.509, PKCS#8, PKCS#10
+i PKCS#12, mieści się w jednym pliku, `kiwi-crypto.js`, bez żadnych
+zależności. Nie ma etapu budowania, a strona niczego nie wczytuje z CDN.
+Content-Security-Policy blokuje wszystkie żądania sieciowe, więc klucze nie
+mogą wydostać się poza stronę.
 
-Strona WWW nie może działać jako agent SSH. Wczytaj utworzone klucze do
-swojego zwykłego `ssh-agent` przez `ssh-add`. Sejf jest tylko tak bezpieczny
-jak twoje hasło główne i twój profil przeglądarki. Ed25519 wymaga aktualnej
-przeglądarki (Chrome 137+, Firefox 129+, Safari 17+).
+Strona internetowa nie może działać jako agent SSH. Żeby korzystać
+z utworzonych kluczy, wczytaj je do swojego zwykłego `ssh-agent` poleceniem
+`ssh-add`. Sejf jest tak bezpieczny, jak twoje hasło główne i twój profil
+przeglądarki. Ed25519 wymaga aktualnej przeglądarki (Chrome 137+, Firefox
+129+, Safari 17+).

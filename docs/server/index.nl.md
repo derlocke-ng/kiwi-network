@@ -6,10 +6,10 @@ machines aan de hand daarvan in. Je hoeft dus niet elke machine met de hand te
 installeren en te configureren.
 
 Voor elke host maakt kiwi-server een **installatie-ISO voor een automatische
-installatie**. Dat is een installatie-image dat Fedora CoreOS, uCore of Debian
-installeert zonder iets te vragen, en de machine daarna uitzet. Vervolgens
-**past** kiwi-server via SSH de rol van de machine **toe**, waardoor de machine
-een `kiwi-master` of een `kiwi-node` wordt. Daarna blijft kiwi-server het werk
+installatie**: een image dat Fedora CoreOS, uCore of Debian op de machine zet
+zonder iets te vragen, en de machine daarna uitzet. Vervolgens wordt via SSH de
+rol van de machine **toegepast**, en daarmee wordt de machine een `kiwi-master`
+of een `kiwi-node`. Ook daarna blijft kiwi-server het werk
 voor je machines doen: het voegt WireGuard-clients toe, leest uit hoe het met
 elke machine gaat, bewaart de secrets, maakt een back-up van het fleetbestand
 en ontgrendelt versleutelde schijven.
@@ -50,7 +50,7 @@ kiwi-server heeft Python 3.9+ met PyYAML en Jinja2 nodig, en de programma’s
 `openssl` en `ssh`. Voor de opslag van de secrets is `age` nodig. Om ISO’s te
 bouwen heb je `butane`, `coreos-installer` en `xorriso` nodig, en voor Debian
 ook `cpio`, `gzip` en `curl`. Installeer deze pakketten op Silverblue of
-Bluefin niet als laag op het systeem, maar bouw de ISO-tools als één
+Bluefin niet als extra laag in het systeem (layering), maar bouw de ISO-tools als één
 containerimage:
 
 ```bash
@@ -106,7 +106,7 @@ wordt ondersteund. Andere zijn [gepland](roadmap.md#more-hosters-and-network-boo
 
 | Commando | Wat het doet |
 |---|---|
-| `init [fleet.yaml]` | Schrijft het voorbeeldfleetbestand. `--domain` stelt het domein in; standaard is dat `home`. |
+| `init [fleet.yaml]` | Schrijft het voorbeeldfleetbestand. `--domain` stelt het domein in. Standaard is dat `home`. |
 | `validate fleet.yaml [host…]` | Controleert het fleetbestand. Het genereert daarbij elke stack, zodat ook fouten in modules aan het licht komen. |
 | `list` / `show fleet.yaml <host>` | Het eerste toont de hosts en wat er voor ze is gegenereerd. Het tweede toont de configuratie die voor één host echt geldt, met de secrets afgeschermd. |
 | `render fleet.yaml [host…]` | Schrijft de rolscripts, stacks en installatieconfiguraties naar `output/<host>/`. |
@@ -163,9 +163,8 @@ zodra de app het opslaat.
   kiwi-server voor het eerst met een machine verbinding maakt. Verandert de
   sleutel van een machine later, dan wordt de verbinding geweigerd. Verwijder
   na een herinstallatie de regel van die machine uit dit bestand.
-- **Een rolscript draait als root.** Vertrouw je een rol die je niet zelf hebt
-  geschreven, lees dan eerst de uitvoer van `kiwi-server script fleet.yaml <host>
-  --offline`.
+- **Een rolscript draait als root.** Lees eerst de uitvoer van `kiwi-server script fleet.yaml <host>
+  --offline` voordat je een rol vertrouwt die je niet zelf hebt geschreven.
 - **Een mislukte rol wordt gemeld.** De machine bewaart het bestand
   `/var/lib/kiwi-server/role.failed`, met de stap en het commando die zijn
   mislukt, en `status` toont het.
@@ -175,7 +174,7 @@ zodra de app het opslaat.
 Het hele traject, van het fleetbestand tot een werkende machine, is in oktober
 en november 2026 getest op echte hardware. Debian, uCore en Fedora CoreOS zijn
 het hele traject doorlopen op twee VPS’en, een mini-pc en een VM. In een
-oefening waarin een node was uitgevallen, werd een versleutelde
+oefening waarin het uitvallen van een node werd nagespeeld, werd een versleutelde
 Debian-machine in ongeveer 14 minuten opnieuw opgebouwd. Back-ups van nodes zijn
 van de ene node op een andere teruggezet (papaya naar lychee). De tunnel-MTU is
 op echte verbindingen gemeten en afgesteld, ook op mobiele. De geautomatiseerde
@@ -183,7 +182,7 @@ tests (CI) genereren elke rol, halen elk script door shellcheck en valideren
 elke Butane-configuratie. Ook vergelijken ze vier referentiestacks, de golden
 stacks, byte voor byte met hun opgeslagen uitvoer.
 
-Federatie tussen netwerken is nog niet getest. Alles gebruikt IPv4. De
+Federatie tussen netwerken is nog niet getest. Alles draait op IPv4. De
 Debian-ISO is er alleen voor amd64. Een control plane (`kiwi-server serve`) is
 gepland en ontworpen, maar nog niet gebouwd.
 

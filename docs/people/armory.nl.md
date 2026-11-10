@@ -1,70 +1,87 @@
 # Armory
 
-**Peer-to-peer-webtools, gewapend met nostr.** Elke tool draait volledig in je
-browser en synchroniseert via relays die jij kiest. Er is geen registratie, geen
-server van ons en geen tracking, en alles wordt versleuteld voordat het je
-apparaat verlaat. Installeer het als web-app vanaf de startpagina.
+Armory is de eerste hub die met kiwi-framework is gebouwd, de software waarmee
+elke community haar eigen hub kan draaien. In de termen van het framework is
+Armory een **distributie**: het framework samen met een naam, standaardrelays en
+een selectie apps. Armory bevat alle tien apps van het framework en geeft ze
+eigen namen. De markt en de feed zijn ingericht voor hennepkwekers. Dat
+onderwerp is de keuze van deze ene hub, niet van het framework: een andere
+community gebruikt dezelfde apps voor haar eigen onderwerp. Je kunt Armory
+gebruiken zoals het is, of het kopiëren als sjabloon voor je eigen hub.
+
+Elke tool draait volledig in je browser. De tools synchroniseren via relays,
+servers die je gegevens opslaan en doorgeven, en je kiest zelf welke relays je
+gebruikt. Je hoeft je niet te registreren, het project draait geen eigen server
+voor Armory, en niets volgt je. Alles wordt versleuteld voordat het je apparaat
+verlaat. Vanaf de startpagina kun je Armory als webapp installeren.
 
 - **Openen:** [derlocke-ng.github.io/armory](https://derlocke-ng.github.io/armory/)
-- Repository: [derlocke-ng/armory](https://github.com/derlocke-ng/armory), GPL-3.0-or-later
-- Een distributie van [kiwi-framework](index.md) 0.32.1 (vastgepind op een
-  commit). Er zijn nog geen release-tags.
-- In het Engels, Duits, Frans, Spaans, Italiaans, Nederlands, Pools en
-  Portugees.
+- De repository is [derlocke-ng/armory](https://github.com/derlocke-ng/armory),
+  de licentie is GPL-3.0-or-later.
+- Armory is een distributie van [kiwi-framework](index.md) 0.32.1, vastgezet op
+  een commit. Armory zelf heeft nog geen release-tags.
+- Armory is er in het Engels, Duits, Frans, Spaans, Italiaans, Nederlands, Pools
+  en Portugees.
 
-Armory heette vroeger weaponized.js.
+Vroeger heette Armory weaponized.js.
 
 ## De tools { #the-tools }
 
 | Tool | Wat het doet |
 |---|---|
-| [**Loadout**](https://derlocke-ng.github.io/armory/loadout/) | Gedeelde boodschappen- en to-dolijsten, huishoudvoorraden en Markdown-notities tussen je apparaten en met iedereen met wie je ze deelt. End-to-end versleuteld, met links om te bewerken of alleen te bekijken. Werkt offline, en je apparaten zetten terug wat relays vergeten. |
-| [**Uplink**](https://derlocke-ng.github.io/armory/uplink/) | Berichten en bestanden aan vrienden (NIP-17, verzegeld op je apparaat), groepen die blijven tot hun host ze sluit, en live-kamers waar iedereen met de link in kan, weg zodra ze leeg zijn. Antwoorden, reacties, bewerkingen, vastgezette berichten, zoeken op het apparaat, verdwijnende berichten, en spraak- en videogesprekken tussen maximaal zes mensen. |
-| [**Payload**](https://derlocke-ng.github.io/armory/payload/) | Bestanden delen: een link die versleuteld op je mediaservers wacht tot je hem verwijdert; bestanden naar vrienden en groepen in Uplink; of rechtstreeks van jouw browser naar die van hen, nergens opgeslagen. |
-| [**Vault**](https://derlocke-ng.github.io/armory/vault/) | Een wachtwoordbeheerder: logins, notities, kaarten en tweestapscodes op elk apparaat waarop je inlogt. Een generator, een gezondheidsrapport (zwakke, hergebruikte, oude en, als je het aanzet, gelekte wachtwoorden), import en export, SSH-sleutels, een SSH-certificaatautoriteit, een X.509-CA en TLS-certificaten. Verzegeld met een eigen wachtzin. Geen automatisch invullen. |
-| [**Authenticator**](https://derlocke-ng.github.io/armory/authenticator/) | Tweestapscodes (TOTP) voor je accounts elders: voeg er een toe via een QR-code, een link of geheim, of een export uit Google Authenticator. Bewaard in dezelfde verzegelde kluis. |
-| [**Calendar**](https://derlocke-ng.github.io/armory/calendar/) | Je agenda's uit je eigen Nextcloud of een andere CalDAV-server: de komende dagen of een maand, terugkerende afspraken, herinneringen zolang een pagina open is. Er gaat niets naar relays; de aanmelding zit verzegeld in je account. Je server moet de origin van Armory toestaan (CORS). |
-| [**Outpost**](https://derlocke-ng.github.io/armory/outpost/) | Kweekverslagen en kweekdagboeken: berichten met foto's, week na week, voor iedereen in Outpost, je vrienden, een kring of alleen jou. Hashtags, likes en reacties. Verzegeld op je apparaat, foto's versleuteld. |
-| [**Trading Post**](https://derlocke-ng.github.io/armory/tradingpost/) | Een hennepmarkt: zaden, stekken en spullen met foto's, gevonden op categorie en op waarheen ze verzonden worden. De knop om de verkoper een bericht te sturen opent Uplink. Voor mensen met een account (geen leeftijdscontrole). Verkopers moeten eerst in Outpost actief zijn geweest (drie berichten, elk geliket door drie mensen) of door een moderator zijn goedgekeurd. |
-| [**DevBoard**](https://derlocke-ng.github.io/armory/devboard/) | Een prikbord voor freelancers: meld dat je mensen zoekt of beschikbaar bent, ondertekend met je sleutel, gedekt door proof of work, met stemmen, weg zodra het verloopt (24 uur tot 30 dagen). Bewust openbaar. |
-| [**pongjs**](https://derlocke-ng.github.io/armory/pongjs/) | Retro-Pong voor twee spelers tussen twee browsers. Deel een link of QR-code of kies een open spel, of oefen offline tegen de computer. |
+| [**Loadout**](https://derlocke-ng.github.io/armory/loadout/) | Gedeelde boodschappen- en takenlijsten, huishoudvoorraden en notities in Markdown. Ze blijven gelijk op al je apparaten en bij de mensen met wie je ze deelt. Alles is end-to-end versleuteld, en je deelt een lijst met een link waarmee de ander kan bewerken of alleen kan bekijken. Loadout werkt offline, en je apparaten zetten op de relays terug wat de relays kwijt zijn. |
+| [**Uplink**](https://derlocke-ng.github.io/armory/uplink/) | Berichten en bestanden aan vrienden (NIP-17, versleuteld op je apparaat). Groepen bestaan tot degene die ze heeft aangemaakt ze sluit. Iedereen met de link kan een live-kamer binnengaan, en een kamer verdwijnt zodra de laatste persoon weg is. Uplink kent antwoorden, reacties, bewerken, vastgezette berichten, zoeken op je apparaat en verdwijnende berichten. Spraak- en videogesprekken werken met maximaal zes mensen. |
+| [**Payload**](https://derlocke-ng.github.io/armory/payload/) | Bestanden delen op drie manieren. Je kunt een link maken naar bestanden die versleuteld op je mediaservers blijven staan tot je ze verwijdert. Je kunt bestanden naar vrienden en groepen in Uplink sturen. Of je stuurt bestanden rechtstreeks van je browser naar die van een ander, en dan worden ze nergens opgeslagen. |
+| [**Vault**](https://derlocke-ng.github.io/armory/vault/) | Een wachtwoordbeheerder voor logins, notities, kaarten en tweestapscodes, op elk apparaat waarop je inlogt. Hij heeft een wachtwoordgenerator en een gezondheidsrapport. Het rapport vindt zwakke, hergebruikte en oude wachtwoorden en, als je die controle aanzet, gelekte wachtwoorden. Vault kan items importeren en exporteren. Daarnaast beheert hij SSH-sleutels, een SSH-certificaatautoriteit, een X.509-CA en TLS-certificaten. Hij is versleuteld met een eigen wachtzin. Wachtwoorden op websites vult hij niet voor je in. |
+| [**Authenticator**](https://derlocke-ng.github.io/armory/authenticator/) | Tweestapscodes (TOTP) voor je accounts bij andere diensten. Je voegt een account toe met een QR-code, een link of het geheim, of uit een export van Google Authenticator. De codes staan in dezelfde versleutelde kluis die Vault gebruikt. |
+| [**Calendar**](https://derlocke-ng.github.io/armory/calendar/) | Je agenda’s uit je eigen Nextcloud of een andere CalDAV-server. De agenda toont de komende dagen of een maand, kan terugkerende afspraken aan en herinnert je aan afspraken zolang er een pagina open is. Er gaat niets naar relays, en de aanmeldgegevens voor je server worden versleuteld in je account bewaard. Je server moet verzoeken vanaf de origin van Armory toestaan (CORS). |
+| [**Outpost**](https://derlocke-ng.github.io/armory/outpost/) | De feed van Armory, voor kweekverslagen en kweekdagboeken. Je plaatst berichten met foto’s, week na week. Elk bericht kan bedoeld zijn voor iedereen in Outpost, voor je vrienden, voor één kring van vrienden of alleen voor jou. Berichten kunnen hashtags, likes en reacties hebben. Ze worden op je apparaat versleuteld, de foto’s ook. |
+| [**Trading Post**](https://derlocke-ng.github.io/armory/tradingpost/) | De markt van Armory, voor hennep: zaden, stekken en spullen. Advertenties hebben foto’s, en kopers vinden ze op categorie en op waar naartoe wordt verzonden. Met “Verkoper berichten” open je Uplink. Je hebt een account nodig om Trading Post te gebruiken, en er is geen leeftijdscontrole. Voordat iemand kan verkopen, moet die in Outpost hebben gepost (drie berichten, elk door drie mensen geliket) of door een moderator zijn goedgekeurd. |
+| [**DevBoard**](https://derlocke-ng.github.io/armory/devboard/) | Een prikbord voor freelancers. Je hangt een briefje op dat je mensen zoekt of dat je beschikbaar bent. Elk briefje is ondertekend met je sleutel en vraagt proof of work: een kleine berekening die het massaal plaatsen van briefjes duur maakt. Anderen kunnen op een briefje stemmen. Een briefje verdwijnt als het verloopt, 24 uur tot 30 dagen nadat het is geplaatst. Alle briefjes zijn bewust openbaar. |
+| [**pongjs**](https://derlocke-ng.github.io/armory/pongjs/) | Retro-Pong voor twee spelers in twee browsers. Om een spel te starten, deel je een link of een QR-code, of je kiest een van de open spellen. Offline kun je ook tegen de computer oefenen. |
 
-Er is een blog gepland.
+Een blog is gepland.
 
-Elke tool is een van de apps van het framework, gemount onder de naam van
-Armory: Loadout is `boards`, Uplink `chat`, Outpost `feed`, Trading Post
-`market`, DevBoard `notices`, pongjs `pong`.
+Elke tool is een van de apps van het framework, onder een naam die Armory
+eraan heeft gegeven. Loadout is de app `boards` van het framework, Uplink is
+`chat`, Outpost is `feed`, Trading Post is `market`, DevBoard is `notices` en
+pongjs is `pong`.
 
-## Eén account, elke tool { #one-account-every-tool }
+## Eén account voor alle tools { #one-account-every-tool }
 
-Log in of maak een account aan op de startpagina (gebruikersnaam en wachtwoord,
-of een nostr-sleutel) en elke tool gebruikt het. Lijsten die je op een apparaat
-maakte voordat je inlogde, worden meegenomen. Zonder account gebruikt elk
-apparaat een eigen sleutel.
+Op de startpagina log je in of maak je een account aan, met een gebruikersnaam
+en wachtwoord of met een nostr-sleutel. Alle tools gebruiken daarna dat
+account. Lijsten die je op een apparaat hebt gemaakt voordat je inlogde, gaan
+mee naar het account. Gebruik je geen account, dan werkt elk apparaat met een
+eigen sleutel.
 
-De instellingenpagina beslaat de hele hub: je account en apparaten, vrienden en
-kringen, geblokkeerde mensen, relays, spaces en mediaservers, meldingen, en
-versleutelde back-ups.
+De pagina met instellingen geldt voor de hele hub. Daar beheer je je account en
+apparaten, vrienden en kringen, geblokkeerde mensen, relays, spaces en
+mediaservers, meldingen, en versleutelde back-ups.
 
 ## Relays en mediaservers { #relays-and-media-servers }
 
 De standaardrelays van Armory zijn `wss://nos.lol`, `wss://relay.damus.io`,
-`wss://nostr.mom` en `wss://relay.primal.net`. De standaard mediaservers
-(Blossom) zijn `nostr.download`, `blossom.yakihonne.com`, `blossom.band` (alleen
-foto's) en `blossom.primal.net`. Je kunt je eigen kiezen in de instellingen.
+`wss://nostr.mom` en `wss://relay.primal.net`. Mediaservers bewaren de bestanden
+die je uploadt, en gebruiken daarvoor een protocol dat Blossom heet. De
+standaardmediaservers van Armory zijn `nostr.download`, `blossom.yakihonne.com`,
+`blossom.band` (alleen voor foto’s) en `blossom.primal.net`. In de instellingen
+kun je je eigen relays en mediaservers kiezen.
 
-Relays geven gegevens door, maar wat eerst versleuteld is, kunnen ze niet lezen.
-Het [privacymodel](index.md#privacy-model) somt op wat ze wel kunnen zien.
+Relays slaan gegevens op en geven ze door, maar ze kunnen niets lezen dat
+versleuteld was voordat het werd verstuurd. Wat relays wel kunnen zien, staat in
+het [privacymodel](index.md#privacy-model).
 
 ## Moderatie { #moderation }
 
-De moderators van Armory modereren Outpost, Trading Post en DevBoard.
-Outpost-berichten kunnen als 18+ of als advertentie worden gemarkeerd door hun
-schrijver, door twee meldingen, of door een moderator. Die berichten zijn alleen
-zichtbaar voor mensen met een account.
+De moderatoren van Armory zijn verantwoordelijk voor Outpost, Trading Post en
+DevBoard. Een bericht in Outpost kan als 18+ of als advertentie worden
+gemarkeerd. Dat kan de schrijver doen, een moderator, en twee meldingen doen
+het ook. Gemarkeerde berichten zijn alleen zichtbaar voor mensen met een
+account.
 
 ## Je eigen Armory { #your-own-armory }
 
-Armory is het sjabloon voor je eigen hub. Fork het (of gebruik het als sjabloon),
-wijzig `distribution.js` en de vertalingen, en publiceer het. Zie
-[Je eigen hub draaien](hubs.md).
+Armory is ook het sjabloon voor je eigen hub. Fork de repository of gebruik haar
+als sjabloon, pas `distribution.js` en de vertalingen aan, en publiceer het
+resultaat. De stappen staan in [Je eigen hub draaien](hubs.md).

@@ -1,87 +1,101 @@
 # ensconce
 
-Modułowa konfiguracja poinstalacyjna dla [Bluefin-DX](https://projectbluefin.io/).
-ensconce zamienia świeżą instalację Bluefin w twoją skonfigurowaną stację
-roboczą na podstawie zwykłych plików z listami: nakładane pakiety, Flatpaki,
-rozszerzenia GNOME, synchronizacja Nextcloud, synchronizowana konfiguracja
-SSH, ustawienia pulpitu i ekranu logowania oraz twoje aplikacje Kiwi.
+ensconce konfiguruje za ciebie świeżo zainstalowanego
+[Bluefina-DX](https://projectbluefin.io/), więc nie musisz ustawiać każdej nowej
+maszyny ręcznie. Opisujesz swoją stację roboczą w prostych plikach z listami,
+a ensconce zamienia świeżą instalację w tę stację roboczą. Zajmuje się
+nakładanymi pakietami, Flatpakami, rozszerzeniami GNOME, synchronizacją
+z Nextcloudem, konfiguracją SSH synchronizowaną między twoimi maszynami,
+ustawieniami pulpitu i ekranu logowania oraz twoimi aplikacjami Kiwi. Pakiety
+nakładane (layered) to pakiety RPM dodawane na wierzch obrazu systemu.
+Konfiguracja jest modułowa: składa się z osobnych kroków, które możesz
+uruchomić albo pominąć.
 
-- Repozytorium: [derlocke-ng/ensconce](https://github.com/derlocke-ng/ensconce),
-  GPL-3.0-or-later (według manifestu; README podaje GPL-3.0)
-- Najnowsze wydanie: **v2.5.0**. Jest w [katalogu Kiwi](catalogs.md), zakres użytkownika.
+- Repozytorium: [derlocke-ng/ensconce](https://github.com/derlocke-ng/ensconce).
+  Według manifestu licencja to GPL-3.0-or-later, a według README GPL-3.0.
+- Najnowsze wydanie: **v2.5.0**. Jest w [katalogu Kiwi](catalogs.md)
+  i instaluje się w zakresie użytkownika, czyli w twoim folderze domowym.
 
 ```bash
 kiwi install ensconce
-ensconce --init          # utwórz ~/.config/ensconce z przykładów
-ensconce                 # uruchom konfigurację
+ensconce --init          # tworzy ~/.config/ensconce z przykładów
+ensconce                 # uruchamia konfigurację
 ```
 
-Albo z klona: `./ensconce.sh --init`, edytuj `config/`, potem `./ensconce.sh`.
+Możesz go też uruchomić z klona repozytorium. Uruchom `./ensconce.sh --init`,
+zmień pliki w `config/`, a potem uruchom `./ensconce.sh`.
 
 ## Kroki { #steps }
 
-Każda faza to skrypt w `steps/`, uruchamiany po kolei:
+Konfiguracja jest podzielona na kroki. Każdy krok to skrypt w `steps/`, a kroki
+wykonują się w tej kolejności:
 
-| # | Krok | Robi |
+| # | Krok | Co robi |
 |---|---|---|
-| 01 | `rebase` | przełącza na Bluefin-DX |
-| 02 | `ujust` | grupy deweloperskie i narzędzia CLI |
+| 01 | `rebase` | przełącza system na Bluefina-DX |
+| 02 | `ujust` | konfiguruje grupy dla programistów i narzędzia CLI |
 | 03 | `repos` | dodaje repozytoria RPM |
 | 04 | `packages` | nakłada pakiety RPM |
-| 05 | `flatpaks` | instaluje aplikacje Flatpak (`FLATPAK_LANGUAGES` wybiera ich tłumaczenia) |
-| 06 | `overrides` | nadpisania uprawnień Flatpak |
-| 07 | `extensions` | rozszerzenia GNOME Shell |
-| 08 | `cacert` | własne certyfikaty CA |
-| 09 | `nextcloud` | wstępnie konfiguruje synchronizację folderów Nextcloud |
-| 10 | `dconf` | ustawienia pulpitu GNOME |
-| 11 | `gdm` | ekran logowania |
-| 12 | `ssh` | synchronizowana konfiguracja SSH, z Bitwarden lub GNOME jako agentem SSH |
-| 13 | `kiwi` | instaluje kiwi-updater (`KIWI_INSTALL=recommended\|manual\|minimal`) i każdą aplikację z `kiwi-apps.list` |
-| 14 | `sysctl` | pliki drop-in z `sysctl.d/` (przykład ogranicza dirty writeback dla wolnych dysków SSD) |
-| 15 | `power` | `SYSTEM_SLEEP=off` maskuje targety uśpienia |
+| 05 | `flatpaks` | instaluje aplikacje Flatpak. `FLATPAK_LANGUAGES` wybiera języki ich tłumaczeń |
+| 06 | `overrides` | ustawia nadpisania uprawnień Flatpaków |
+| 07 | `extensions` | instaluje rozszerzenia GNOME Shell |
+| 08 | `cacert` | instaluje własne certyfikaty CA |
+| 09 | `nextcloud` | z góry konfiguruje synchronizację folderów z Nextcloudem |
+| 10 | `dconf` | wprowadza ustawienia pulpitu GNOME |
+| 11 | `gdm` | konfiguruje ekran logowania |
+| 12 | `ssh` | konfiguruje synchronizowaną konfigurację SSH, z Bitwardenem albo GNOME jako agentem SSH |
+| 13 | `kiwi` | instaluje kiwi-updater w sposób wybrany przez `KIWI_INSTALL=recommended\|manual\|minimal`, a potem każdą aplikację z `kiwi-apps.list` |
+| 14 | `sysctl` | instaluje pliki z ustawieniami jądra z `sysctl.d/`. Przykładowy plik ogranicza ilość niezapisanych danych, które jądro trzyma w pamięci, co pomaga na wolnych dyskach SSD |
+| 15 | `power` | przy `SYSTEM_SLEEP=off` maskuje cele uśpienia, więc maszyna nie może przejść w stan uśpienia |
 
-ensconce najpierw sprawdza środowisko (obraz Bluefin, `rpm-ostree`,
-`flatpak`, `dconf`, `jq`, `curl`). Zapisuje swój postęp i wznawia pracę po
-restartach, a przez cały przebieg nie pozwala maszynie zasnąć i potem
+Przed startem ensconce sprawdza środowisko. System musi być obrazem Bluefin,
+a `rpm-ostree`, `flatpak`, `dconf`, `jq` i `curl` muszą być dostępne. ensconce
+zapisuje postęp, więc po ponownym uruchomieniu komputera wznawia pracę od miejsca,
+w którym ją przerwał. Przez cały przebieg nie pozwala maszynie zasnąć, a na koniec
 przywraca twoje ustawienia zasilania.
 
+Przebiegiem sterują te opcje:
+
 ```bash
-ensconce --dry-run                  # podgląd bez zmieniania czegokolwiek
-ensconce --skip rebase,ujust        # pomiń kroki
-ensconce --only extensions,dconf    # uruchom tylko te
+ensconce --dry-run                  # podgląd bez żadnych zmian
+ensconce --skip rebase,ujust        # pomija kroki
+ensconce --only extensions,dconf    # uruchamia tylko te
 ensconce --status | --list-steps | --reset
-ensconce --log [file]               # zapisz wynik
-ensconce --config-dir               # wypisz aktywny katalog konfiguracji
+ensconce --log [file]               # zapisuje wynik
+ensconce --config-dir               # wypisuje używany folder konfiguracji
 ```
 
 ## Konfiguracja { #configuration }
 
-Katalogiem konfiguracji jest pierwszy istniejący z: `$ENSCONCE_CONFIG`,
-`~/.config/ensconce/` (instalacja przez kiwi), `config/` w klonie i
-`config.example/` (z ostrzeżeniem).
+ensconce szuka swojego folderu konfiguracji w czterech miejscach i używa
+pierwszego, które istnieje. Najpierw sprawdza `$ENSCONCE_CONFIG`, potem
+`~/.config/ensconce/`, używany wtedy, gdy ensconce zainstalowano przez kiwi,
+potem `config/` w klonie, a na końcu `config.example/`. Gdy używa
+`config.example/`, wypisuje ostrzeżenie.
 
-| Plik / katalog | Przeznaczenie |
+| Plik / folder | Do czego służy |
 |---|---|
-| `settings.sh` | adresy URL serwerów i przełączniki: SSH, kiwi-updater, języki Flatpak, uśpienie |
-| `packages.list`, `flatpaks.list`, `extensions.list` | jedna pozycja na linię |
+| `settings.sh` | adresy URL serwerów oraz przełączniki dla SSH, kiwi-updater, języków Flatpaków i usypiania |
+| `packages.list`, `flatpaks.list`, `extensions.list` | pakiety, Flatpaki i rozszerzenia GNOME do zainstalowania, po jednym w wierszu |
 | `kiwi-apps.list` | aplikacje Kiwi do zainstalowania |
-| `repos.d/`, `flatpak-overrides/` | pliki repozytoriów; nadpisania dla poszczególnych aplikacji we własnym formacie Flatpak |
-| `nextcloud/folders.list` | foldery synchronizacji jako `localPath\|remotePath[\|tags]` |
-| `nextcloud/exclude.lst`, `exclude.d/` | globalne i per-folder (oznaczone tagiem) wykluczenia z synchronizacji |
-| `certs/` | certyfikaty CA (`.pem`), na przykład `kiwiCA.pem` twojej floty |
+| `repos.d/`, `flatpak-overrides/` | pliki repozytoriów i nadpisania dla poszczególnych aplikacji we własnym formacie Flatpaka |
+| `nextcloud/folders.list` | foldery do synchronizacji, w zapisie `localPath\|remotePath[\|tags]` |
+| `nextcloud/exclude.lst`, `exclude.d/` | co jest wyłączone z synchronizacji, dla wszystkich folderów i dla poszczególnych folderów z tagiem |
+| `certs/` | certyfikaty CA (`.pem`), np. `kiwiCA.pem` twojej sieci |
 | `sysctl.d/` | ustawienia jądra |
-| `dconf-settings.ini`, `gtk3-bookmarks` | ustawienia GNOME, zakładki Nautilusa |
+| `dconf-settings.ini`, `gtk3-bookmarks` | ustawienia GNOME i zakładki Nautilusa |
 | `gdm/dconf.d/`, `gdm/monitors.xml` | ustawienia i układ ekranów ekranu logowania |
 
-Tag wykluczenia dla folderu, taki jak `browser`, umieszcza
-`exclude.d/browser.lst` w tym folderze, co chroni bazy danych profilu
-przeglądarki przed synchronizacją (i uszkodzeniem), podczas gdy `user.js` jest
-nadal synchronizowany.
+Tag w `nextcloud/folders.list` nadaje folderowi własne wyłączenia. Na przykład
+tag `browser` umieszcza w tym folderze `exclude.d/browser.lst`. Bazy danych
+profilu przeglądarki nie są wtedy synchronizowane, bo synchronizacja mogłaby
+je uszkodzić, a `user.js` nadal jest synchronizowany.
 
 ## Klonowanie maszyny { #cloning-a-machine }
 
-`--export` odczytuje działający system i zapisuje drzewo konfiguracji
-ensconce, odwrotność kroków:
+`--export` działa odwrotnie niż kroki. Odczytuje działający system i zapisuje
+na jego podstawie folder konfiguracji ensconce. Tym folderem możesz potem
+skonfigurować nową maszynę:
 
 ```bash
 ensconce --export ./my-setup        # na skonfigurowanej maszynie
@@ -90,11 +104,13 @@ cp -rT ./my-setup "$(ensconce --config-dir)"
 ensconce --dry-run && ensconce
 ```
 
-Zapisuje tylko to, co zostało dodane: jawnie żądane (requested) pakiety zamiast całego obrazu,
-rozszerzenia faktycznie pochodzące z extensions.gnome.org, twoje własne pliki
-repozytoriów i wybrane poddrzewa dconf zamiast pełnego zrzutu. Traktuj to jako
-punkt wyjścia. `certs/` i `nextcloud/` mogą zawierać prywatne dane.
+Eksport zawiera tylko twoje własne dodatki do systemu. Wymienia pakiety
+zainstalowane na twoje życzenie, a nie cały obraz. Wymienia tylko rozszerzenia, które
+naprawdę pochodzą z extensions.gnome.org. Zawiera twoje własne pliki
+repozytoriów oraz wybrane poddrzewa dconf zamiast pełnego zrzutu. Traktuj
+eksport jako punkt wyjścia. `certs/` i `nextcloud/` mogą zawierać prywatne
+dane.
 
-ensconce to aplikacja w **zakresie użytkownika**. Kroki, które potrzebują
-roota, same o niego proszą. Własny krok dodasz jako `steps/NN-<name>.sh` z
-funkcją `step_<name>()`.
+ensconce to aplikacja działająca w **zakresie użytkownika**. Kroki, które
+potrzebują roota, same o niego proszą. Żeby dodać własny krok, utwórz plik
+`steps/NN-<name>.sh` z funkcją `step_<name>()`.

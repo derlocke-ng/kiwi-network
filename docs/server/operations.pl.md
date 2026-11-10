@@ -1,54 +1,72 @@
 # Eksploatacja
 
-Codzienna praca z działającą flotą, w całości z maszyny operatora.
+Ta strona opisuje pracę, która zaczyna się, gdy maszyny są już zainstalowane
+i działają: sprawdzanie ich stanu, bezpieczne przechowywanie sekretów, kopie
+zapasowe plików sieci i danych na maszynach, odblokowywanie zaszyfrowanych
+dysków, dostrajanie MTU tunelu i instalację na serwerze w netcup. Wszystko to
+robisz narzędziem kiwi-server z twojego własnego komputera (*komputera
+administratora*), na którym znajdują się plik fleet i sekrety.
 
 ## Stan { #status }
+
+`kiwi-server status` pokazuje, w jakim stanie są twoje maszyny: wszystkie
+albo ta, którą podasz:
 
 ```bash
 kiwi-server status fleet.yaml            # każdy host
 kiwi-server status fleet.yaml papaya        # jeden
 ```
 
-Każda maszyna raportuje przez SSH (tylko do odczytu): swoją rolę, swój stack,
-problemy (nieudana rola, zatrzymany kontener), swoje dyski i to, czy są
-zaszyfrowane lub zablokowane, swoje kopie zapasowe i ile zostało ważności jej
-certyfikatom. Node z kopiami zapasowymi raportuje też swoją pojemność.
-Aplikacja Kiwi Server pokazuje to samo w *Overview* każdego hosta.
+kiwi-server łączy się z każdą maszyną przez SSH i tylko odczytuje dane. Każda
+maszyna zgłasza swoją rolę i swój stack (wszystkie kontenery i usługi, które
+uruchamia), ewentualne problemy, takie jak nieudana rola albo zatrzymany
+kontener, swoje dyski i to, czy są zaszyfrowane lub zablokowane, swoje kopie
+zapasowe oraz to, jak długo jeszcze ważne są jej certyfikaty. Node z serwerem
+kopii zapasowych zgłasza też swoją pojemność. Aplikacja Kiwi Server pokazuje te
+same informacje w widoku *Overview* każdego hosta.
 
 ## Sekrety { #secrets }
 
-Wszystko, co tajne, leży w `secrets/` obok pliku fleet: seed, z którego
-wyprowadzane jest każde wygenerowane hasło, CA floty, konfiguracje WireGuard,
-klucze LUKS i klucze hostów SSH.
+Wszystko, co tajne, jest przechowywane w `secrets/`, katalogu obok pliku
+fleet. Jest tam seed, z którego wyprowadzane są wszystkie generowane hasła,
+własny urząd certyfikacji (CA) twojej sieci, konfiguracje WireGuard, klucze
+LUKS zaszyfrowanych dysków i klucze hosta SSH. kiwi-server może trzymać ten
+katalog zaszyfrowany i otwierać go tylko na czas pracy:
 
 ```bash
 kiwi-server secrets init fleet.yaml      # secrets/ staje się jednym plikiem zaszyfrowanym age
-kiwi-server secrets unlock fleet.yaml    # otwórz go do pamięci (--for 8h; 0 zostawia go otwartym)
+kiwi-server secrets unlock fleet.yaml    # otwórz go w pamięci (--for 8h; 0 zostawia otwarty)
 kiwi-server secrets lock fleet.yaml
 kiwi-server secrets status fleet.yaml
-kiwi-server secrets show fleet.yaml papaya [setting]   # a host's generated passwords
+kiwi-server secrets show fleet.yaml papaya [setting]   # wygenerowane hasła hosta
 ```
 
-`secrets init` trzyma jeden klucz w GNOME Keyring i jeden raz pokazuje **klucz
-odzyskiwania**. Gdy magazyn jest otwarty, może go odczytać wszystko, co działa
-jako ty.
+`secrets init` tworzy zaszyfrowany magazyn. Zapisuje jeden klucz w GNOME
+Keyring i pokazuje ci **klucz odzyskiwania**. Klucz odzyskiwania jest
+wyświetlany tylko raz. Dopóki magazyn jest otwarty, może go odczytać każdy
+program działający na twoim koncie użytkownika.
 
-## Kopia zapasowa samej floty { #backing-up-the-fleet-itself }
+## Kopia zapasowa plików sieci { #backing-up-the-fleet-itself }
 
-Po każdym udanym renderze lub buildzie katalog floty jest szyfrowany (AES-256
-z PBKDF2, 600 000 iteracji) i kopiowany na node'y wymienione w
-`backup.hosts`, które przechowują dziesięć najnowszych kopii. Na świeżej
-maszynie:
+Katalog sieci zawiera plik fleet i `secrets/`, a kiwi-server sam robi jego
+kopię zapasową. Po każdym udanym `render` albo `build` (dwóch krokach, które
+generują konfigurację hostów i ich instalacyjne obrazy ISO) szyfruje katalog
+sieci (AES-256 z PBKDF2, 600 000 iteracji) i kopiuje go na node’y wymienione
+w `backup.hosts`. Każdy z tych node’ów przechowuje dziesięć najnowszych kopii.
+Na nowym komputerze odzyskujesz katalog sieci z jednego z tych node’ów.
+W dowolnej chwili możesz też zapisać kopię w wybranym katalogu:
 
 ```bash
-kiwi-server restore --from core@lychee.home  # katalog floty z powrotem
-kiwi-server backup fleet.yaml --local /mnt/usb   # albo kopia do katalogu, w dowolnym momencie
+kiwi-server restore --from core@lychee.home  # przywróć katalog sieci
+kiwi-server backup fleet.yaml --local /mnt/usb   # albo zapisz kopię w katalogu, w dowolnej chwili
 ```
 
-## Kopie zapasowe danych maszyn { #backing-up-the-machines-data }
+## Kopie zapasowe danych na maszynach { #backing-up-the-machines-data }
 
-Daj node'owi moduł `backup-server` (serwer restic REST), a każdej maszynie,
-która ma mieć kopię zapasową, moduł `backup` wskazujący na niego:
+Kopie zapasowe danych na maszynach robi restic, program do kopii zapasowych.
+Kopie przechowuje jeden node. Dodaj temu node’owi moduł `backup-server`, który
+uruchamia serwer REST restic. Każda maszyna, której dane mają być
+zabezpieczane, dostaje moduł `backup` z ustawieniem wskazującym ten serwer:
 
 ```yaml
 lychee:
@@ -61,89 +79,120 @@ papaya:
     backup: { server: https://backup.lychee.home }
 ```
 
-Co noc o 03:00 (w ciągu 15 minut po tej godzinie) restic wysyła, zaszyfrowane,
-to, co każdy moduł każe zachować. Każda maszyna ma dostęp tylko do własnego
-repozytorium i może do niego tylko dopisywać. Dlatego usuwanie starych
-snapshotów odbywa się z maszyny operatora:
+Co noc o 03:00 lub do 15 minut później restic wysyła na serwer kopii
+zapasowych, w postaci zaszyfrowanej, te dane, które każdy moduł chce
+zachować. Maszyna ma dostęp tylko do własnego repozytorium na serwerze i może
+tylko do niego dopisywać. Nie może tam niczego usunąć. Dlatego polecenie, które
+usuwa stare snapshoty, uruchamia się na komputerze administratora. Snapshot to
+w restic zapisany stan z jednego przebiegu kopii zapasowej. Pierwsze polecenie
+poniżej uruchamiasz na samej maszynie, drugie na swoim komputerze:
 
 ```bash
 sudo kiwi-stack backup | snapshots | restore [--at TIME] MODULE...   # na maszynie
-kiwi-server prune fleet.yaml            # zachowaj 7 dziennych, 4 tygodniowe, 6 miesięcznych
+kiwi-server prune fleet.yaml            # zostawia 7 dziennych, 4 tygodniowe, 6 miesięcznych
 ```
 
-Odtwarzanie przetestowano z node'a na node'a: kopie zapasowe papaya na lychee.
+Przywracanie przetestowano między dwoma node’ami: kopie zapasowe z papaya
+przywrócono na lychee.
 
 ### W następnym wydaniu { #coming-in-the-next-release }
 
 !!! info "Na gałęzi `several-servers`"
-    Ta praca jest wypchnięta na gałęzie `several-servers` w kiwi-modules i
-    kiwi-server, ale nie jest jeszcze scalona ani wydana. Kilka serwerów i
-    automatyczne odtwarzanie przetestowano na sprzęcie. Kontroli stanu VPN nie.
+    Te zmiany są już wypchnięte na gałęzie `several-servers` repozytoriów
+    kiwi-modules i kiwi-server, ale nie zostały jeszcze scalone ani wydane.
+    Kilka serwerów kopii zapasowych i automatyczne przywracanie przetestowano
+    na sprzęcie. Kontroli stanu VPN jeszcze nie.
 
-- **Kilka serwerów kopii zapasowych.** `backup.servers` przyjmuje listę, a
-  każdy serwer dostaje własną pełną kopię. Jeśli jeden serwer zawiedzie,
-  brakuje tylko jego kopii. Odtwarzanie bierze najświeższą kopię z tego
-  serwera, który ją ma, a `kiwi-stack snapshots` wypisuje je serwer po
-  serwerze. Pojedyncze `server` nadal działa.
-- **Odbudowana maszyna sama się odtwarza.** Jeśli maszyna znajduje siebie w
-  kopiach zapasowych, ale nie zrobiła żadnej z nich (odbudowa), przed swoją
-  pierwszą kopią sama odtwarza każdy moduł, a potem robi kopie jak wcześniej
-  (`backup.restore:
-  auto`, domyślnie). Z `hold` czeka na `kiwi-stack restore` lub
-  `kiwi-stack backup --new`.
-- **Przycinanie na timerze.** `kiwi-server prune fleet.yaml --every week` (lub
-  `day`) instaluje timer użytkownika systemd na twoim komputerze, jedynym
-  miejscu, które ma klucze uprawnione do usuwania. Pominięte uruchomienie
-  nastąpi przy następnym logowaniu. `kiwi-server status` pokazuje każdą kopię
-  zapasową i ostrzega, gdy node z kopiami zapasowymi nie był przycinany od
-  trzech tygodni.
-- **Zawieszone komercyjne wyjście startuje od nowa.** gluetun dostaje kontrolę
-  stanu. Po pięciu minutach w złym stanie kontener jest zabijany, a przy
-  następnym starcie wybiera inny serwer.
+- **Kilka serwerów kopii zapasowych.** `backup.servers` przyjmuje listę
+  serwerów, a każdy serwer dostaje własną, pełną kopię. Gdy jeden serwer
+  ulegnie awarii, dotyczy to tylko jego kopii. Przywracanie bierze najnowszą
+  kopię z tego serwera, który ją ma, a `kiwi-stack snapshots` wypisuje
+  snapshoty osobno dla każdego serwera. Pojedyncze ustawienie `server` nadal
+  działa.
+- **Odbudowana maszyna sama przywraca swoje dane.** Odbudowana maszyna znajduje
+  na serwerze kopie zapasowe samej siebie, choć sama żadnej z nich nie zrobiła.
+  Wtedy, zanim zrobi pierwszą kopię, sama przywraca dane każdego modułu,
+  a potem robi kopie tak jak wcześniej. Tak jest domyślnie,
+  `backup.restore: auto`. Przy `hold` maszyna czeka, aż uruchomisz
+  `kiwi-stack restore` albo `kiwi-stack backup --new`.
+- **Usuwanie starych snapshotów według harmonogramu.**
+  `kiwi-server prune fleet.yaml --every week` (albo `day`) instaluje na twoim
+  komputerze timer użytkownika systemd. Twój komputer to jedyne miejsce, gdzie
+  są klucze uprawnione do usuwania. Jeśli jakiś przebieg zostanie pominięty,
+  zostanie nadrobiony przy następnym logowaniu. `kiwi-server status` pokazuje
+  każdą kopię zapasową i ostrzega, gdy na nodzie z kopiami od trzech tygodni
+  nie usuwano starych snapshotów.
+- **Zawieszone połączenie z komercyjnym dostawcą VPN samo wraca do
+  działania.** gluetun, kontener klienta VPN, dostaje kontrolę stanu (health
+  check), która co jakiś czas sprawdza, czy połączenie nadal działa. Gdy przez
+  pięć minut wynik jest negatywny, kontener zostaje zabity, a przy następnym
+  starcie wybiera inny serwer.
 
-## Zaszyfrowane dyski i odblokowywanie { #encrypted-disks-and-unlocking }
+## Zaszyfrowane dyski i ich odblokowywanie { #encrypted-disks-and-unlocking }
 
-- **Debian** (`debian.encrypt: true`) instaluje się z jednorazowym kluczem,
-  który wpisujesz przy pierwszym rozruchu (`secrets/luks/<host>.once`).
-  Pierwsze `apply` zastępuje go kluczem `secrets/luks/<host>.key`, a master
-  dostaje też nowy klucz wolumenu. Utrata tego pliku klucza blokuje dysk, więc
-  trzymaj kopię zapasową floty.
-- **CoreOS / uCore** szyfrują przy instalacji przez Ignition (przy około 4 GiB
-  RAM przy pierwszym rozruchu).
-- **Pierścienie Tang** pozwalają zaszyfrowanym maszynom odblokować się przy
-  starcie bez obecności człowieka. Node uruchamia moduł `tang` (każdy
-  pierścień to jeden serwer Tang z własnymi kluczami, domyślnie `infra` na
-  porcie 7500), a blok `unlock:` hosta wiąże jego dysk z pierścieniami z
-  progiem.
-- **SSH w initramfs** (`unlock.ssh: true`: dropbear na Debianie, dracut-sshd
-  na CoreOS) używa własnego ograniczonego klucza, `secrets/unlock_ed25519`,
-  który może tylko uruchomić odblokowanie.
-- `kiwi-server unlock fleet.yaml <host>` przekazuje pierścień do maszyny
-  czekającej przy starcie, a `--manual` przekazuje sam klucz. Pierścień
-  `operator` jest serwowany z twojej własnej maszyny, dopóki jest potrzebny.
-  `vpn-server.unlock_relay` dociera do maszyn za NAT-em.
+Zaszyfrowany dysk trzeba odblokować przy każdym uruchomieniu maszyny. W tej
+sekcji opisano, jak każdy system docelowy (system operacyjny instalowany na
+maszynie) szyfruje dysk i jak można go odblokować z udziałem człowieka albo
+bez niego.
+
+- **Debian** (`debian.encrypt: true`) jest instalowany z jednorazowym
+  kluczem, który wpisujesz przy pierwszym uruchomieniu. Znajdziesz go
+  w `secrets/luks/<host>.once`. Pierwsze `apply` zastępuje go kluczem
+  `secrets/luks/<host>.key`, a master dostaje wtedy dodatkowo nowy klucz
+  woluminu. Jeśli stracisz ten plik z kluczem, dysk pozostanie zablokowany,
+  więc pilnuj kopii zapasowej plików sieci.
+- **CoreOS / uCore** szyfrują dysk w ramach instalacji przez Ignition,
+  narzędzie, które konfiguruje maszynę z CoreOS przy pierwszym uruchomieniu.
+  Maszyna potrzebuje do tego przy pierwszym uruchomieniu około 4 GiB RAM.
+- **Pierścienie Tang** pozwalają zaszyfrowanym maszynom odblokować dyski przy
+  starcie bez udziału człowieka. Tang to mały serwer, którego maszyna przez
+  sieć prosi o pomoc w odblokowaniu dysku. Na nodzie działa moduł `tang`,
+  a każdy pierścień to jeden serwer Tang z własnymi kluczami. Domyślnie jest
+  jeden pierścień, `infra`, na porcie 7500. Blok `unlock:` hosta przypisuje
+  jego dysk do jednego lub kilku pierścieni i ustala próg, czyli liczbę
+  pierścieni, które muszą odpowiedzieć.
+- **SSH w initramfs** (`unlock.ssh: true`) pozwala połączyć się z maszyną,
+  która czeka na odblokowanie dysku. Initramfs to mały system, który działa,
+  zanim dysk zostanie otwarty. Serwerem SSH jest w nim dropbear na Debianie
+  i dracut-sshd na CoreOS. Przyjmuje on własny klucz z ograniczonymi
+  uprawnieniami, `secrets/unlock_ed25519`, który pozwala tylko na odblokowanie.
+- `kiwi-server unlock fleet.yaml <host>` przekazuje pierścień do maszyny, która
+  czeka przy starcie, dzięki czemu może ona skorzystać z pierścienia, z którym
+  sama się nie połączy. Z opcją `--manual` przekazuje sam klucz. Pierścień
+  o nazwie `operator` jest udostępniany z twojego komputera na czas, gdy jest
+  potrzebny. `vpn-server.unlock_relay` udostępnia pierścień przez mastera
+  maszynom za NAT-em.
 
 ## MTU tunelu { #tunnel-mtu }
 
-WireGuard dodaje własne nagłówki, więc tunel przenosi mniejsze pakiety niż
-łącze pod nim, a ścieżka mobilna jeszcze mniejsze. Pakiet zbyt duży dla
-któregoś łącza po drodze zostaje odrzucony lub podzielony, a połączenia się
-zawieszają. Kiwi radzi sobie z tym na trzech warstwach:
+MTU to największy pakiet, jaki łącze sieciowe przenosi w całości. WireGuard
+dodaje do każdego pakietu własne nagłówki, więc tunel przenosi mniejsze
+pakiety niż łącze pod nim, a łącze komórkowe jeszcze mniejsze. Pakiet zbyt
+duży dla któregoś z łączy po drodze zostaje odrzucony albo podzielony,
+a połączenia się zawieszają. Kiwi radzi sobie z tym na trzy sposoby:
 
-- **Dwa ustawienia.** `wg_mtu` (domyślnie **1376**, wielokrotność 16, bo
-  WireGuard dopełnia do 16) to MTU gluetuna, konfiguracji klientów wg-easy i
-  `wg0`. `bridge_mtu` (domyślnie **1500**) to MTU sieci stacka. `validate`
-  odrzuca `wg_mtu`, którego dopełniony pakiet plus 80 bajtów nagłówków nie
-  mieści się w mostku, oraz wszystko poniżej 1280, minimum, z którym działa
-  IPv6.
-- **MSS jest przycinane w obie strony** do `wg_mtu - 40`, w wg-easy i w
-  kliencie VPN, więc TCP nigdy nie próbuje segmentu, który nie może przejść.
-- **TCP samo sonduje.** Klient VPN działa z `net.ipv4.tcp_mtu_probing=1` i
-  `tcp_base_mss=1024`, więc połączenie, które trafi na ścieżkę po cichu
-  odrzucającą duże pakiety, znajduje działający rozmiar, zamiast się
-  zawiesić.
+- **Dwa ustawienia.** `wg_mtu` to MTU gluetun (klienta VPN), konfiguracji
+  klientów wystawianych przez wg-easy (serwer WireGuard) i interfejsu
+  WireGuard `wg0`.
+  Domyślnie wynosi **1376**. To wielokrotność 16, bo WireGuard dopełnia każdy
+  pakiet do najbliższej wielokrotności 16 bajtów. `bridge_mtu` to MTU sieci
+  stacku, która łączy kontenery na maszynie. Domyślnie wynosi **1500**.
+  `validate` odrzuca `wg_mtu`, przy którym dopełniony pakiet razem z 80 bajtami
+  nagłówków nie mieści się w moście. Odrzuca też wszystko poniżej 1280, bo to
+  najmniejsze MTU, przy którym działa IPv6.
+- **MSS jest ograniczany w obu kierunkach.** MSS to największa porcja danych,
+  jaką TCP umieszcza w jednym pakiecie. Zarówno wg-easy, jak i klient VPN
+  ograniczają go do `wg_mtu - 40`, więc TCP nigdy nie próbuje wysłać segmentu,
+  który nie przejdzie.
+- **TCP sam znajduje działający rozmiar.** Klient VPN działa
+  z `net.ipv4.tcp_mtu_probing=1` i `tcp_base_mss=1024`. Gdy połączenie biegnie
+  trasą, która po cichu odrzuca duże pakiety, TCP próbuje coraz mniejszych, aż
+  znajdzie rozmiar, który działa, zamiast się zawiesić.
 
-### Pomiar ścieżki: `kiwi-server mtu` { #measuring-a-path-kiwi-server-mtu }
+### Pomiar trasy: `kiwi-server mtu` { #measuring-a-path-kiwi-server-mtu }
+
+Żeby sprawdzić, co naprawdę przenosi trasa do node’a albo urządzenia, zmierz
+ją:
 
 ```bash
 kiwi-server mtu fleet.yaml papaya --ssh core@<address>   # node
@@ -151,37 +200,44 @@ kiwi-server mtu fleet.yaml phone --ssh core@<master>     # urządzenie z secrets
 kiwi-server mtu fleet.yaml papaya --write                # i zapisz wg_mtu w pliku fleet
 ```
 
-Sonda wysyła przez tunel pingi z flagą don't-fragment, z wnętrza przestrzeni
-nazw, która go trzyma. Node mierzy z jego własnego klienta VPN (którego
-zapora odrzuca przychodzące pingi), a urządzenie z serwera WireGuard. Zaczyna
-od zwykłego pinga, potem próbuje każdej wielokrotności 16 od 1280 w górę i
-podaje największą, która dociera **w całości**. Podczas pingowania odczytuje
-liczniki ponownego składania pakietów w jądrze, więc odpowiedź podzielona po
-drodze i złożona z powrotem nie liczy się jako pasująca.
+Pomiar wysyła przez tunel pingi z ustawioną flagą „nie fragmentuj” (don’t
+fragment), więc po drodze nie mogą zostać podzielone. Wysyła je z wnętrza
+sieciowej przestrzeni nazw (network namespace), w której jest tunel.
+Sieciowa przestrzeń nazw to osobne środowisko sieciowe na maszynie, takie jak
+to, które ma kontener. Node jest mierzony z jego własnego klienta VPN, bo
+zapora sieciowa klienta odrzuca przychodzące pingi. Urządzenie jest mierzone
+z serwera WireGuard. Pomiar zaczyna się od zwykłego pingu, potem sprawdza
+każdą wielokrotność 16 od 1280 w górę i podaje największy rozmiar, który
+dociera **w całości**. W trakcie pingowania odczytuje liczniki składania
+pakietów w jądrze. Dzięki temu odpowiedź, która po drodze została podzielona
+i z powrotem złożona, nie liczy się jako pasująca.
 
-Podaje też, co ustawić. Dla **urządzenia** jest to jego własne `MTU =` w jego
-konfiguracji WireGuard i nikogo innego to nie dotyczy. Dla **node'a** jest to
-`wg_mtu` na tym nodzie i na jego masterze, które `--write` wpisuje do pliku
-fleet (zmieniając tylko te linie). Pakietu, który jest dzielony tylko w drodze
-na zewnątrz i składany z powrotem przez drugą stronę, nie widać z tej strony.
+Pomiar podpowiada też, co ustawić. Dla **urządzenia** jest to linia `MTU =`
+we własnej konfiguracji WireGuard tego urządzenia i nikogo innego to nie
+dotyczy. Dla **node’a** jest to `wg_mtu` na tym nodzie i na jego masterze.
+Z opcją `--write` pomiar wpisuje wartość do pliku fleet i zmienia tylko te
+linie. Jednej rzeczy nie widać z tej strony: pakietu, który został podzielony
+tylko w drodze w jedną stronę i złożony z powrotem przez drugą stronę.
 
-Wartości domyślne zmierzono na testowej flocie. Dla telefonu na danych
-mobilnych, gdzie ścieżki są często tylko IPv6 za 464XLAT z zagnieżdżoną
-enkapsulacją, zmierz sam telefon i obniż jego własne `MTU =`, jeśli sonda tak
-wskaże.
+Wartości domyślne zmierzono na sieci testowej. Telefon w sieci komórkowej
+wymaga własnego pomiaru, bo trasy komórkowe często działają wyłącznie po IPv6
+za 464XLAT, z zagnieżdżoną enkapsulacją. Zmierz sam telefon i obniż jego
+własne `MTU =`, jeśli tak wyjdzie z pomiaru.
 
-## VPS-y netcup { #netcup-vpses }
+## VPS-y w netcup { #netcup-vpses }
 
-netcup to dostawca, na którym kiwi-server potrafi dziś sam instalować, przez
-API jego Server Control Panel. Inni dostawcy są
+netcup to dostawca hostingu i na razie jedyny, u którego kiwi-server potrafi
+sam zainstalować wynajęty serwer (VPS). Robi to przez API Server Control
+Panel firmy netcup. Inni dostawcy hostingu są
 [planowani](roadmap.md#more-hosters-and-network-boot) jako wtyczki.
 
 ```bash
 kiwi-server vps login fleet.yaml         # logowanie device flow; token trafia do secrets/
 kiwi-server vps list fleet.yaml
-kiwi-server vps install fleet.yaml sorbet  # wipe the server and install the host's ISO
+kiwi-server vps install fleet.yaml sorbet  # wyczyść serwer i zainstaluj ISO hosta
 ```
 
-`vps install` najpierw pyta, chyba że podasz `--yes`. Odrzuca obraz ISO, który
-zawiera sekrety roli, błędny `disk:` oraz szyfrowanie dysku CoreOS przy mniej
-niż 3500 MiB RAM.
+`vps install` czyści serwer, dlatego najpierw pyta o potwierdzenie, chyba że
+podasz `--yes`. Odmawia instalacji w trzech przypadkach: gdy ISO zawiera
+sekrety roli, gdy `disk:` wskazuje niewłaściwy dysk i gdy dysk z CoreOS ma być
+zaszyfrowany na serwerze z mniej niż 3500 MiB RAM.

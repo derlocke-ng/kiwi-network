@@ -1,103 +1,131 @@
-# Waar het heen gaat
+# Waar het naartoe gaat
 
-!!! info "Ontworpen, niet gebouwd"
+Op deze pagina lees je wat kiwi-server volgens de plannen moet worden, en
+welke delen van dat plan er al zijn.
+
+!!! info "Ontworpen, nog niet gebouwd"
     Deze pagina vat het
-    [control-plane-ontwerp](https://github.com/derlocke-ng/kiwi-server/blob/main/docs/design/control-plane.md)
-    van kiwi-server samen, vastgesteld in oktober 2026. Tenzij er bij een regel
-    *gebouwd* staat, bestaat er nog niets van. De
+    [ontwerp voor de control plane](https://github.com/derlocke-ng/kiwi-server/blob/main/docs/design/control-plane.md)
+    van kiwi-server samen, waarover in oktober 2026 overeenstemming is bereikt.
+    Niets van wat hier staat, bestaat al, tenzij er *gebouwd* bij staat. In de
     [roadmap](https://github.com/derlocke-ng/kiwi-server/blob/main/docs/ROADMAP.md)
-    houdt de volgorde bij.
+    staat in welke volgorde het werk wordt gedaan.
 
-Vandaag is kiwi-server een desktoptool: het fleet-bestand, de geheimen en de CA
-staan op de machine van de beheerder. Het plan is er een **dienst** van te maken
-die op een node kan draaien, zodat een netwerk kan worden aangemaakt en beheerd
-zonder Linux-desktop, vanaf een telefoon, en door meer dan één persoon. Machines
-blijven reproduceerbaar uit het fleet-bestand. Het control plane is alleen wat dat
-bestand bewaart en de renderer draait.
+Op dit moment is kiwi-server een programma voor de desktop. Het fleetbestand,
+de secrets en de CA (de certificaatautoriteit van de fleet) staan op de
+beheercomputer. Het plan is er een **dienst** van te maken die op een node kan
+draaien. Je kunt een netwerk dan zonder Linux-desktop opzetten en beheren,
+vanaf een telefoon en met meer dan één persoon. Machines blijven uit het fleetbestand
+te reproduceren. De control plane is het deel dat dat bestand bewaart
+en er de configuratie van elke machine uit genereert.
 
 ## De lagen { #the-layers }
 
-1. **kiwi-modules**: de modules en het rendercontract voor één machine. *Gebouwd.*
-2. **kiwi-stack**: de kant van de machine, vanaf `kiwi-stack apply`. *Gebouwd.*
-3. **kiwi-server core**: de fleet, hosts, targets, ISO's, de CA, aanmelden en
-   toepassen, headless zoals vandaag. *Gebouwd.*
-4. **De control-module**: de core als container, met een API en een webinterface,
-   die als module op een node draait zoals elke andere.
-5. **Clients**: eerst de webinterface. De GTK-app blijft en praat met de lokale
-   CLI of met een controller via de mesh, en de CLI blijft ook. Geen enkele
-   frontend krijgt eigen logica.
+Het ontwerp deelt de software op in vijf lagen.
 
-## De control node { #the-control-node }
+1. **kiwi-modules** bevat de modules en het contract dat vastlegt hoe
+   de configuratie van één machine wordt gegenereerd. *Gebouwd.*
+2. **kiwi-stack** is het deel dat op de machine draait. Het begint met
+   `kiwi-stack apply`, dat een gegenereerde configuratie op de machine zet.
+   *Gebouwd.*
+3. **De kern van kiwi-server** regelt de fleet, de hosts, de doelsystemen, de
+   ISO’s, de CA, het toevoegen van apparaten en het toepassen van rollen. Hij
+   is headless, dus zonder eigen grafische interface, net als nu. *Gebouwd.*
+4. **De control-module** is die kern als container, met een API en een
+   webinterface. Hij draait op een node als een module zoals elke andere.
+5. **Clients** zijn de programma’s waarmee je met de control-module werkt. De
+   webinterface komt eerst. De GTK-app blijft, en praat ofwel met de lokale
+   CLI, ofwel via de mesh, het besloten WireGuard-netwerk, met een controller
+   (een draaiende control-module). Ook de CLI blijft. Alle logica blijft in de
+   kern, dus geen enkele client krijgt eigen logica.
 
-De controller draait op een node thuis (de *control node*), vanuit de mesh alleen
-bereikbaar voor beheerders, op een versleutelde schijf. Hij bewaart de seed, de
-CA-sleutel, het fleet-bestand en elke configuratie.
+## De control-node { #the-control-node }
 
-De gehuurde **master wordt vervangbare relay-infrastructuur**. Hij bewaart alleen
-wat hij nodig heeft om te draaien: zijn WireGuard-sleutels en peers, zijn eigen
-wachtwoorden en zijn certificaat. Hem verliezen kost een nieuwe apply vanaf de
-control node. De control node verliezen kost een restore van de fleet-back-up.
+De controller draait op een node thuis, de *control-node*. Alleen beheerders
+kunnen erbij, en dan nog alleen vanuit de mesh. De schijf is versleuteld. Op de
+control-node staan de seed, de sleutel van de CA, het fleetbestand en elke
+configuratie.
+
+De gehuurde **master wordt een vervangbaar doorgeefluik**. Hij stuurt het
+verkeer van het netwerk door en heeft alleen wat hij nodig heeft om te draaien:
+zijn WireGuard-sleutels en peers, zijn eigen wachtwoorden en zijn certificaat.
+Raak je de master kwijt, dan pas je hem vanaf de control-node opnieuw toe. Raak
+je de control-node kwijt, dan zet je de back-up van de fleet terug.
 
 ## Gebruikers { #users }
 
-Een `users:`-blok met twee rollen: een **fleet-beheerder** die alles kan, en
-**node-beheerders** die aan hun eigen hosts gebonden zijn. Een node-beheerder ziet
-de status, logs, workloads en back-ups van die hosts, en meldt apparaten aan in de
-groepen die de fleet-beheerder toestaat, maar ziet niets van de master, de CA of
-de andere nodes. Inloggen gebeurt met een wachtwoord plus een clientcertificaat
-van de fleet-CA of WebAuthn, en elke wijziging gaat naar een auditlog.
+Met een blok `users:` leg je gebruikers vast, elk met een van twee rollen. Een
+**fleetbeheerder** mag alles. Een **nodebeheerder** is gebonden aan zijn eigen
+hosts. Hij ziet de status, logs, workloads en back-ups van die hosts, en kan
+apparaten toevoegen aan de groepen die de fleetbeheerder toestaat. Van de
+master, de CA en de andere nodes ziet een nodebeheerder niets. Om in te loggen
+heeft een gebruiker een wachtwoord nodig, plus een clientcertificaat van de CA
+van de fleet of WebAuthn. Elke wijziging wordt in een auditlog vastgelegd.
 
-## Een machine toevoegen { #joining-a-machine }
+## Een machine aansluiten { #joining-a-machine }
 
-Beide wegen blijven:
+Een machine kan op twee manieren bij het netwerk komen, en beide blijven
+bestaan:
 
-- **Een ISO per host** met zijn rol (het huidige `build --offline`), voor
-  offline installaties.
-- **Een generieke bootstrap-ISO** per target, één keer gebouwd door CI en zonder
-  geheimen. Bij de eerste start haalt hij zijn rol op bij de controller met een
-  eenmalig **join-token**. Een met de hand geïnstalleerde machine of een VPS komt
-  erbij met één regel: `curl https://control.<host>.<tld>/join/<token> | sudo bash`.
+- **Een ISO per host** waarop de rol van de machine staat, zoals nu met
+  `build --offline`. Die is bedoeld voor installaties zonder netwerk.
+- **Een algemene bootstrap-ISO** per doelsysteem, die één keer door CI wordt
+  gebouwd en geen secrets bevat. Bij de eerste keer opstarten haalt de machine
+  haar rol bij de controller op met een eenmalig **join-token**. Een machine die
+  met de hand is geïnstalleerd, of een VPS, sluit aan met één regel:
+  `curl https://control.<host>.<tld>/join/<token> | sudo bash`.
 
-Elke machine uit de CoreOS-lijn moet **één bootc-image** gaan draaien, waarbij de
-rol bij de eerste start binnenkomt.
+Alle machines uit de CoreOS-familie moeten **één bootc-image** gaan draaien,
+een opstartbaar containerimage dat voor allemaal hetzelfde is. De machine
+krijgt haar rol bij de eerste keer opstarten.
 
 ## Federatie en multi-hop { #federation-and-multi-hop }
 
-Netwerken die elkaars CA vertrouwen en namen aan elkaar delegeren, worden clients
-van elkaar. Met de derde exit-modus kan de master van het ene netwerk het
-internet op via die van een ander: **multi-hop**, waarbij de tweede master alleen
-de eerste ziet. Meerdere masters van één beheerder vormen dan een eigen
-VPN-dienst: ingangsmasters in het ene land, exit-masters in andere, met Tor
-erbinnen.
+Federatie verbindt afzonderlijke Kiwi Networks met elkaar. Netwerken die
+elkaars CA vertrouwen en namen aan elkaar delegeren, worden clients van elkaar.
+Een master heeft drie uitgangsmodi, die bepalen hoe zijn verkeer op internet
+komt. Bij de derde stuurt de master van een netwerk zijn internetverkeer via de
+master van een ander netwerk. Dat heet **multi-hop**, en de tweede master ziet
+alleen de eerste. Wie op deze manier meerdere masters draait, heeft een eigen
+VPN-dienst, met ingangsmasters in het ene land, uitgangsmasters in andere
+landen, en Tor binnen het netwerk.
 
-## De boomgaard { #the-orchard }
+## De orchard { #the-orchard }
 
-De boomgaard (orchard) is voor mensen die veel masters voor anderen draaien. Het
-is een aparte app of een kiwi-server-plugin die VPS'en aanmaakt via API's van
-providers, elke master zijn installatie en een registratietoken geeft, van elke
-master een heartbeat verzamelt (versie, gezondheid, schijf, laatste update), en
-updates uitrolt door image-tags per kanaal te verplaatsen.
+De orchard (Engels voor boomgaard) is de geplande dienst voor mensen die veel
+masters voor anderen draaien. Het wordt een aparte app of een plug-in voor
+kiwi-server. De orchard maakt VPS’en aan via de API’s van de hostingproviders
+en geeft elke master zijn installatie en een registratietoken. Van elke master
+ontvangt hij een heartbeat, een regelmatig statusbericht (versie, gezondheid,
+schijf, laatste update). Updates rolt hij uit door de image-tag van elk
+updatekanaal te verschuiven.
 
-Hij kan niet inloggen op een master, geen fleet lezen en geen node aanraken. De
-control node van elke tenant thuis houdt diens netwerk. De host van de master kan
-het niet lezen, en draait één VM per tenant. De netcup-ondersteuning van
-kiwi-server (`kiwi-server
-vps`, *gebouwd*) is het eerste stuk van zijn providerdriver.
+De orchard kan niet inloggen op een master, geen fleet lezen en geen node
+wijzigen. Elke tenant, dat wil zeggen iedereen voor wie een master wordt
+gedraaid, houdt zijn netwerk op zijn eigen control-node thuis. De fleet en de
+sleutels blijven daar, zodat de hostingprovider die de VM van de master draait
+de netwerkgegevens van de tenant niet kan lezen. De master van elke tenant
+draait in een eigen VM. De orchard heeft een driver nodig voor de API’s van de
+providers, en de ondersteuning voor netcup in kiwi-server (`kiwi-server vps`,
+*gebouwd*) is daar het eerste stuk van.
 
-## Meer providers, en netwerkboot { #more-hosters-and-network-boot }
+## Meer hostingproviders, en opstarten via het netwerk { #more-hosters-and-network-boot }
 
-*Gepland.* Het doel is een volledig geautomatiseerde installatie, waar een machine
-ook staat.
+*Gepland.* Het doel is dat een machine volledig automatisch kan worden
+geïnstalleerd, waar ze ook staat.
 
-- **Providers als plugins.** netcup is vandaag ingebouwd. Het plan is een eigen
-  repository voor API's van providers, zodat iedereen AWS, Hetzner en de rest kan
-  toevoegen zoals netcup nu werkt: een server aanmaken of wissen, de installatie
-  erop zetten en hem opstarten.
-- **Wake-on-LAN en PXE-boot** voor machines thuis: een node wordt wakker en
-  installeert zich via het netwerk, zonder USB-stick.
+- **Hostingproviders als plug-ins.** De ondersteuning voor netcup is nu
+  ingebouwd. Het plan is een aparte repository voor de API’s van de providers,
+  zodat iedereen AWS, Hetzner en andere providers kan toevoegen. Een plug-in
+  zou werken zoals de ondersteuning voor netcup nu: hij maakt een server aan of
+  wist hem, zet de installatie erop en start hem op.
+- **Wake-on-LAN en opstarten via PXE** zijn gepland voor machines thuis. Met
+  Wake-on-LAN zet je een machine via het netwerk aan, en met PXE start ze op
+  vanaf het netwerk. Een node wordt dan wakker en installeert zichzelf via het
+  netwerk, zonder USB-stick.
 
-## Ook op de lijst { #also-on-the-list }
+## Verder op de lijst { #also-on-the-list }
 
-Een stand-by-master, rootless podman, IPv6 van begin tot eind, ARM-borden,
-poortbereiken en een games-module, en een restore van de gegevens van een node
-bij de eerste start.
+Op de roadmap staan ook een reservemaster (standby), rootless podman, IPv6 van
+begin tot eind, ARM-borden, poortbereiken en een module voor games, en het
+terugzetten van de gegevens van een node bij de eerste keer opstarten.

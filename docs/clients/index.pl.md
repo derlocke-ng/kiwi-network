@@ -1,19 +1,26 @@
-# Praca z wieloma sieciami klientów
+# Praca w sieciach wielu klientów
 
-Dziesięciu zdalnych klientów to często dziesięć VPN-ów lub punktów końcowych
-SOCKS, po jednym do sieci każdego klienta. Uruchamianie ich wszystkich na
-hoście to bałagan: dziesięć tuneli naraz, trasy, które się gryzą, i jedna sieć
-przeciekająca do następnej. Aplikacje desktopowe Kiwi dają zamiast tego
-każdemu z nich **zapieczętowane wyjście**: kontener, którego jedyną trasą jest
-ten jeden upstream. Twoje narzędzia dołączają do potrzebnego wyjścia, a poza
-tym nic na hoście się nie zmienia.
+Jeśli pracujesz zdalnie dla wielu klientów, do sieci każdego z nich zwykle
+łączysz się przez osobne połączenie VPN lub SOCKS. Dziesięciu klientów to
+wtedy dziesięć połączeń. Uruchomienie ich wszystkich na hoście sprawia
+kłopoty: dziesięć tuneli działa jednocześnie, ich trasy wchodzą sobie
+w drogę, a ruch przeznaczony do sieci jednego klienta może trafić do sieci
+innego.
+
+Aplikacje desktopowe Kiwi pozwalają pracować w sieci każdego klienta
+w izolacji. Host nie jest zaśmiecany tunelami i trasami, a ty nie masz
+dziesięciu połączeń VPN działających naraz. Każde połączenie trafia do
+osobnego kontenera, a jedyna trasa wychodząca z tego kontenera prowadzi do
+tego jednego klienta. Takie połączenie nazywa się **exitem**. Twoje narzędzia
+działają w kontenerze albo w profilu przeglądarki, który korzysta z exitu,
+jakiego potrzebują, a poza tym nic na hoście się nie zmienia.
 
 | Aplikacja | Co robi |
 |---|---|
-| [**kiwi-proxy**](kiwi-proxy.md) | Silnik. **Wyjście** (exit) to jeden upstream o nazwie: SOCKS5, który ci przekazano, albo taki, który tworzy moduł dostawcy. Uruchomienie go tworzy **gateway**, przestrzeń nazw sieciowych, której jedyną trasą jest ten upstream. Aplikacje hosta mogą go używać jako lokalnego portu SOCKS5 |
-| [**kiwi-custodia**](kiwi-custodia.md) | **Kontenery dystrybucji na wyjściu**: Fedora, Ubuntu, Debian, Kali, Arch, openSUSE, Rocky lub Alpine w kontenerze bez roota z własnym katalogiem domowym. *Wszystko* w kontenerze wychodzi przez wyjście: menedżery pakietów, gry, statyczne pliki binarne, które nigdy nie słyszały o proxy |
-| [**kiwi-fox**](kiwi-fox.md) | **Profile przeglądarki na wyjściu**: Camoufox, Firefox lub Tor Browser, każdy profil z własną pamięcią |
-| [**Moduły dostawców**](providers.md) | Wyjścia z Tora, VPN-a (gluetun), 9proxy lub Mysterium. Tor i Mysterium to szybki sposób na więcej adresów IP wyjścia, przydatny do testów |
+| [**kiwi-proxy**](kiwi-proxy.md) | Silnik, na którym opierają się pozostałe aplikacje. **Exit** to jedno połączenie z upstreamem, zapisane pod wybraną nazwą. Upstream to proxy, do którego wysyłany jest twój ruch: albo proxy SOCKS5, które ci przekazano, albo takie, które tworzy moduł dostawcy. Gdy uruchamiasz exit, kiwi-proxy tworzy dla niego **gateway**. Gateway to sieciowa przestrzeń nazw (network namespace), czyli osobny stos sieciowy z własnymi trasami i zaporą, której jedyna trasa prowadzi do tego upstreamu. Programy na hoście mogą korzystać z exitu przez lokalny port SOCKS5 |
+| [**kiwi-custodia**](kiwi-custodia.md) | **Dystrybucje Linuksa w boxach, które korzystają z exitu.** Box to kontener rootless (działający bez uprawnień roota) z Fedorą, Ubuntu, Debianem, Kali, Archem, openSUSE, Rocky albo Alpine i z własnym folderem domowym. *Cały* ruch sieciowy z boxa przechodzi przez exit. Dotyczy to także menedżerów pakietów, gier i programów linkowanych statycznie, które ignorują ustawienia proxy |
+| [**kiwi-fox**](kiwi-fox.md) | **Profile przeglądarki, które korzystają z exitu.** Każdy profil uruchamia Camoufox, Firefoksa albo Tor Browser i ma własne dane |
+| [**Moduły dostawców**](providers.md) | Moduły, które tworzą exity przez Tor, VPN (z gluetun), 9proxy albo Mysterium. Tor i Mysterium to szybki sposób na zdobycie dodatkowych adresów IP, przydatnych przy testach |
 
 ```
  client A: socks5://…  ─┐                                   ┌─ box "client-a" (Fedora: ssh, ansible, dnf …)
@@ -22,48 +29,58 @@ tym nic na hoście się nie zmienia.
                                                is the exit
 ```
 
-## Jak zachowuje się czystość { #how-it-stays-clean }
+## Jak exity pozostają rozdzielone { #how-it-stays-clean }
 
-- **Fail closed.** Zapora gatewaya odrzuca wszystko poza jego jednym
-  upstreamem. Jeśli gateway padnie, to, co do niego dołączyło, traci trasę.
-  Kill switch to brak trasy, a nie oprogramowanie, które musi coś zauważyć.
-- **Nic nieużywanego nie działa.** Gateway uruchomiony przez kontener lub
-  przeglądarkę znika, gdy odejdzie ostatni z nich. Działać zostają tylko
-  wyjścia, które uruchomisz przez `kiwi-proxy up`.
-- **Co osobne, zostaje osobne.** Rzeczy na tym samym wyjściu je dzielą (jeden
-  IP, jedna przestrzeń nazw). Klienci, którzy nie mogą się spotkać, dostają
-  różne wyjścia, a każdy kontener ma własny katalog domowy, więc klucze SSH i
-  profile przeglądarki się nie mieszają.
-- **Bez roota, bez tras na hoście.** Wszystko działa w Podmanie bez roota, a
-  własna sieć hosta pozostaje nietknięta.
-- **DNS też idzie przez wyjście.** Domyślnie nazwy są rozwiązywane przez DoH
-  przez wyjście, z listami blokującymi reklamy. Dla **wewnętrznych nazw hostów**
-  klienta przekaż zamiast tego nazwy stronie klienta przez `--dns remote`
-  (to także tryb dla Tora i nazw `.onion`).
+- **Gateway działa w trybie fail-closed.** Oznacza to, że awaria przerywa
+  połączenie i nigdy nie otwiera ruchowi innej drogi. Zapora w gatewayu
+  odrzuca wszystko, co nie jest adresowane do jego jedynego upstreamu. Jeśli
+  gateway przestanie działać, wszystko, co z niego korzysta, traci połączenie.
+  Żaden program nie musi zauważyć awarii i na nią zareagować, bo bez gatewaya
+  po prostu nie ma trasy.
+- **Działa tylko to, czego używasz.** Gateway uruchomiony przez box albo
+  przeglądarkę jest usuwany, gdy tylko zatrzyma się ostatni box lub ostatnia
+  przeglądarka, która z niego korzystała. Działać pozostają tylko exity, które
+  uruchomisz samodzielnie poleceniem `kiwi-proxy up`.
+- **Klienci są od siebie oddzieleni.** Boxy i przeglądarki korzystające z tego
+  samego exitu współdzielą go, więc mają ten sam adres IP i tę samą sieciową
+  przestrzeń nazw. Klienci, którzy nie mogą się nawzajem widzieć, dostają
+  różne exity. Każdy box ma też własny folder domowy, więc klucze SSH i profile
+  przeglądarki jednego klienta nie są dostępne w boxie innego klienta.
+- **Bez uprawnień roota i bez tras na hoście.** Wszystko działa w rootless
+  Podmanie, który uruchamia kontenery jako twój własny użytkownik. Sieć samego
+  hosta pozostaje bez zmian.
+- **Zapytania DNS też idą przez exit.** Domyślnie nazwy są rozwiązywane przez
+  DNS over HTTPS (DoH) przez exit, a listy domen reklamowych są blokowane.
+  Żeby rozwiązywać **wewnętrzne nazwy hostów** klienta, użyj zamiast tego
+  `--dns remote`. Nazwy są wtedy przekazywane na stronę klienta i tam
+  rozwiązywane. Tego trybu wymagają też Tor i nazwy `.onion`.
 
 ## Ograniczenia { #limits }
 
-Pochodzą z repozytoriów:
+Te ograniczenia podają same repozytoria:
 
-- **Tylko TCP, tylko IPv4.** UDP nigdzie nie wychodzi (bez QUIC, bez mediów
-  WebRTC), a IPv6 nie dostaje trasy.
-- **Jedna konfiguracja VPN na maszynę.** Moduł dostawcy VPN trzyma jedną
-  konfigurację gluetun (jeden `vpn.json`, jedną własną konfigurację
-  WireGuard), a jego wyjścia różnią się tylko krajem serwera. Dla własnych
-  VPN-ów kilku klientów obok siebie drogą jest dziś punkt końcowy SOCKS5 dla
-  każdego klienta.
-- **Kontener to areszt sieciowy, a nie piaskownica.** Dzieli twój ekran,
-  magistralę sesji i schowek, jak distrobox. Nie może natomiast dotrzeć do
-  sieci inaczej niż przez swoje wyjście.
-- **Mysterium:** jedna tożsamość utrzymuje jedno połączenie naraz.
+- **Tylko TCP i tylko IPv4.** UDP nie jest przekazywane, więc QUIC i media
+  WebRTC nie działają. Dla IPv6 nie ma trasy.
+- **Jedna konfiguracja VPN na maszynę.** Moduł dostawcy VPN ma jedną
+  konfigurację gluetun, z jednym plikiem `vpn.json` i jedną własną
+  konfiguracją WireGuard. Jego exity różnią się tylko krajem serwera. Jeśli
+  potrzebujesz jednocześnie własnych VPN-ów kilku klientów, obecnie da się to
+  zrobić tylko przez osobny punkt końcowy SOCKS5 dla każdego klienta.
+- **Box ogranicza sieć, ale nie jest piaskownicą.** Tak jak kontener
+  distrobox współdzieli twój ekran, magistralę sesji i schowek. Nie może
+  jedynie łączyć się z siecią inaczej niż przez swój exit.
+- **Mysterium:** jedna tożsamość może mieć naraz tylko jedno połączenie.
 
 ## Pierwsze kroki { #get-started }
 
+Poniższe polecenia instalują aplikacje, zapisują proxy SOCKS5 jednego klienta
+jako exit i otwierają powłokę w boxie z Fedorą, który korzysta z tego exitu:
+
 ```bash
-kiwi install kiwi-custodia            # przynosi ze sobą kiwi-proxy
+kiwi install kiwi-custodia            # instaluje przy okazji kiwi-proxy
 kiwi-custodia setup                   # obrazy i dane DNS
 
 kiwi-proxy add client-a socks5://user:pass@jump.client-a.example:1080 --dns remote
 kiwi-custodia new client-a --exit client-a --distro fedora
-kiwi-custodia enter client-a          # a shell whose only way out is client A's SOCKS5
+kiwi-custodia enter client-a          # powłoka, której jedyną drogą na zewnątrz jest SOCKS5 klienta A
 ```

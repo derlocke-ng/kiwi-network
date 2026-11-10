@@ -8,8 +8,8 @@ wilt en hoeft geen enkele machine met de hand te configureren.
 
 Het bestand heeft twee sleutels. Onder `defaults` staan de instellingen die
 voor alle hosts gelden, en onder `hosts` staat per machine een eigen blok. Een
-instelling in het blok van een host gaat boven dezelfde instelling in de
-standaardwaarden. `kiwi-server init` schrijft een bestand met uitleg in
+instelling in het blok van een host gaat voor dezelfde instelling onder
+`defaults`. `kiwi-server init` schrijft een bestand met uitleg in
 commentaar waarmee je kunt beginnen. De volledige referentie is
 [examples/fleet.yaml](https://github.com/derlocke-ng/kiwi-server/blob/main/examples/fleet.yaml).
 
@@ -105,7 +105,7 @@ gebruikt kiwi-server de ingebouwde waarde uit deze tabel.
 | `backup` | De hosts waarop een back-up van de fleetmap wordt gemaakt, en hoeveel back-ups er worden bewaard (`hosts: []`, `keep: 10`) |
 | `vps` | `server:` het id, de naam of de bijnaam van een server bij netcup |
 
-## Hoe instellingen samengaan { #how-settings-combine }
+## Hoe instellingen worden gecombineerd { #how-settings-combine }
 
 - Een host overschrijft de standaardwaarden **per sleutel**. Bij een host hoef
   je dus alleen de sleutels te noemen die afwijken. Een uitzondering zijn de
@@ -137,9 +137,9 @@ direct in het blok van de rol.
 |---|---|---|
 | `preset` (node) | `gateway` | `gateway`, `cloud` of `minimal` |
 | `runtime` | `podman` | `podman` draait de containers als podman-quadlets, systemd-units voor containers. `docker` gebruikt docker compose |
-| `auto_update` | `registry` | `registry` voert eens per week `podman auto-update` uit. Met `off` veranderen de containerimages alleen als je de host opnieuw toepast |
+| `auto_update` | `registry` | `registry` voert eens per week `podman auto-update` uit. Met `off` veranderen de containerimages alleen als je `apply` opnieuw op de host uitvoert |
 | `docker_dir` | `/home/user/docker` | de map met de stack en de gegevens ervan |
-| `service_user` | de beheerder | de gebruiker die eigenaar is van de gegevensmappen |
+| `service_user` | het beheerdersaccount | de gebruiker die eigenaar is van de gegevensmappen |
 | `vpn_ip` | uit de WireGuard-configuratie | het mesh-adres van de machine |
 | `master_ip` | uit de fleet | het mesh-adres van de master |
 | `mesh_subnet` | `10.8.0.0/16` | |

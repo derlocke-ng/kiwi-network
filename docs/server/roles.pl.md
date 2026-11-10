@@ -1,38 +1,49 @@
 # Role
 
-Rola to to, czym staje się maszyna. Każda rola działa na wszystkich trzech
-targetach.
+Rola określa, do czego służy maszyna w twojej Kiwi Network. W pliku fleet
+przypisujesz rolę każdemu hostowi, a kiwi-server konfiguruje maszynę zgodnie
+z nią. Maszyna może być samym systemem bazowym, masterem, z którym łączą się
+wszystkie urządzenia i node’y, albo node’em, na którym działają twoje usługi.
+Każda rola działa na wszystkich trzech systemach docelowych, czyli systemach
+operacyjnych, które kiwi-server potrafi zainstalować.
 
 | Rola | Czym staje się maszyna | Moduły |
 |---|---|---|
-| `bare` | systemem bazowym: użytkownik administracyjny, SSH, automatyczne aktualizacje | brak |
-| `master` | **kiwi-master**: punkt wejścia WireGuard z podwójnym skokiem, Pi-hole, Tor i strony administracyjne | `vpn-client`, `vpn-server`, `dns`, `tor`, `reverse-proxy` |
-| `node`, preset `gateway` | **kiwi-node**, który trasuje LAN przez VPN, z Pi-hole, przekaźnikiem DHCP, stacją pobierania i SFTP | `vpn-client`, `dns`, `dhcp-relay`, `reverse-proxy`, `downloader`, `gateway`, `portainer`, `sftp` |
+| `bare` | Tylko systemem bazowym z użytkownikiem administracyjnym, SSH i automatycznymi aktualizacjami | brak |
+| `master` | **kiwi-master**. Przez niego wchodzi się do sieci WireGuard, a ruch sieci do internetu przekazuje on dalej przez komercyjny VPN (podwójny przeskok, double hop). Działają na nim też Pi-hole jako DNS blokujący reklamy, Tor i strony administracyjne | `vpn-client`, `vpn-server`, `dns`, `tor`, `reverse-proxy` |
+| `node`, preset `gateway` | **kiwi-node**, który kieruje ruch sieci lokalnej (LAN) przez VPN. Działają na nim też Pi-hole, przekazywanie zapytań DHCP (DHCP relay), stacja pobierania plików i SFTP | `vpn-client`, `dns`, `dhcp-relay`, `reverse-proxy`, `downloader`, `gateway`, `portainer`, `sftp` |
 | `node`, preset `cloud` | **kiwi-node** z Nextcloud i Vaultwarden | `vpn-client`, `reverse-proxy`, `cloud`, `vault`, `portainer` |
-| `node`, preset `minimal` | **kiwi-node** do wypełnienia wybranymi przez ciebie modułami | `vpn-client`, `reverse-proxy` |
+| `node`, preset `minimal` | **kiwi-node** z dwoma podstawowymi modułami, do których dodajesz potrzebne ci moduły | `vpn-client`, `reverse-proxy` |
 
-`node-gw` i `node-cloud` nadal działają jako nazwy presetów `gateway` i
-`cloud`.
+Rola `node` występuje w kilku presetach. Preset to gotowa lista modułów.
+Starsze nazwy ról `node-gw` i `node-cloud` nadal działają i oznaczają presety
+`gateway` i `cloud`.
 
-Role modułowe renderują **stack**: domyślnie quadlety podmana (docker compose
-z `runtime: docker`), które `kiwi-stack` uruchamia i utrzymuje w działaniu.
-Zobacz [Moduły](modules.md).
+Role `master` i `node` są zbudowane z modułów, a moduł to jedna usługa.
+kiwi-server zamienia moduły hosta w **stack**, czyli wszystkie kontenery, które
+uruchamia maszyna. Domyślnie stack składa się z podman quadlets, czyli
+jednostek systemd uruchamiających kontenery. Z `runtime: docker` uruchamia go
+docker compose. Na maszynie `kiwi-stack` uruchamia stack i pilnuje, żeby
+działał. Zobacz [Moduły](modules.md).
 
 ## `master` { #master }
 
-Preset zmienia te wartości domyślne modułów:
+Rola `master` zmienia te wartości domyślne modułów:
 
 - `vpn-client`: `vpn_provider: mullvad`, `mss_clamp: true`
 - `dns`: `network_mode: vpn-server`, `mullvad_socks: true`
 - `tor` i `reverse-proxy`: `network_mode: vpn-server`
 
-Dzięki temu Pi-hole, Tor i nginx działają w przestrzeni nazw sieciowych
-serwera WireGuard i odpowiadają pod adresem mastera w sieci mesh. Kontenery
-nazywają się `km-…` i są w sieci `knet-master` (`172.64.0.0/24`).
+Dzięki tym ustawieniom Pi-hole, Tor i nginx współdzielą sieciową przestrzeń
+nazw (network namespace) serwera WireGuard, czyli zestaw interfejsów i adresów
+sieciowych, który widzi kontener. Te trzy usługi są więc dostępne pod adresem
+mastera w sieci mesh, czyli w prywatnej sieci WireGuard. Kontenery na masterze
+mają nazwy `km-…` i są podłączone do sieci `knet-master` (`172.64.0.0/24`).
 
-Master może dodać do swoich `modules:` moduły `nostr-relay` i `hub`
-([hub dla ludzi](../people/hubs.md)), `portainer` i `backup`. Przekaźnik i hub
-działają tylko na masterach.
+Na masterze mogą też działać `nostr-relay` i `hub` (dla
+[huba dla ludzi](../people/hubs.md)), `portainer` oraz `backup`. Żeby ich
+używać, dodaj je do listy `modules:` mastera. Przekaźnik i hub działają
+wyłącznie na masterach.
 
 ```yaml
 sorbet:
@@ -43,9 +54,10 @@ sorbet:
 
 ## `node` { #node }
 
-Preset wybiera listę modułów. `modules:` ją zastępuje, a wymagane moduły
-dochodzą same. Kontenery nazywają się `kn-…` i są w sieci `knet-node`
-(`172.128.0.0/24`).
+To preset decyduje, jakie moduły uruchamia node. Jeśli napiszesz własną listę
+`modules:`, zastąpi ona listę presetu, a moduły wymagane przez moduły z listy
+zostaną dodane automatycznie. Kontenery na nodzie mają nazwy `kn-…` i są
+podłączone do sieci `knet-node` (`172.128.0.0/24`).
 
 ```yaml
 papaya:
@@ -53,18 +65,20 @@ papaya:
   node:
     preset: cloud
     modules: [vpn-client, reverse-proxy, cloud, vault, portainer, backup]
-    backup: { server: https://backup.lychee.home }   # lychee uruchamia moduł backup-server
+    backup: { server: https://backup.lychee.home }   # na lychee działa moduł backup-server
 ```
 
-Preset gateway włącza własną stronę WWW Pi-hole (`expose_web_ui: true`) pod
-`127.0.0.1:8080`. Reverse proxy i tak serwuje ją przez TLS pod
+Preset `gateway` udostępnia też własną stronę WWW Pi-hole’a pod
+`127.0.0.1:8080` na nodzie (`expose_web_ui: true`). Niezależnie od tego
+ustawienia reverse proxy udostępnia tę stronę przez TLS pod
 `pihole.<hostname>`.
 
-## Pisanie roli { #writing-a-role }
+## Własna rola { #writing-a-role }
 
-Rola to katalog `roles/<name>/` z plikami `role.yaml` i `apply.sh`. Rola
-modułowa wymienia swoje moduły i dołącza wspólne ustawienia stacka, a jej
-`apply.sh` to jedno wywołanie:
+Możesz napisać własną rolę. Rola to katalog `roles/<name>/` z plikami
+`role.yaml` i `apply.sh`. Rola zbudowana z modułów wypisuje je w `role.yaml`
+i dołącza wspólne ustawienia stacku. Jej `apply.sh` składa się wtedy z jednego
+wywołania.
 
 ```yaml
 name: node-media
@@ -81,8 +95,9 @@ module_defaults:
 ks_role_apply() { ks_stack_apply; }
 ```
 
-Rola bez modułów wykonuje własną pracę w `ks_role_apply()`, korzystając z
-biblioteki w `roles/common/lib.sh` (która pochodzi z kiwi-stack). Ustawienia w
-`role.yaml` stają się zmiennymi `KS_ROLE_<KEY>`. Skrypt działa jako root z
-`set -euo pipefail`. Testy renderują każdą rolę w drzewie i sprawdzają ją
-shellcheckiem.
+Rola bez modułów wykonuje całą pracę sama w `ks_role_apply()`. Może przy tym
+korzystać z biblioteki `roles/common/lib.sh`, która pochodzi z kiwi-stack.
+Ustawienia zadeklarowane w `role.yaml` są dostępne w skrypcie jako zmienne
+`KS_ROLE_<KEY>`. Skrypt działa jako root z `set -euo pipefail`. Testy projektu
+generują konfigurację każdej roli z drzewa i sprawdzają ją programem
+shellcheck.

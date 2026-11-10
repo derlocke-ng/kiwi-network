@@ -51,7 +51,7 @@ scp kiwi.sh root@192.168.1.1:/tmp/ && ssh root@192.168.1.1 sh /tmp/kiwi.sh
 ```
 
 Het script installeert het WireGuard-pakket als dat ontbreekt. Het maakt een
-interface aan met de naam `kiwi`; met `--name` kies je een andere naam. De
+interface aan met de naam `kiwi`. Met `--name` kies je een andere naam. De
 interface krijgt de `wg_mtu` van de fleet als MTU en heeft één peer, de master.
 Die peer wordt aangemaakt met `route_allowed_ips`, zodat OpenWrt de routes zelf
 toevoegt. Daarnaast maakt het script een firewallzone aan waar het LAN verkeer
@@ -68,13 +68,13 @@ Fritz!OS heeft een WireGuard-client en statische routes, maar kan
 DNS-verzoeken voor één enkel domein niet doorsturen. De DNS-regel moet daarom
 door een node worden afgehandeld:
 
-1. **Tunnel:** ga naar Internet → Toegang verlenen → VPN (WireGuard) →
-   Verbinding toevoegen, kies voor een verbinding met een andere
-   WireGuard-dienst en importeer de configuratie die de master heeft
+1. **Tunnel:** ga naar Internet → Permit Access → VPN (WireGuard) → Add
+   Connection, kies voor een verbinding met een andere WireGuard-dienst
+   (connect to another WireGuard service) en importeer de configuratie die de master heeft
    uitgegeven. De regel `AllowedIPs` in die configuratie bepaalt of de tunnel
    split of full is.
-2. **Of een statische route:** ga naar Thuisnetwerk → Netwerk →
-   Netwerkinstellingen → IPv4-routes. Vul `10.8.0.0` in als doelnetwerk,
+2. **Of een statische route:** ga naar Home Network → Network → Network
+   Settings → IPv4 Routes. Vul `10.8.0.0` in als doelnetwerk,
    `255.255.0.0` als subnetmasker en het LAN-adres van de gateway-node als
    gateway.
 3. **DNS:** laat het LAN een Pi-hole als DNS-server gebruiken. Stel de
@@ -92,6 +92,6 @@ Bij elke andere router heb je aan drie dingen genoeg. Geef de router een
 WireGuard-clientconfiguratie, of voeg een statische route voor `10.8.0.0/16`
 toe die naar het LAN-adres van de gateway-node wijst. Laat het LAN daarna als
 DNS-server een Pi-hole gebruiken die de fleet kent. Elke node waarop de module
-`dns` draait, is zo’n Pi-hole. Routers op basis van dnsmasq (DD-WRT, Tomato, de
-forwarder in pfSense) accepteren ook de doorstuurregel van één regel:
+`dns` draait, is zo’n Pi-hole. Bij routers op basis van dnsmasq (DD-WRT, Tomato, de
+forwarder in pfSense) volstaat ook één regel in de configuratie:
 `server=/home/10.8.0.1`.

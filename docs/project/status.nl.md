@@ -52,37 +52,37 @@ versietags. De versies zijn die van november 2026.
 
 Deze hiaten noemen de repository’s zelf:
 
-- **kiwi-server**: Het is getest op echte hardware, in oktober en november
-  2026. Bij die tests zijn back-ups van de ene node op een andere node
+- **kiwi-server**: dat het op echte hardware werkt, is in oktober en november
+  2026 aangetoond. Bij die tests zijn back-ups van de ene node op een andere node
   teruggezet en is de tunnel-MTU afgesteld, ook voor mobiele verbindingen. Vier
   uitbreidingen staan op de branches `several-servers` van kiwi-server en
   kiwi-modules en zijn nog niet uitgebracht: meerdere back-upservers, het
   automatisch terugzetten van de gegevens op een machine die opnieuw is
   opgebouwd, een timer die oude snapshots opruimt, en een healthcheck die een
-  vastgelopen verbinding met de commerciële VPN-provider herstart. Van federatie
-  tussen netwerken is nog niet aangetoond dat ze werkt. Alles werkt alleen met
+  vastgelopen verbinding met de commerciële VPN-provider herstart. Dat federatie
+  tussen netwerken werkt, is nog niet aangetoond. Alles werkt alleen met
   IPv4, en de Debian-ISO is er alleen voor amd64. De control plane is
   ontworpen, nog niet gebouwd.
-- **kiwi-modules**: De modules OpenCloud, Immich en Paperless-ngx zijn
+- **kiwi-modules**: de modules OpenCloud, Immich en Paperless-ngx zijn
   gemarkeerd als “om uit te proberen”. Een TURN-server voor gesprekken moet nog
   worden gemerged.
-- **kiwi-stack**: Er is geen rollback. Je kunt alleen gegevens terugzetten en
+- **kiwi-stack**: er is geen rollback. Je kunt alleen gegevens terugzetten en
   een oudere bundel opnieuw toepassen.
-- **kiwi-framework**: Een aantal onderdelen moet nog komen: het blog,
+- **kiwi-framework**: een aantal onderdelen moet nog komen, namelijk het blog,
   goedkeuringen bij de moderatie, het volgen van spaces die een hub niet
   meelevert, en signers voor NIP-07 en NIP-46.
-- **kiwi-updater**: Een gehost register van vertrouwde catalogi is gepland. De
+- **kiwi-updater**: een gehost register van vertrouwde catalogi is gepland. De
   releasetags van de andere apps zijn nog niet ondertekend. Daarom vraagt het
   deel van kiwi-killswitch dat als root draait om een wachtwoord wanneer het
   wordt bijgewerkt.
-- **kiwi-proxy**: De module ervan voor kiwi-server heeft nog niet op een
-  machine gedraaid. Exits verwerken alleen TCP en IPv4. De VPN-module kan per
-  machine één configuratie bevatten.
-- **Providermodules**: De modules voor VPN en 9proxy zijn nog niet van begin
+- **kiwi-proxy**: de module voor kiwi-server heeft nog niet op een
+  machine gedraaid. Exits verwerken alleen TCP en IPv4. De VPN-module bevat per
+  machine maar één configuratie.
+- **Providermodules**: de modules voor VPN en 9proxy zijn nog niet van begin
   tot eind gevalideerd met een echt account. De module voor Mysterium is dat
   wel, op 7 november 2026.
-- **kiwi-custodia**: Sommige onderdelen moeten nog op een echte machine worden
-  gemeten: tun2socks in een rootless gateway, en andere compositors dan GNOME.
+- **kiwi-custodia**: sommige onderdelen moeten nog op een echte machine worden
+  gemeten, namelijk tun2socks in een rootless gateway, en andere compositors dan GNOME.
 - **Licenties**: kiwi-icons, kiwi-catalog en mullvad-socks5 hebben geen
   LICENSE-bestand, en kiwi-killswitch vermeldt zijn licentie alleen in de
   README en het manifest.
