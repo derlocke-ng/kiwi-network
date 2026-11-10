@@ -29,8 +29,8 @@ una pull request.
 
 kiwi lavora in due ambiti. L’ambito utente è tutto ciò che sta nella tua
 cartella home, e non richiede mai root. L’ambito di sistema è una parte che
-appartiene a root, per le app che hanno bisogno di root. Al momento
-dell’installazione scegli quanto dell’ambito di sistema vuoi:
+appartiene a root, per le app che hanno bisogno di root. Durante
+l’installazione decidi quanta parte dell’ambito di sistema vuoi usare:
 
 ```bash
 # consigliato: ambito utente più l’ambito di sistema di proprietà di root, una sola richiesta di password
@@ -187,5 +187,5 @@ pacchetti. Usa `kiwi info --installer`, `kiwi diff` e `kiwi pin` per vedere che
 cosa fa un’app prima di decidere. Una firma limita *chi può pubblicare* una
 release, ma non dice nulla su *che cosa fa la release pubblicata*.
 
-Una cosa è ancora prevista: un registro ospitato di cataloghi fidati, con il
+È ancora prevista una cosa: un registro ospitato di cataloghi fidati, con il
 comando `kiwi catalog browse` e con le impronte dei firmatari per ogni voce.

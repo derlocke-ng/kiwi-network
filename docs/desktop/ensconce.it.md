@@ -109,10 +109,10 @@ ensconce --dry-run && ensconce
 L’esportazione contiene soltanto ciò che hai aggiunto al sistema. Elenca i
 pacchetti che hai richiesto tu e non l’intera immagine. Elenca solo le
 estensioni che provengono davvero da extensions.gnome.org. Contiene i tuoi file
-di repository e, invece di un dump completo, alcuni sottoalberi di dconf scelti.
+di repository e, invece di un dump completo, alcuni sottoalberi di dconf selezionati.
 Considera l’esportazione un punto di partenza: `certs/` e `nextcloud/` possono
 contenere materiale privato.
 
-ensconce è un’app dell’**ambito utente**. I passi che hanno bisogno di root lo
-chiedono da soli. Per aggiungere un passo tuo, crea un file
+ensconce è un’app dell’**ambito utente**. I passi che hanno bisogno di root
+chiedono i permessi da soli. Per aggiungere un passo tuo, crea un file
 `steps/NN-<name>.sh` con una funzione `step_<name>()`.

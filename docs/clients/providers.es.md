@@ -71,8 +71,8 @@ SOCKS5 only
 Un mismo contenedor de proveedor sirve a todos los exits que usan el mismo
 módulo y el mismo lease. Un lease es cada una de las opciones de exit que
 ofrece un módulo para elegir, por ejemplo el país de un servidor VPN o un nodo
-de Mysterium. Si un túnel pierde su sesión, es fail-closed, es decir, no sale
-ningún tráfico, y se reinicia.
+de Mysterium. Si un túnel pierde su sesión, se corta todo el tráfico, porque
+es fail-closed, y el túnel se reinicia.
 
 ## Configuración { #configuration }
 

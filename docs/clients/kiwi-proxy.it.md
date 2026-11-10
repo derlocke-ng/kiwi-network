@@ -21,8 +21,8 @@ Un **exit** è una connessione a un upstream, con un nome. L’upstream è il pr
 a cui viene inviato il traffico: un proxy SOCKS5 che ti è stato fornito, oppure
 uno che un [modulo provider](providers.md) crea per te attraverso Tor, un tunnel
 VPN, 9proxy o Mysterium. Di per sé un exit è soltanto una voce salvata, e non fa
-girare nulla. Quando attivi un exit, kiwi-proxy avvia per lui un container
-**gateway**:
+girare nulla. Quando attivi un exit, kiwi-proxy avvia un container **gateway**
+dedicato a quell’exit:
 
 ```
 gateway container   owns the network namespace
@@ -57,7 +57,7 @@ in file con permessi 0600, che può leggere soltanto il tuo utente.
 kiwi-proxy add client-a socks5://user:pass@host:1080   # un exit; per ora non gira nulla
 kiwi-proxy add tor-de --module tor --country de        # un exit da un modulo provider
 kiwi-proxy list
-kiwi-proxy check client-a      # che cosa vede il resto del mondo attraverso di lui
+kiwi-proxy check client-a      # che cosa vede il resto del mondo attraverso l’exit
 kiwi-proxy up client-a         # attiva il suo gateway e lo tiene attivo
 kiwi-proxy down client-a       # lo spegne, insieme a chi lo stava usando
 kiwi-proxy ps                  # i gateway in esecuzione, qualunque app li abbia avviati
@@ -118,7 +118,7 @@ proxy SOCKS5 che ti è stato fornito oppure da un modulo provider. Per un exit d
 un modulo scegli da un elenco di paesi in cui puoi cercare, oppure da un elenco
 di nodi. Puoi attivare e spegnere gli exit, offrire un exit come porta SOCKS5 su
 questo computer e copiarne l’indirizzo, e controllare che cosa vede il mondo
-esterno quando ti colleghi attraverso di lui. L’app mostra anche quali membri
+esterno quando ti colleghi attraverso quell’exit. L’app mostra anche quali membri
 usano un gateway e i loro log, e installa e configura i moduli provider.
 
 ## Su una macchina kiwi-server { #on-a-kiwi-server-machine }

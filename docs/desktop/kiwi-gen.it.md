@@ -53,7 +53,7 @@ anche le chiavi pubbliche tra il formato SSH e il formato PEM.
 ## Come avviarlo { #running-it }
 
 Apri `index.html` in un browser recente. Funziona direttamente dal disco, senza
-un server web. Puoi anche pubblicare la cartella:
+un server web. In alternativa puoi servire la cartella con un server web:
 
 ```bash
 git clone https://github.com/derlocke-ng/kiwi-gen.git && cd kiwi-gen

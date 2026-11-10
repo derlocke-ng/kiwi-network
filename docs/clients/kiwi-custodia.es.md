@@ -3,9 +3,10 @@
 kiwi-custodia te da un entorno Linux separado para cada red de cliente en la
 que trabajas. Cada entorno es un contenedor con la distribución de Linux que
 elijas, y todo su tráfico de red pasa por un exit de
-[kiwi-proxy](kiwi-proxy.md). Un exit es una conexión a un upstream, guardada
-con un nombre y con su propio contenedor, por ejemplo el proxy SOCKS5 que lleva
-a la red de un cliente. Así puedes trabajar para diez clientes sin tener diez
+[kiwi-proxy](kiwi-proxy.md). Un exit es una conexión guardada con un nombre y
+con su propio contenedor, que va a un upstream, es decir, al proxy al que se
+envía tu tráfico. Puede ser, por ejemplo, el proxy SOCKS5 que lleva a la red de
+un cliente. Así puedes trabajar para diez clientes sin tener diez
 conexiones VPN en el host, y las herramientas y claves de cada cliente se
 quedan en el entorno de ese cliente. *Si conoces distrobox: es la misma idea,
 pero el contenedor solo puede llegar a la red a través de su exit.*

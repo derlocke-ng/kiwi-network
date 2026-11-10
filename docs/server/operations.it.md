@@ -19,9 +19,9 @@ kiwi-server status fleet.yaml papaya        # uno solo
 
 kiwi-server si collega a ogni macchina via SSH e si limita a leggere. Ogni
 macchina riporta il suo ruolo e il suo stack (l’insieme dei container e dei
-servizi che esegue), gli eventuali problemi, come un ruolo fallito o un
-container fermo, i suoi dischi e se sono cifrati o bloccati, i suoi backup e
-per quanto tempo i suoi certificati sono ancora validi. Un node di backup
+servizi che esegue) e gli eventuali problemi, come un ruolo fallito o un
+container fermo. Riporta poi i suoi dischi, e se sono cifrati o bloccati, i
+suoi backup e per quanto tempo i certificati restano validi. Un node di backup
 riporta anche lo spazio disponibile. L’app Kiwi Server mostra le stesse
 informazioni nella scheda *Overview* di ogni host.
 
@@ -42,8 +42,8 @@ kiwi-server secrets show fleet.yaml papaya [setting]   # le password generate di
 ```
 
 `secrets init` crea l’archivio cifrato. Salva una chiave nel portachiavi di
-GNOME e ti mostra una **chiave di recupero**, che viene mostrata una sola
-volta. Finché l’archivio è aperto, qualsiasi programma che gira con il tuo
+GNOME e ti mostra una **chiave di recupero**: la vedi una volta
+sola. Finché l’archivio è aperto, qualsiasi programma che gira con il tuo
 account utente può leggerlo.
 
 ## Il backup della fleet { #backing-up-the-fleet-itself }
@@ -100,7 +100,7 @@ papaya.
 
 !!! info "Nel branch `several-servers`"
     Questo lavoro si trova nei branch `several-servers` di kiwi-modules e di
-    kiwi-server, ma non è ancora stato unito né rilasciato. L’uso di più
+    kiwi-server, ma non è ancora stato integrato (merge) né rilasciato. L’uso di più
     server di backup e il ripristino automatico sono stati testati su
     hardware. L’health check della VPN no.
 
@@ -110,8 +110,8 @@ papaya.
   server che ce l’ha, e `kiwi-stack snapshots` elenca gli snapshot server per
   server. L’impostazione singola `server` funziona ancora.
 - **Una macchina ricostruita si ripristina da sola.** Una macchina appena
-  ricostruita trova sul server dei backup di sé stessa, anche se non ne ha
-  fatto nessuno. In quel caso, prima di fare il suo primo backup, ripristina da
+  ricostruita trova sul server dei backup che la riguardano, anche se lei
+  stessa non ne ha ancora fatto nessuno. In quel caso, prima di fare il suo primo backup, ripristina da
   sola tutti i moduli, e poi continua a fare i backup come prima. È il
   comportamento predefinito, `backup.restore: auto`. Con `hold` la macchina
   aspetta che tu esegua `kiwi-stack restore` oppure `kiwi-stack backup --new`.
@@ -125,7 +125,7 @@ papaya.
 - **Una connessione bloccata con il provider VPN commerciale si ripristina da
   sola.** gluetun, il container del client VPN, riceve un health check, cioè
   un controllo periodico che verifica se la connessione funziona ancora.
-  Quando il controllo fallisce per cinque minuti, il container viene terminato,
+  Quando il controllo fallisce per cinque minuti di fila, il container viene terminato,
   e al riavvio successivo sceglie un altro server.
 
 ## Dischi cifrati e sblocco { #encrypted-disks-and-unlocking }
@@ -183,8 +183,8 @@ le connessioni si bloccano. Kiwi affronta il problema in tre modi:
   minima con cui funziona IPv6.
 - **La MSS viene limitata in entrambe le direzioni.** La MSS è la quantità
   massima di dati che TCP mette in un pacchetto. wg-easy e il client VPN la
-  limitano entrambi a `wg_mtu - 40`, così TCP non prova mai un segmento che
-  non può passare.
+  limitano entrambi a `wg_mtu - 40`, così TCP non tenta mai di inviare un
+  segmento che non passerebbe.
 - **TCP trova da solo una dimensione che funziona.** Il client VPN gira con
   `net.ipv4.tcp_mtu_probing=1` e `tcp_base_mss=1024`. Quando una connessione
   passa per un percorso che scarta in silenzio i pacchetti grandi, TCP prova
@@ -202,22 +202,22 @@ kiwi-server mtu fleet.yaml phone --ssh core@<master>     # un dispositivo da sec
 kiwi-server mtu fleet.yaml papaya --write                # e scrive wg_mtu nel file fleet
 ```
 
-La misurazione manda dei ping attraverso il tunnel con il flag don’t-fragment
+Per misurare, kiwi-server manda dei ping attraverso il tunnel con il flag don’t-fragment
 attivo, così non possono essere spezzati lungo il percorso. Li manda
 dall’interno del namespace di rete che contiene il tunnel. Un namespace di rete
 è un ambiente di rete separato su una macchina, come quello che ha un
 container. Un node viene misurato dal suo client VPN, perché il firewall del
 client scarta i ping in arrivo. Un dispositivo viene misurato dal server
-WireGuard. La misurazione parte con un ping normale, poi prova tutti i
+WireGuard. Si comincia con un ping normale, poi prova tutti i
 multipli di 16 a partire da 1280 e riporta la dimensione più grande che arriva
 **intera**. Mentre manda i ping, legge i contatori di riassemblaggio del
 kernel: così una risposta spezzata lungo il percorso e poi ricomposta non
 viene contata come se fosse passata.
 
-La misurazione ti dice anche che cosa impostare. Per un **dispositivo** è la
+Il risultato ti dice anche che cosa impostare. Per un **dispositivo** è la
 riga `MTU =` nella configurazione WireGuard del dispositivo stesso, e nessun
 altro ne risente. Per un **node** è `wg_mtu` su quel node e sul suo master. Con
-`--write` la misurazione scrive il valore nel file fleet e modifica solo
+`--write` kiwi-server scrive il valore nel file fleet e modifica solo
 quelle righe. C’è una cosa che da questo lato non si vede: un pacchetto
 spezzato solo all’andata e ricomposto dall’altra parte.
 

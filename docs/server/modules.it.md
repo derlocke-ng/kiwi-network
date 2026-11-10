@@ -13,7 +13,8 @@ include una copia. Uno stack è composto da un file compose, dai **quadlet di
 podman** (un’unità systemd per ogni container), dai file di configurazione,
 dalle unità systemd per l’host e da `stack.sh`, un manifest che li elenca
 tutti. Sulla macchina lo stack viene installato da [kiwi-stack](single.md).
-Tutti i template vengono compilati sul computer che genera lo stack. Alla
+I template vengono completati con i valori sul computer che genera lo
+stack. Alla
 macchina che lo esegue basta podman 4.4 o successivo, oppure docker con il
 plugin compose se imposti `runtime: docker`.
 
@@ -45,7 +46,7 @@ tutte le tue macchine, e stabiliscono come il suo traffico arriva a Internet.
 | `cloud` | **Nextcloud**, composto dai container del progetto AIO ma *senza* il container master di AIO. Per questo non ha bisogno del socket di docker e funziona con podman. Collabora, OnlyOffice, Talk, Imaginary, ClamAV, la ricerca full-text e Whiteboard si possono attivare o disattivare uno per uno | node | vpn-client, reverse-proxy |
 | `vault` | **Vaultwarden**, un gestore di password compatibile con Bitwarden | node | vpn-client, reverse-proxy |
 | `downloader` | **Transmission** e **JDownloader**. Entrambi girano nel namespace di rete del client VPN: usano la sua connessione e non ne hanno una propria. Quando il tunnel non è attivo non trasferiscono nulla | node | vpn-client |
-| `sftp` | Un server SFTP su una porta dedicata (`2224`), da cui puoi scaricare i file scaricati | node | nessuno |
+| `sftp` | Un server SFTP su una porta dedicata (`2224`), da cui puoi recuperare i file scaricati | node | nessuno |
 | `portainer` | **Portainer CE**, un’interfaccia web per i container. È raggiungibile su `127.0.0.1:9443` e su `portainer.<host>` | entrambi | nessuno |
 | `opencloud` | **OpenCloud**, per i file e la loro condivisione, in un unico binario Go (da provare) | node | vpn-client, reverse-proxy |
 | `immich` | **Immich**, per foto e video (da provare) | node | vpn-client, reverse-proxy |
@@ -100,7 +101,7 @@ Vedi [Gestione](operations.md).
 | vault | `signups_allowed` | `false` | attivala per creare il primo account, poi disattivala di nuovo |
 | downloader | `download_dir` | (obbligatoria) | |
 | nostr-relay | `members` | `approved` | oppure `registered` |
-| | `write_pubkeys` | `[]` | le chiavi degli amministratori. Gli amministratori possono sempre pubblicare, e valgono solo le loro liste dei membri e dei bannati |
+| | `write_pubkeys` | `[]` | le chiavi degli amministratori. Gli amministratori possono sempre pubblicare, e valgono solo le liste dei membri e le liste di ban pubblicate da loro |
 | hub | `image` | `ghcr.io/derlocke-ng/armory:latest` | l’immagine di un qualsiasi hub costruito con kiwi-framework |
 | | `public_relays`, `public_mounts` | `[]` | da impostare per un hub semipubblico |
 | backup | `server` | (obbligatoria) | l’indirizzo `https://…` di un node backup-server che elenca questa macchina |
@@ -132,7 +133,7 @@ fleet. Ogni nome è composto dal nome del servizio e dal nome dell’host.
   vengono avviati tramite `kiwi-stack.target`, e i loro log finiscono nel
   journal di systemd. Un container che condivide il namespace di rete di un
   altro container è legato a quel container, e quindi viene riavviato insieme
-  a lui.
+  a quello.
 - I segreti vengono scritti in file `kiwi/env/<service>.env` leggibili solo da
   root. Non finiscono mai nelle unità.
 - I container hanno indirizzi fissi che seguono lo schema di indirizzamento
@@ -166,7 +167,7 @@ nginx che il modulo registra, gli URL stampati quando il ruolo ha finito, le
 regole di validazione e le impostazioni del modulo (`settings`).
 
 Lo schema delle impostazioni serve a due cose: convalida il file fleet, e l’app
-kiwi-server lo usa per costruire il modulo delle impostazioni. I template sono
+kiwi-server lo usa per costruire il form delle impostazioni. I template sono
 scritti in Jinja2 e possono usare il contesto dell’host, che contiene il nome e
 il tipo dell’host, l’indirizzo di ogni modulo, la mesh, i nomi della fleet, i
 moduli attivi e le impostazioni di tutti i moduli.

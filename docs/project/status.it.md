@@ -64,13 +64,13 @@ Queste lacune sono indicate dagli stessi repository:
   solo con IPv4, e la ISO di Debian esiste solo per amd64. Il control plane è
   progettato, non ancora realizzato.
 - **kiwi-modules**: i moduli OpenCloud, Immich e Paperless-ngx sono
-  contrassegnati come «da provare». Un server TURN per le chiamate aspetta di
-  essere unito.
+  contrassegnati come «da provare». Un server TURN per le chiamate è ancora in
+  attesa di merge.
 - **kiwi-stack**: non esiste un modo per tornare indietro (rollback). Puoi
   soltanto ripristinare i dati e applicare di nuovo un bundle più vecchio.
-- **kiwi-framework**: mancano ancora diverse parti: il blog, le approvazioni
-  della moderazione, la possibilità di seguire spazi che un hub non include e
-  i firmatari NIP-07/NIP-46.
+- **kiwi-framework**: diverse parti devono ancora arrivare, cioè il blog, le
+  approvazioni della moderazione, la possibilità di seguire spazi che un hub
+  non include e i signer NIP-07/NIP-46.
 - **kiwi-updater**: è previsto un registro online dei cataloghi affidabili. I
   tag di release delle altre app non sono ancora firmati. Per questo la parte
   di kiwi-killswitch che gira come root chiede una password quando viene
@@ -82,7 +82,7 @@ Queste lacune sono indicate dagli stessi repository:
   capo all’altro con un account reale. Il modulo Mysterium è stato verificato
   il 7 novembre 2026.
 - **kiwi-custodia**: alcune parti devono ancora essere misurate su una
-  macchina reale: tun2socks in un gateway rootless e i compositor diversi da
+  macchina reale, cioè tun2socks in un gateway rootless e i compositor diversi da
   quello di GNOME.
 - **Licenze**: kiwi-icons, kiwi-catalog e mullvad-socks5 non hanno un file
   LICENSE, e kiwi-killswitch indica la sua licenza solo nel README e nel

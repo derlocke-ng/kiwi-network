@@ -27,8 +27,8 @@ Il progetto divide il software in cinque livelli.
 1. **kiwi-modules** contiene i moduli e il contratto di generazione, che
    stabilisce come viene generata la configurazione di una macchina.
    *Realizzato.*
-2. **kiwi-stack** è la parte che gira sulla macchina. Si parte con
-   `kiwi-stack apply`, che installa sulla macchina una configurazione
+2. **kiwi-stack** è la parte che gira sulla macchina. Il suo punto di
+   partenza è `kiwi-stack apply`, che installa sulla macchina una configurazione
    generata. *Realizzato.*
 3. **Il nucleo di kiwi-server** si occupa di fleet, host, sistemi di
    destinazione, ISO, CA, registrazione dei dispositivi e `apply`. Come oggi,
@@ -84,8 +84,8 @@ riceve il suo ruolo al primo avvio.
 ## Federazione e multi-hop { #federation-and-multi-hop }
 
 La federazione collega tra loro Kiwi Network separate. Reti che si fidano
-ciascuna della CA dell’altra e si delegano a vicenda dei nomi diventano l’una
-client dell’altra. Un master ha tre modalità di uscita, che stabiliscono come
+reciprocamente delle proprie CA e si delegano a vicenda dei nomi diventano
+client l’una dell’altra. Un master ha tre modalità di uscita, che stabiliscono come
 il suo traffico arriva a Internet. Con la terza, il master di una rete manda
 il proprio traffico Internet attraverso il master di un’altra rete. Questo si
 chiama **multi-hop**, e il secondo master vede soltanto il primo. Chi gestisce
@@ -98,8 +98,8 @@ L’orchard (“frutteto” in inglese) è il servizio previsto per chi gestisce
 master per conto di altre persone. Sarà un’app separata oppure un plugin di
 kiwi-server. Crea VPS tramite le API dei provider di hosting e consegna a ogni
 master la sua installazione e un token di registrazione. Raccoglie da ogni
-master un heartbeat, cioè un rapporto di stato periodico (versione, salute,
-disco, ultimo aggiornamento). Distribuisce gli aggiornamenti spostando il tag
+master un heartbeat, cioè un rapporto di stato periodico (versione, stato di
+salute, disco, ultimo aggiornamento). Distribuisce gli aggiornamenti spostando il tag
 dell’immagine di ciascun canale di aggiornamento.
 
 L’orchard non può accedere a un master, leggere una fleet o modificare un

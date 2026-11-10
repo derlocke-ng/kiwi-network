@@ -70,7 +70,7 @@ on https://yourhost:40123  (also https://localhost:40123)
 
 `select-server` mostra un menu numerato con tutti gli alias `Host` concreti del
 tuo `~/.ssh/config`, cioè tutti gli alias che non sono pattern con caratteri
-jolly. Ne scegli uno e si collega a quell’host. Per filtrare il menu, assegna
+jolly. Ne scegli uno, e select-server si collega a quell’host. Per filtrare il menu, assegna
 dei tag ai tuoi host: aggiungi un commento come `# tags: work prod` dentro il
 blocco `Host` e passa un tag sulla riga di comando:
 
@@ -83,7 +83,7 @@ $ select-server -f other.conf   # un altro file di configurazione
 ## `tethering`: impostare il TTL per i dispositivi in tethering { #tethering-the-ttl-fix }
 
 `tethering` serve quando altri dispositivi usano la connessione a Internet di
-questa macchina, cioè quando fai tethering. Alcuni operatori contano i salti di
+questa macchina, cioè quando fai tethering. Alcuni operatori telefonici contano i salti di
 rete del traffico, e in questo modo distinguono i dispositivi collegati in
 tethering dalla macchina stessa. `tethering` imposta il TTL a 64 su tutto il
 traffico che arriva da una certa interfaccia. Per l’operatore, il traffico dei

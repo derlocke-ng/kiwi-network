@@ -48,7 +48,7 @@ richieste.
   traffico può uscire soltanto attraverso il tunnel protetto. Se la VPN cade, se
   riavvii o se passi dal Wi-Fi al tethering, tutto resta bloccato finché non
   torna disponibile una strada consentita.
-- **Le nuove interfacce di rete vengono bloccate.** Se colleghi un tethering
+- **Le nuove interfacce di rete vengono bloccate.** Se attivi il tethering
   USB o accendi il Wi-Fi mentre il kill switch è armato, cioè attivo, la nuova
   interfaccia è bloccata per impostazione predefinita. Non viene lasciata
   passare solo perché nessuna regola la nomina.
@@ -83,7 +83,7 @@ richieste.
   switch non decide mai da solo che un gateway è fidato.
 - **Si può collegare una sola VPN.** È raggiungibile soltanto il server della
   connessione scelta. Qualsiasi altro tunnel tu avvii non riesce a collegarsi, e
-  l’interfaccia utente lo indica per nome.
+  l’interfaccia utente ne mostra il nome.
 - **Le regole restano al loro posto.** Ci sono ancora dopo un riavvio, dopo
   logout e login e dopo un riavvio di NetworkManager. Un’unità separata carica
   le regole di blocco *prima che la rete si attivi*.
@@ -143,7 +143,7 @@ proprio il daemon, cancella le sue tabelle del firewall con
 attraverso l’host, quindi il kill switch non la riguarda. In questo caso evita
 `paranoid`, perché quel livello filtra sulla scheda di rete fisica. Una VM in
 NAT fa passare il suo traffico attraverso l’host. Con `strict` quel traffico
-esce dal tunnel e viene bloccato quando il tunnel non è attivo. Aggiungi la
+esce attraverso il tunnel e viene bloccato quando il tunnel non è attivo. Aggiungi la
 sottorete della VM a `mgmt_subnets`, così le sue richieste DHCP e DNS
 raggiungono l’host. La tabella mostra che cosa consente ciascuna impostazione:
 
@@ -172,7 +172,7 @@ oppure `ip route get 1.1.1.1`.
   c’è alcun motivo di provocarlo.
 - Una VPN il cui server è indicato con un **nome host** non riesce a
   ricollegarsi mentre il kill switch è armato, a meno che il DNS non sia
-  impostato su *un resolver scelto da me*. Il motivo è che NetworkManager e
+  impostato su *a resolver I choose* (un resolver scelto da te). Il motivo è che NetworkManager e
   OpenVPN risolvono il nome attraverso il resolver di sistema, e il resolver di
   sistema è bloccato finché non c’è un tunnel attivo. Le connessioni il cui
   server è indicato con un indirizzo IP non hanno questo problema.
@@ -187,7 +187,7 @@ oppure `ip route get 1.1.1.1`.
   contro il fingerprinting del browser, contro WebRTC o contro un’app che manda
   dati al suo produttore attraverso il tunnel.
 - È uno strumento personale e non è stato sottoposto a una verifica
-  indipendente. `tests/run.sh` collauda il vero daemon con il vero nftables. Ogni
+  indipendente. `tests/run.sh` prova il daemon reale con un vero nftables. Ogni
   gruppo di test gira nel proprio namespace, e i test non hanno bisogno di root.
 - I suoi tag di release non sono ancora firmati. Con kiwi-updater 2.4, quindi,
   la sua metà root chiede la tua password quando viene aggiornata.

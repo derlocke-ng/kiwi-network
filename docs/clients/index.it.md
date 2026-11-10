@@ -16,7 +16,7 @@ cui hanno bisogno, e sull’host non cambia nient’altro.
 
 | App | Che cosa fa |
 |---|---|
-| [**kiwi-proxy**](kiwi-proxy.md) | Il motore su cui si basano le altre app. Un **exit** è una connessione a un upstream, salvata con un nome. L’upstream è il proxy a cui viene inviato il tuo traffico: un proxy SOCKS5 che ti è stato fornito, oppure uno creato da un modulo provider. Quando attivi un exit, kiwi-proxy crea per lui un **gateway**. Un gateway è un namespace di rete (uno stack di rete separato, con rotte e firewall propri) la cui unica rotta porta a quell’upstream. I programmi sull’host possono usare un exit attraverso una porta SOCKS5 locale |
+| [**kiwi-proxy**](kiwi-proxy.md) | Il motore su cui si basano le altre app. Un **exit** è una connessione a un upstream, salvata con un nome. L’upstream è il proxy a cui viene inviato il tuo traffico: un proxy SOCKS5 che ti è stato fornito, oppure uno creato da un modulo provider. Quando attivi un exit, kiwi-proxy crea un **gateway** dedicato. Un gateway è un namespace di rete (uno stack di rete separato, con rotte e firewall propri) la cui unica rotta porta a quell’upstream. I programmi sull’host possono usare un exit attraverso una porta SOCKS5 locale |
 | [**kiwi-custodia**](kiwi-custodia.md) | **Distribuzioni Linux in box che usano un exit.** Una box è un container rootless (cioè che gira senza permessi di root) con Fedora, Ubuntu, Debian, Kali, Arch, openSUSE, Rocky o Alpine e con una sua cartella home. *Tutto* il traffico di rete della box passa dall’exit, compreso quello dei gestori di pacchetti, dei giochi e dei programmi compilati staticamente che ignorano le impostazioni del proxy |
 | [**kiwi-fox**](kiwi-fox.md) | **Profili del browser che usano un exit.** Ogni profilo esegue Camoufox, Firefox o Tor Browser e ha un proprio archivio dei dati |
 | [**Moduli provider**](providers.md) | Moduli che creano exit attraverso Tor, una VPN (con gluetun), 9proxy o Mysterium. Tor e Mysterium sono un modo rapido per ottenere altri indirizzi IP, utile per i test |
@@ -48,8 +48,8 @@ cui hanno bisogno, e sull’host non cambia nient’altro.
   rootless, che esegue i container con il tuo utente. La rete dell’host non
   viene modificata.
 - **Anche le query DNS passano dall’exit.** Per impostazione predefinita i nomi
-  vengono risolti con DNS over HTTPS (DoH) attraverso l’exit, e le liste di
-  domini pubblicitari vengono bloccate. Per risolvere i **nomi host interni** di
+  vengono risolti con DNS over HTTPS (DoH) attraverso l’exit, e i domini
+  pubblicitari presenti nelle liste di blocco vengono bloccati. Per risolvere i **nomi host interni** di
   un cliente usa invece `--dns remote`: i nomi vengono passati dalla parte del
   cliente e risolti lì. Anche Tor e i nomi `.onion` hanno bisogno di questa
   modalità.

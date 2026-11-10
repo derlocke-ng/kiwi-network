@@ -3,15 +3,15 @@
 kiwi-fox te da un navegador separado para cada red de cliente en la que
 trabajas y para cada cuenta que gestionas. Un perfil del navegador para un
 cliente llega a las consolas web de ese cliente a través de su conexión y no
-tiene ninguna otra salida. Para eso no necesitas ninguna conexión VPN en el
+puede salir por ningún otro camino. Para eso no necesitas ninguna conexión VPN en el
 host.
 
 Cada perfil es una identidad permanente. Tiene su propio almacenamiento,
 ejecuta uno de tres navegadores en un contenedor de Podman rootless (un
 contenedor que se ejecuta con tu propio usuario y sin permisos de root) y
 normalmente usa un exit de [kiwi-proxy](kiwi-proxy.md). Un exit es una conexión
-a un upstream, guardada con un nombre y con su propio contenedor, como el proxy
-SOCKS5 de un cliente. Para cada exit, kiwi-proxy arranca un contenedor
+guardada con un nombre y con su propio contenedor, que va a un upstream (el
+proxy al que se envía tu tráfico), como el proxy SOCKS5 de un cliente. Para cada exit, kiwi-proxy arranca un contenedor
 gateway. La única ruta que sale del gateway lleva a ese upstream, y el gateway
 incluye un resolvedor DNS que bloquea los dominios publicitarios.
 

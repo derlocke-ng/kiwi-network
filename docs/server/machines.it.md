@@ -59,8 +59,8 @@ kiwi-server apply fleet.yaml papaya --ssh core@192.168.1.25 # la prima volta, pe
 Per prima cosa `apply` genera di nuovo la configurazione dell’host, cioè
 ricrea i file dell’host a partire dal file fleet. Poi copia via SSH lo script
 del ruolo in `/var/lib/kiwi-server/role.sh`. Lo script del ruolo è lo script
-che prepara la macchina per il suo ruolo, e `apply` lo esegue come root. Dopo
-di che `apply` lega il disco ai suoi anelli Tang, cioè ai server che
+che prepara la macchina per il suo ruolo, e `apply` lo esegue come root. Dopodiché
+`apply` lega il disco ai suoi anelli Tang, cioè ai server che
 permettono a una macchina cifrata di sbloccare il disco all’avvio. Su un
 master salva inoltre lo stato di WireGuard insieme ai segreti della fleet. Su
 una macchina Debian cifrata, il primo `apply` sostituisce la chiave monouso
@@ -75,7 +75,7 @@ indirizzi la cui chiave host è già registrata.
 
 Per un ruolo costruito con i moduli, lo script del ruolo passa lo stack a
 `kiwi-stack`. Lo stack è l’insieme dei container che la macchina esegue per i
-suoi moduli. `kiwi-stack` procede poi in questi passaggi:
+suoi moduli. `kiwi-stack` esegue poi questi passaggi:
 
 1. Installa o attiva podman 4.4+ o docker, e si assicura che l’utente dei
    servizi esista. Su Debian, podman viene installato insieme a `netavark`,
@@ -119,7 +119,7 @@ Per eseguire di nuovo lo script a mano, usa
 Le macchine installano di continuo gli aggiornamenti del sistema operativo. Il
 **riavvio** che li rende effettivi avviene però solo all’interno della
 finestra di manutenzione che imposti con `updates.days`, `time` e
-`length_minutes`, nell’ora locale.
+`length_minutes`, secondo l’ora locale.
 
 | Sistema di destinazione | Installa gli aggiornamenti | Si riavvia |
 |---|---|---|

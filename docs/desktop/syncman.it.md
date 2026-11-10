@@ -4,8 +4,8 @@ syncman tiene sincronizzate in entrambe le direzioni delle coppie di cartelle su
 una macchina Linux. In qualunque delle due cartelle compaia un file nuovo o
 modificato, il file viene copiato nell’altra. syncman è nato per i salvataggi
 dei giochi, ma funziona con qualsiasi cartella. **L’unica dipendenza è rsync**,
-e inotify-tools è facoltativo. syncman si installa e gira soltanto nel tuo
-ambito utente, cioè per il tuo account utente.
+e inotify-tools è facoltativo. syncman si installa e gira soltanto
+nell’ambito utente, cioè per il tuo account.
 
 - Repository: [derlocke-ng/syncman](https://github.com/derlocke-ng/syncman), GPL-3.0-or-later
 - Ultima release: **v0.4.1**. È nel [catalogo Kiwi](catalogs.md), ambito utente.

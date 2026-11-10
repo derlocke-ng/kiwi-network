@@ -18,7 +18,7 @@ ci aggiungi sopra tre cose.
    bisogno di root riceve anche una parte che appartiene a root. kiwi-updater
    aggiorna anche sé stesso.
 2. **[ensconce](ensconce.md)** configura un Bluefin-DX appena installato.
-   Descrivi la tua configurazione in semplici file di elenco, e ensconce la
+   Descrivi la tua configurazione in semplici file di elenco, ed ensconce la
    applica: pacchetti, Flatpak, estensioni di GNOME, sincronizzazione con
    Nextcloud, SSH, impostazioni di sysctl e del risparmio energetico, la
    schermata di accesso e le tue app Kiwi. Con `--export` scrive la
@@ -38,7 +38,7 @@ ci aggiungi sopra tre cose.
 In questa sezione trovi anche [kiwi-gen](kiwi-gen.md), un gestore di chiavi e
 certificati che gira nel browser e funziona offline.
 
-## Da un’installazione nuova { #from-a-fresh-install }
+## Da un’installazione pulita { #from-a-fresh-install }
 
 Questi comandi ti portano da un sistema appena installato a un desktop con le
 app Kiwi:
