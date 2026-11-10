@@ -1,75 +1,149 @@
-/*
-  Kiwi Network docs theme
-  Matches kiwi-blog defaults:
-  - content hue: 100
-  - header hue: 210
-*/
+/* Kiwi Network docs — the homepage's look on MkDocs Material.
+   One accent from the kiwi-network icon (kiwi-icons), a light header,
+   system fonts, nothing fetched from third parties. */
 
-:root {
-  --kiwi-content-hue: 100;
-  --kiwi-header-hue: 210;
-}
-
-/* Light */
-[data-md-color-scheme="default"] {
-  --md-default-fg-color: hsl(var(--kiwi-content-hue), 50%, 18%);
-  --md-default-fg-color--light: hsl(var(--kiwi-content-hue), 30%, 30%);
-  --md-default-bg-color: hsl(var(--kiwi-content-hue), 30%, 96%);
-  --md-default-bg-color--light: hsl(var(--kiwi-content-hue), 25%, 92%);
-
-  --md-primary-fg-color: hsl(var(--kiwi-header-hue), 25%, 25%);
-  --md-primary-fg-color--light: hsl(var(--kiwi-header-hue), 35%, 35%);
-  --md-primary-fg-color--dark: hsl(var(--kiwi-header-hue), 20%, 20%);
-  --md-primary-bg-color: hsl(var(--kiwi-header-hue), 15%, 88%);
-
-  --md-accent-fg-color: hsl(var(--kiwi-content-hue), 45%, 45%);
-  --md-accent-fg-color--transparent: hsla(var(--kiwi-content-hue), 45%, 45%, 0.12);
-
-  --md-typeset-a-color: hsl(var(--kiwi-content-hue), 60%, 38%);
-}
-
-/* Dark */
-[data-md-color-scheme="slate"] {
-  --md-default-fg-color: hsl(var(--kiwi-content-hue), 30%, 90%);
-  --md-default-fg-color--light: hsl(var(--kiwi-content-hue), 20%, 75%);
-  /* Dark background: neutral/blue-gray (less green cast) */
-  --md-default-bg-color: hsl(var(--kiwi-header-hue), 18%, 9%);
-  --md-default-bg-color--light: hsl(var(--kiwi-header-hue), 16%, 13%);
-
-  --md-primary-fg-color: hsl(var(--kiwi-header-hue), 25%, 18%);
-  --md-primary-fg-color--light: hsl(var(--kiwi-header-hue), 30%, 22%);
-  --md-primary-fg-color--dark: hsl(var(--kiwi-header-hue), 20%, 14%);
-  --md-primary-bg-color: hsl(var(--kiwi-header-hue), 15%, 92%);
-
-  --md-accent-fg-color: hsl(var(--kiwi-content-hue), 55%, 65%);
-  --md-accent-fg-color--transparent: hsla(var(--kiwi-content-hue), 55%, 65%, 0.12);
-
-  --md-typeset-a-color: hsl(var(--kiwi-content-hue), 60%, 70%);
-}
-
-/* Small alignment with kiwi-blog look */
-.md-header {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
-}
-
-.md-typeset code {
-  border-radius: 0.25rem;
-}
-
-/* No web fonts (theme.font: false): a system stack, nothing fetched from a third party */
 :root {
   --md-text-font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
   --md-code-font-family: ui-monospace, "SFMono-Regular", "JetBrains Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace;
+  --kiwi-radius: 12px;
 }
 
-.md-tabs {
-  background-color: var(--md-primary-fg-color--dark);
+/* ---------- light ---------- */
+[data-md-color-scheme="default"] {
+  --md-default-bg-color: #fcfbfe;
+  --md-default-fg-color: #1d1a29;
+  --md-default-fg-color--light: #5d596c;
+  --md-default-fg-color--lighter: #9b96ab;
+  --md-default-fg-color--lightest: #e7e3f0;
+
+  --md-primary-fg-color: #f7f6fb;          /* header background */
+  --md-primary-fg-color--light: #efedf6;
+  --md-primary-fg-color--dark: #efedf6;
+  --md-primary-bg-color: #1d1a29;          /* header text */
+  --md-primary-bg-color--light: #5d596c;
+
+  --md-accent-fg-color: #6f57ab;
+  --md-accent-fg-color--transparent: rgba(111, 87, 171, .10);
+  --md-typeset-a-color: #5b4590;
+
+  --md-code-bg-color: #f3f1f9;
+  --md-code-fg-color: #2a2438;
+  --kiwi-surface: #ffffff;
+  --kiwi-border: #e1ddec;
+  --kiwi-soft: rgba(111, 87, 171, .08);
+  --kiwi-button: #5b4590;
+  --kiwi-button-hover: #37275b;
 }
 
+/* ---------- dark ---------- */
+[data-md-color-scheme="slate"] {
+  --md-hue: 260;
+  --md-default-bg-color: #121019;
+  --md-default-fg-color: #ece9f5;
+  --md-default-fg-color--light: #aaa4bb;
+  --md-default-fg-color--lighter: #7b7590;
+  --md-default-fg-color--lightest: #2a2638;
+
+  --md-primary-fg-color: #17141f;
+  --md-primary-fg-color--light: #1c1926;
+  --md-primary-fg-color--dark: #1c1926;
+  --md-primary-bg-color: #ece9f5;
+  --md-primary-bg-color--light: #aaa4bb;
+
+  --md-accent-fg-color: #c4abff;
+  --md-accent-fg-color--transparent: rgba(196, 171, 255, .12);
+  --md-typeset-a-color: #c4abff;
+
+  --md-code-bg-color: #1c1926;
+  --md-code-fg-color: #e4dff2;
+  --kiwi-surface: #1c1926;
+  --kiwi-border: #312c41;
+  --kiwi-soft: rgba(196, 171, 255, .08);
+  --kiwi-button: #6f57ab;
+  --kiwi-button-hover: #5b4590;
+}
+
+/* ---------- header, tabs, search ---------- */
+.md-header { box-shadow: none; border-bottom: 1px solid var(--kiwi-border); }
+.md-header[data-md-state="shadow"], .md-header--shadow { box-shadow: none; }
+.md-header__button.md-logo img, .md-header__button.md-logo svg { height: 1.7rem; width: auto; }
+.md-header__title { font-weight: 700; }
+.md-tabs { background-color: var(--md-primary-fg-color); border-bottom: 1px solid var(--kiwi-border); color: var(--md-default-fg-color--light); }
+.md-tabs__link { opacity: 1; font-weight: 550; }
+.md-tabs__link--active, .md-tabs__item--active .md-tabs__link { color: var(--md-typeset-a-color); }
+.md-search__form { background-color: var(--kiwi-soft); border: 1px solid var(--kiwi-border); border-radius: 10px; }
+.md-search__form:hover { background-color: var(--md-accent-fg-color--transparent); }
+.md-search__input { color: var(--md-default-fg-color); }
+.md-search__input::placeholder { color: var(--md-default-fg-color--light); }
+.md-search__icon { color: var(--md-default-fg-color--light); }
+.md-source { color: var(--md-default-fg-color--light); }
+.md-select:hover .md-select__inner, .md-select:focus-within .md-select__inner { max-height: 20rem; }
+.md-select__list { max-height: 20rem; }
+.md-select__link:hover, .md-select__link:focus { color: var(--md-typeset-a-color); }
+
+/* ---------- navigation ---------- */
+.md-nav__title { font-weight: 700; }
+.md-nav__item--section > .md-nav__link { text-transform: uppercase; letter-spacing: .07em; font-size: .62rem; font-weight: 750; color: var(--md-default-fg-color--light); }
+.md-nav__link--active, .md-nav__link--active code { color: var(--md-typeset-a-color); font-weight: 650; }
+.md-nav__link:hover { color: var(--md-accent-fg-color); }
+
+/* ---------- typography ---------- */
+.md-typeset { font-size: .82rem; line-height: 1.7; }
+.md-typeset h1 { font-weight: 780; letter-spacing: -.02em; color: var(--md-default-fg-color); margin-bottom: 1rem; }
+.md-typeset h2 { font-weight: 720; letter-spacing: -.01em; margin-top: 2.2em; padding-top: .9em; border-top: 1px solid var(--kiwi-border); }
+.md-typeset h3 { font-weight: 680; }
+.md-typeset a { text-underline-offset: 2px; }
+.md-typeset hr { border-bottom-color: var(--kiwi-border); }
+
+/* ---------- code ---------- */
+.md-typeset code { border-radius: 6px; padding: .1em .35em; }
+.md-typeset pre > code { border-radius: var(--kiwi-radius); padding: .9em 1.1em; }
+.md-typeset .highlight, .md-typeset pre { border-radius: var(--kiwi-radius); }
+.md-typeset pre { border: 1px solid var(--kiwi-border); }
+
+/* ---------- tables ---------- */
 .md-typeset table:not([class]) {
-  font-size: 0.72rem;
+  font-size: .74rem; border: 1px solid var(--kiwi-border); border-radius: var(--kiwi-radius);
+  overflow: hidden; box-shadow: none; background: var(--kiwi-surface);
+}
+.md-typeset table:not([class]) th {
+  background: var(--kiwi-soft); color: var(--md-default-fg-color); font-weight: 700;
+  white-space: nowrap; border-bottom: 1px solid var(--kiwi-border);
+}
+.md-typeset table:not([class]) td { border-top: 1px solid var(--kiwi-border); vertical-align: top; }
+.md-typeset table:not([class]) tr:hover { background: transparent; box-shadow: none; }
+
+/* ---------- admonitions ---------- */
+.md-typeset .admonition, .md-typeset details {
+  border-radius: var(--kiwi-radius); border-width: 1px; border-left-width: 4px;
+  box-shadow: none; font-size: .78rem;
 }
 
-.md-typeset table:not([class]) th {
-  white-space: nowrap;
+/* ---------- landing page ---------- */
+.kiwi-hero { text-align: center; padding: 1.2rem 0 .6rem; }
+.kiwi-hero img { width: 96px; height: 96px; filter: drop-shadow(0 8px 22px rgba(91, 69, 144, .28)); }
+.kiwi-hero .kiwi-motto { margin: .6rem 0 .2rem; color: var(--md-typeset-a-color); font-style: italic; }
+.md-typeset .kiwi-hero h1 { font-size: 2.3em; margin: .2rem 0 .6rem; }
+.kiwi-hero .kiwi-lede { max-width: 34em; margin: 0 auto 1.2rem; color: var(--md-default-fg-color--light); font-size: 1.05em; }
+.kiwi-hero .md-button { margin: .2rem .3rem; border-radius: 10px; }
+
+/* buttons: Material paints them with the primary (header) colour, which is light here */
+.md-typeset .md-button { color: var(--md-typeset-a-color); border-color: var(--kiwi-border); background: var(--kiwi-surface); }
+.md-typeset .md-button:hover, .md-typeset .md-button:focus { color: var(--md-typeset-a-color); border-color: var(--md-accent-fg-color); background: var(--kiwi-soft); }
+.md-typeset .md-button--primary { color: #fff; background: var(--kiwi-button); border-color: var(--kiwi-button); }
+.md-typeset .md-button--primary:hover, .md-typeset .md-button--primary:focus { color: #fff; background: var(--kiwi-button-hover); border-color: var(--kiwi-button-hover); }
+
+.kiwi-cards { display: grid; gap: .8rem; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); margin: 1.4rem 0; }
+.md-typeset .kiwi-cards > a {
+  display: block; padding: 1rem 1.1rem; border: 1px solid var(--kiwi-border); border-radius: var(--kiwi-radius);
+  background: var(--kiwi-surface); color: var(--md-default-fg-color); text-decoration: none;
+  transition: border-color .15s, transform .15s;
 }
+.md-typeset .kiwi-cards > a:hover { border-color: var(--md-accent-fg-color); transform: translateY(-2px); }
+.kiwi-cards strong { display: block; font-size: 1.02em; margin-bottom: .25rem; }
+.kiwi-cards span { color: var(--md-default-fg-color--light); font-size: .92em; line-height: 1.55; display: block; }
+.kiwi-cards em { display: block; font-style: normal; margin-top: .5rem; color: var(--md-typeset-a-color); font-weight: 650; font-size: .9em; }
+@media (prefers-reduced-motion: reduce) { .md-typeset .kiwi-cards > a, .md-typeset .kiwi-cards > a:hover { transition: none; transform: none; } }
+
+/* icons page */
+.kiwi-icons-row p { display: flex; flex-wrap: wrap; gap: .6rem; }
