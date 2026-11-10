@@ -2,9 +2,9 @@
 
 Un Kiwi Network réunit vos machines dans un seul réseau privé, où qu’elles se
 trouvent : serveurs chez vous ou au bureau, ordinateurs portables, téléphones,
-et même des réseaux domestiques entiers derrière leur routeur. Les machines se
-joignent entre elles comme si elles étaient branchées sur le même réseau local,
-et une seule d’entre elles doit être accessible depuis Internet. Cette page
+et même des réseaux domestiques entiers derrière leur routeur. Les machines
+communiquent entre elles comme si elles étaient branchées sur le même réseau
+local, et une seule d’entre elles doit être accessible depuis Internet. Cette page
 explique comment ce réseau est construit et à quoi sert chacun de ses éléments.
 
 Ce réseau privé est un **mesh WireGuard**. WireGuard est le logiciel VPN qui
@@ -177,7 +177,7 @@ par lequel le trafic du mesh rejoint Internet. Cette sortie a trois modes :
 |---|---|---|
 | **provider** | Par un fournisseur VPN commercial (gluetun). C’est le double saut, et c’est ce que met en place le preset du master. | réalisé |
 | **direct** | Directement par la connexion Internet du master. Pour obtenir ce mode, indiquez la liste des modules du master sans `vpn-client`. | réalisé |
-| **master** | Par *le master d’un autre réseau*. Votre master y est client, dans un groupe qui peut accéder à Internet et à rien d’autre. C’est ce qu’on appelle le multi-saut (multi-hop). | conçu ; il faut pour cela pouvoir ajouter une machine au réseau de quelqu’un d’autre, c’est-à-dire la fédération |
+| **master** | Par *le master d’un autre réseau*. Votre master y est client, dans un groupe qui peut accéder à Internet et à rien d’autre. C’est ce qu’on appelle le multi-saut (multi-hop). | conçu ; il faut pour cela pouvoir ajouter une machine d’un réseau à un autre réseau, c’est-à-dire la fédération |
 
 Quel que soit son mode de sortie, chaque master met aussi le proxy SOCKS5 de
 Tor à la disposition du mesh.

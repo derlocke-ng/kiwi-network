@@ -68,7 +68,7 @@ avertissement, parce que les routeurs y répondent eux-mêmes, et les TLD public
 en déclenchent un aussi.
 
 Les noms situés *en dehors* du domaine de votre réseau, dont vous avez besoin
-pour un hub ou un relais public, obtiennent des certificats Let's Encrypt si le
+pour un hub ou un relais public, obtiennent des certificats Let’s Encrypt si le
 reverse proxy du master est public.
 
 ## Les proxys SOCKS5 de Mullvad par leur nom { #mullvad-socks5-proxies-by-name }
@@ -112,7 +112,7 @@ vaut rien pour tout autre nom. C’est important, car toutes les machines font
 confiance à la CA.
 
 ```bash
-kiwi-server ca fleet.yaml        # afficher la CA de la fleet
+kiwi-server ca fleet.yaml        # afficher la CA du réseau
 ```
 
 Importez `kiwiCA.pem` sur vos propres appareils (navigateurs, téléphones) pour

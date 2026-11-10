@@ -99,23 +99,23 @@ plugins:
         nav_translations:
           Home: Accueil
           Network: Réseau
-          How it works: Comment ça marche
+          How it works: Comment fonctionne le réseau
           DNS, names & certificates: DNS, noms et certificats
           Routers: Routeurs
-          Overview: Vue d'ensemble
+          Overview: Vue d’ensemble
           The fleet file: Le fichier fleet
           Roles: Rôles
           Operations: Exploitation
-          Roadmap: Où cela va
-          One machine without a fleet: Une machine sans fleet
+          Roadmap: Feuille de route
+          One machine without a fleet: Une machine sans fichier fleet
           Hubs, not platforms: Des hubs, pas des plateformes
-          The framework's apps: Les apps du framework
+          The framework's apps: Les applications du framework
           Armory, a distribution: Armory, une distribution
           Running your own hub: Héberger votre propre hub
-          Desktop: Bureau
+          Desktop: Poste de travail
           Catalogs & publishing: Catalogues et publication
-          Client networks: Réseaux clients
-          Provider modules: Modules de fournisseurs
+          Client networks: Réseaux de clients
+          Provider modules: Modules fournisseurs
           Project: Projet
           Repositories & status: Dépôts et état
           Icons & colours: Icônes et couleurs

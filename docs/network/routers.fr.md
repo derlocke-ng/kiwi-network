@@ -67,15 +67,17 @@ si vous relancez le script, il remplace donc ce qu’il avait écrit auparavant.
 
 Fritz!OS dispose d’un client WireGuard et de routes statiques, mais il ne sait
 pas transmettre les requêtes DNS d’un seul domaine. C’est donc un node qui doit
-se charger de la règle DNS :
+se charger de la règle DNS. Les menus sont indiqués ci-dessous avec les
+libellés de l’interface anglaise de Fritz!OS :
 
-1. **Tunnel :** ouvrez Internet → Autorisations → VPN (WireGuard) → Ajouter une
-   connexion, choisissez de vous connecter à un autre service WireGuard, puis
-   importez la configuration délivrée par le master. C’est la ligne
+1. **Tunnel :** ouvrez Internet → Permit Access → VPN (WireGuard) → Add
+   Connection, choisissez de vous connecter à un autre service WireGuard
+   (« connect to another WireGuard service »), puis importez la configuration
+   délivrée par le master. C’est la ligne
    `AllowedIPs` de cette configuration qui décide si le tunnel est split ou
    full.
-2. **Ou une route statique :** ouvrez Réseau domestique → Réseau → Paramètres
-   réseau → Routes IPv4. Saisissez `10.8.0.0` comme destination, `255.255.0.0`
+2. **Ou une route statique :** ouvrez Home Network → Network → Network
+   Settings → IPv4 Routes. Saisissez `10.8.0.0` comme destination, `255.255.0.0`
    comme masque de sous-réseau et l’adresse LAN du node passerelle comme
    passerelle.
 3. **DNS :** faites en sorte que le LAN utilise un Pi-hole comme serveur DNS.
@@ -94,6 +96,6 @@ routeur une configuration de client WireGuard, soit vous ajoutez une route
 statique pour `10.8.0.0/16` qui pointe vers l’adresse LAN du node passerelle.
 Ensuite, faites en sorte que le LAN utilise comme serveur DNS un Pi-hole qui
 connaît votre réseau. Tout node qui fait tourner le module `dns` en est un. Les
-routeurs fondés sur dnsmasq (DD-WRT, Tomato, le forwarder de pfSense)
+routeurs fondés sur dnsmasq (DD-WRT, Tomato, le redirecteur DNS de pfSense)
 acceptent aussi la règle de transmission, qui tient en une ligne :
 `server=/home/10.8.0.1`.
