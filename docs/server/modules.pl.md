@@ -6,8 +6,8 @@ zapasowa co noc. Za pomocą modułów decydujesz, co robi każda maszyna.
 [Rola](roles.md) przynosi ze sobą zestaw modułów, a ten zestaw możesz zmienić
 w pliku fleet.
 
-Moduły jednego hosta zamienia w **stack** program generujący konfigurację.
-Stack to wszystko, czego maszyna potrzebuje do uruchomienia tych usług. Tym
+Program generujący konfigurację zamienia moduły jednego hosta w **stack**,
+czyli wszystko, czego maszyna potrzebuje do uruchomienia tych usług. Tym
 programem jest [kiwi-modules](https://github.com/derlocke-ng/kiwi-modules),
 a jego kopia jest dołączona do kiwi-server. Stack składa się z pliku compose,
 **podman quadlets** (po jednej jednostce systemd na kontener), plików
@@ -32,10 +32,10 @@ internetu.
 | Moduł | Co to jest | Działa na | Wymaga | Na hoście |
 |---|---|---|---|---|
 | `vpn-server` | **wg-easy**, serwer WireGuard, z którym łączy się każdy klient i każdy node. Jego trasa domyślna prowadzi do klienta VPN, więc ruch do internetu idzie dalej przez komercyjny VPN mastera (podwójny przeskok, double hop) | master | nic | `51820/udp` oraz interfejs WWW na `127.0.0.1:51821` |
-| `vpn-client` | **gluetun**, tunel VPN, przez który idzie ruch maszyny. Na nodzie tunel prowadzi do mastera, a na masterze do komercyjnego VPN | oba | nic | nic |
-| `dns` | **Pi-hole 6**, serwer DNS blokujący reklamy w sieci mesh albo w sieci lokalnej. Odpowiada na nazwy z twojej sieci i może też podawać nazwy proxy SOCKS5 Mullvada | oba | nic | `53` na nodzie |
-| `tor` | Proxy **Tor SOCKS5** dla klientów w sieci mesh. Korzysta tylko z węzłów Tora w wybranych przez ciebie krajach | oba | nic | `127.0.0.1:9050` na nodzie, a na masterze adres w sieci mesh `:9050` |
-| `reverse-proxy` | **nginx** z TLS. Ma po jednym bloku server na usługę, więc każda usługa jest dostępna pod własną nazwą. Strony administracyjne są dostępne tylko z sieci mesh. Opcjonalnie dochodzą publiczne nazwy z certyfikatami Let’s Encrypt | oba | nic | `80`, `443` na nodzie albo na masterze z włączonym `public` |
+| `vpn-client` | **gluetun**, tunel VPN, przez który idzie ruch maszyny. Na nodzie tunel prowadzi do mastera, a na masterze do komercyjnego VPN | obu | nic | nic |
+| `dns` | **Pi-hole 6**, serwer DNS blokujący reklamy w sieci mesh albo w sieci lokalnej. Odpowiada na nazwy z twojej sieci i może też podawać nazwy proxy SOCKS5 Mullvada | obu | nic | `53` na nodzie |
+| `tor` | Proxy **Tor SOCKS5** dla klientów w sieci mesh. Korzysta tylko z węzłów Tora w wybranych przez ciebie krajach | obu | nic | `127.0.0.1:9050` na nodzie, a na masterze adres w sieci mesh `:9050` |
+| `reverse-proxy` | **nginx** z TLS. Ma po jednym bloku server na usługę, więc każda usługa jest dostępna pod własną nazwą. Strony administracyjne są dostępne tylko z sieci mesh. Opcjonalnie dochodzą publiczne nazwy z certyfikatami Let’s Encrypt | obu | nic | `80`, `443` na nodzie albo na masterze z włączonym `public` |
 | `gateway` | Routing według reguł (policy routing) na hoście. Urządzenia w sieci lokalnej, które mają tę maszynę ustawioną jako bramę, wysyłają ruch do internetu przez VPN | node | vpn-client | jednostka systemd na hoście |
 | `dhcp-relay` | Przekazuje zapytania DHCP z sieci lokalnej do Pi-hole’a, dzięki czemu Pi-hole może być serwerem DHCP tej sieci | node | dns | `67/udp` |
 
@@ -47,7 +47,7 @@ internetu.
 | `vault` | **Vaultwarden**, menedżer haseł zgodny z Bitwarden | node | vpn-client, reverse-proxy |
 | `downloader` | **Transmission** i **JDownloader**. Oba działają w sieciowej przestrzeni nazw klienta VPN, czyli korzystają z jego połączenia sieciowego i nie mają własnego. Gdy tunel nie działa, niczego nie przesyłają | node | vpn-client |
 | `sftp` | Serwer SFTP na osobnym porcie (`2224`), z którego pobierzesz ściągnięte pliki | node | nic |
-| `portainer` | **Portainer CE**, interfejs WWW do zarządzania kontenerami. Jest dostępny pod `127.0.0.1:9443` i pod `portainer.<host>` | oba | nic |
+| `portainer` | **Portainer CE**, interfejs WWW do zarządzania kontenerami. Jest dostępny pod `127.0.0.1:9443` i pod `portainer.<host>` | obu | nic |
 | `opencloud` | **OpenCloud**, do plików i ich udostępniania, w postaci jednego pliku binarnego Go (do wypróbowania) | node | vpn-client, reverse-proxy |
 | `immich` | **Immich**, do zdjęć i filmów (do wypróbowania) | node | vpn-client, reverse-proxy |
 | `paperless` | **Paperless-ngx**, do zeskanowanych dokumentów, z OCR i wyszukiwaniem pełnotekstowym (do wypróbowania) | node | vpn-client, reverse-proxy |
@@ -71,11 +71,11 @@ Zobacz [Własny hub](../people/hubs.md).
 
 | Moduł | Co to jest | Działa na | Wymaga |
 |---|---|---|---|
-| `backup` | Robi kopię zapasową danych tej maszyny programem **restic**, w postaci zaszyfrowanej, na node’a z modułem backup-server. Kopia powstaje co noc o `03:00` lub do 15 minut później oraz za każdym razem, gdy uruchomisz `kiwi-stack backup`. Każdy moduł sam określa, które jego dane trafiają do kopii. Na następne wydanie zaplanowano kopie zapasowe na kilku serwerach i odbudowaną maszynę, która sama przywraca swoje dane ([szczegóły](operations.md#coming-in-the-next-release)) | oba | nic |
+| `backup` | Robi kopię zapasową danych tej maszyny programem **restic**, w postaci zaszyfrowanej, na node’a z modułem backup-server. Kopia powstaje co noc o `03:00` lub do 15 minut później oraz za każdym razem, gdy uruchomisz `kiwi-stack backup`. Każdy moduł sam określa, które jego dane trafiają do kopii. Na następne wydanie zaplanowano kopie zapasowe na kilku serwerach i odbudowaną maszynę, która sama przywraca swoje dane ([szczegóły](operations.md#coming-in-the-next-release)) | obu | nic |
 | `backup-server` | **Serwer REST restic**, który przechowuje kopie zapasowe. Każda maszyna ma dostęp tylko do własnego repozytorium i może tylko do niego dopisywać (append-only) | node | vpn-client, reverse-proxy |
 | `tang` | Serwery **Tang**, dzięki którym maszyny z zaszyfrowanymi dyskami mogą je odblokować przy starcie bez udziału człowieka. Jeden pierścień to jeden serwer Tang z własnymi kluczami. Domyślnie jest jeden pierścień o nazwie `infra` na porcie `7500` | node | nic |
 
-Zobacz [Eksploatacja](operations.md).
+Więcej na stronie [Eksploatacja](operations.md).
 
 ## Najważniejsze ustawienia { #important-settings }
 

@@ -1,9 +1,8 @@
 # kiwi-killswitch
 
 kiwi-killswitch to **kill switch dla VPN** w GNOME na Fedorze Silverblue
-i Bluefinie. Kill switch pilnuje, żeby twój komputer nie wysłał żadnego ruchu
-poza VPN-em, np. gdy połączenie VPN zostanie zerwane albo gdy przechodzisz do
-innej sieci. Ten działa w trybie **fail-closed**: zapora sieciowa blokuje
+i Bluefinie. Kill switch pilnuje, żeby żaden ruch z twojego komputera nie ominął
+VPN-u, np. gdy połączenie VPN zostanie zerwane albo gdy zmieniasz sieć. Ten działa w trybie **fail-closed**: zapora sieciowa blokuje
 wszystko, na co wyraźnie nie zezwolono, więc gdy coś zawiedzie, ruch zostaje
 zablokowany, a nie przepuszczony.
 
@@ -41,10 +40,10 @@ użytkownika tylko wysyła do niego polecenia.
 - **Działa w trybie fail-closed.** Zapora stosuje `policy drop` dla ruchu
   wychodzącego, przychodzącego i przekazywanego, zarówno w IPv4, jak i w IPv6.
   Oznacza to, że każdy pakiet jest odrzucany, chyba że zezwala na niego jakaś
-  reguła. Nowy zestaw reguł zastępuje stary w jednym atomowym kroku. Ruch może
-  wyjść tylko przez chroniony tunel. Jeśli VPN się rozłączy, jeśli uruchomisz
+  reguła. Nowy zestaw reguł zastępuje stary w jednym atomowym kroku. Ruch wychodzi
+  wyłącznie przez chroniony tunel. Jeśli VPN się rozłączy, jeśli uruchomisz
   komputer ponownie albo przełączysz się z Wi-Fi na tethering, wszystko
-  pozostaje zablokowane, dopóki znów nie będzie dozwolonej drogi.
+  pozostaje zablokowane, dopóki znów nie pojawi się dozwolona droga.
 - **Nowe interfejsy sieciowe są blokowane.** Jeśli podłączysz tethering przez
   USB albo włączysz Wi-Fi, gdy kill switch jest uzbrojony, czyli włączony, nowy
   interfejs jest domyślnie zablokowany. Nie zostaje dopuszczony tylko dlatego,
@@ -67,9 +66,8 @@ użytkownika tylko wysyła do niego polecenia.
   ustala adres serwera VPN. Używa do tego DNS-over-HTTPS, łączy się
   z przypiętym (stałym) adresem IP i weryfikuje certyfikat. Każdą odpowiedź
   zapamiętuje w pamięci podręcznej.
-- **Najpierw wybierasz połączenie, potem zatwierdzasz zmiany.** Zmiany są
-  przygotowywane, to znaczy zbierane i wchodzą w życie dopiero wtedy, gdy je
-  zatwierdzisz. Dzięki temu możesz przejść z ustawienia „domowy LAN +
+- **Najpierw wybierasz połączenie, potem zatwierdzasz zmiany.** Zmiany najpierw
+  tylko się zbierają i wchodzą w życie dopiero wtedy, gdy je zatwierdzisz. Dzięki temu możesz przejść z ustawienia „domowy LAN +
   kiwi-node” na „tethering + VPN”, *będąc już na tetheringu*. Zatwierdzenie
   wprowadza wtedy wszystkie zmiany w jednej atomowej transakcji, a kill switch
   ani na chwilę nie zostaje rozbrojony.
@@ -81,7 +79,7 @@ użytkownika tylko wysyła do niego polecenia.
   własną rękę.
 - **Połączyć się może tylko jeden VPN.** Dostępny jest wyłącznie serwer
   wybranego połączenia. Każdy inny tunel, który uruchomisz, nie nawiąże
-  połączenia, a interfejs użytkownika poda jego nazwę.
+  połączenia, a interfejs użytkownika pokazuje, który to tunel.
 - **Reguły zostają na miejscu.** Obowiązują nadal po ponownym uruchomieniu
   komputera, po wylogowaniu i zalogowaniu oraz po restarcie NetworkManagera.
   Osobna jednostka systemd wczytuje reguły blokujące, *zanim sieć zacznie
@@ -154,7 +152,7 @@ do hosta. Tabela pokazuje, na co pozwala każde ustawienie:
 
 **Sprawdzenie, czy działa.** Uzbrój kill switch, a potem wyłącz VPN poleceniem
 `nmcli connection down …`. Teraz `curl --max-time 5 ifconfig.me` musi
-**przekroczyć limit czasu**. Nie może pokazać twojego prawdziwego adresu IP.
+zakończyć się **przekroczeniem limitu czasu**. Nie może pokazać twojego prawdziwego adresu IP.
 Nie oceniaj wyniku na podstawie publicznych adresów IP, które widzisz. Żeby
 udowodnić, że ruch idzie przez tunel, uruchom `wg show <iface> transfer` albo
 `ip route get 1.1.1.1`.
@@ -165,14 +163,14 @@ udowodnić, że ruch idzie przez tunel, uruchom `wg show <iface> transfer` albo
   10, a łańcuchy kill switcha z priorytetem −10.
 - **Nie** uruchamiaj go razem z innym kill switchem, który ma własną tablicę
   odrzucającą ruch wychodzący.
-- Nie ruszaj `nftables.service`, jeśli z niej nie korzystasz. Zatrzymanie tej
+- Nie ruszaj usługi `nftables.service`, jeśli z niej nie korzystasz. Zatrzymanie tej
   usługi usuwa wszystkie tablice nftables. Demon wczytuje swoje reguły
   ponownie w ciągu kilku sekund, ale przez te kilka sekund reguł nie ma, a nie
   ma powodu do tego doprowadzać.
 - VPN, którego serwer jest podany jako **nazwa hosta**, nie może połączyć się
   ponownie, gdy kill switch jest uzbrojony, chyba że DNS jest ustawiony na
-  *a resolver I choose*, czyli na serwer DNS wybrany przez ciebie. Powód: NetworkManager i OpenVPN rozwiązują tę
-  nazwę przez systemowy serwer DNS, a ten jest zablokowany, dopóki nie działa
+  *a resolver I choose*, czyli na serwer DNS wybrany przez ciebie. Powód:
+  NetworkManager i OpenVPN rozwiązują tę nazwę przez systemowy serwer DNS, a ten jest zablokowany, dopóki nie działa
   żaden tunel. Nie dotyczy to połączeń, których serwer jest podany jako adres IP.
 - **Serwer DNS wybrany przez ciebie jest dostępny poza tunelem**, gdy tunel nie
   działa. Włącz dla niego DNS-over-TLS.

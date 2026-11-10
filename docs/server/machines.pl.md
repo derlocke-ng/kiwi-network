@@ -1,7 +1,7 @@
 # Maszyny: instalacja, konfiguracja, aktualizacje
 
-Ta strona prowadzi maszynę od wpisu w pliku fleet do działającego systemu,
-który sam się aktualizuje. kiwi-server buduje obraz instalacyjny, który
+Ta strona opisuje drogę maszyny od wpisu w pliku fleet do działającego
+systemu, który sam się aktualizuje. kiwi-server buduje obraz instalacyjny, który
 instaluje system operacyjny bez nikogo przy klawiaturze. Potem poleceniem
 `apply` konfiguruje maszynę przez SSH zgodnie z jej rolą. Od tej chwili
 maszyna sama instaluje aktualizacje i uruchamia się ponownie tylko w godzinach,
@@ -56,7 +56,7 @@ kiwi-server apply fleet.yaml papaya --ssh core@192.168.1.25 # za pierwszym razem
 
 Najpierw `apply` ponownie generuje konfigurację hosta, czyli tworzy jego pliki
 od nowa na podstawie pliku fleet. Potem kopiuje przez SSH skrypt roli hosta do
-`/var/lib/kiwi-server/role.sh`. Skrypt roli konfiguruje maszynę do jej roli,
+`/var/lib/kiwi-server/role.sh`. Ten skrypt przygotowuje maszynę do jej roli,
 a `apply` uruchamia go jako root. Następnie `apply` przypisuje dysk do
 pierścieni Tang, czyli serwerów, dzięki którym zaszyfrowana maszyna może
 odblokować dysk przy starcie. Na masterze zapisuje też stan WireGuard razem
@@ -80,9 +80,9 @@ Stack to wszystkie kontenery, które maszyna uruchamia dla swoich modułów.
    Pi-hole, aardvark-dns podmana zostaje przeniesiony na port 5533, a sam host
    rozwiązuje nazwy przez Pi-hole’a ze stacku. Dodaje też sieć mesh do sieci
    zaufanych w firewalld.
-3. Odrzuca stack wygenerowany z innym seedem. Seed to sekret, z którego
-   generowane są hasła całej sieci. W przeciwnym razie rozpakowuje stack do
-   `docker_dir`. Instaluje quadlets, czyli jednostki systemd dla kontenerów,
+3. Sprawdza seed, czyli sekret, z którego generowane są hasła całej sieci,
+   i odrzuca stack wygenerowany z innym seedem. Jeśli seed się zgadza,
+   rozpakowuje stack do `docker_dir`. Instaluje quadlets, czyli jednostki systemd dla kontenerów,
    w `/etc/containers/systemd`, oraz jednostki hosta. Usuwa też wszystko, co
    zainstalował moduł, którego nie ma już w stacku.
 4. Otwiera porty stacku w firewalld albo ufw, jeśli któraś z tych zapór jest
@@ -94,7 +94,8 @@ Stack to wszystkie kontenery, które maszyna uruchamia dla swoich modułów.
    nie powiódł.
 
 Jeśli ponownie zastosujesz tę samą wygenerowaną konfigurację, na maszynie nic
-się nie zmieni. Nowa konfiguracja zastępuje to, co się zmieniło. Pamiętaj
+się nie zmieni. Jeśli zastosujesz nową, zostanie zastąpione tylko to, co się
+zmieniło. Pamiętaj
 jednak, że każde `apply` restartuje wszystkie kontenery stacku, nawet jeśli nic
 się nie zmieniło.
 
