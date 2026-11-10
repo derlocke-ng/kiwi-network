@@ -22,7 +22,7 @@ Every repository, with its release and known gaps, is on the
 ```
 site/              the homepage: plain HTML, CSS and JS; no build step, no third-party requests
 site/icons/        app icons, copied from kiwi-icons
-docs/              the documentation (MkDocs Material)
+docs/              the documentation (MkDocs Material): page.md in English, page.de.md, page.fr.md … beside it
 mkdocs.yml         docs configuration (builds into build/docs)
 .github/workflows/pages.yml   builds the docs, puts site/ at / and the docs at /docs/, deploys to GitHub Pages
 ```
@@ -30,7 +30,7 @@ mkdocs.yml         docs configuration (builds into build/docs)
 Work on it locally:
 
 ```bash
-python -m pip install mkdocs-material
+python -m pip install mkdocs-material mkdocs-static-i18n
 mkdocs serve                 # docs at http://127.0.0.1:8000
 mkdocs build --strict        # what CI runs: fails on broken links and anchors
 
@@ -39,6 +39,13 @@ python -m http.server -d site 8080   # the homepage
 
 A push to `main` deploys both. Keep the docs true to the repositories they
 describe: what a tool does today, with planned work marked as planned.
+
+The docs are in the languages Armory and kiwi-framework speak: English,
+German, French, Spanish, Italian, Dutch, Polish and Portuguese. English is
+the source. A translation sits beside its page with the language as suffix
+(`modules.de.md`), keeps the English anchor on every heading
+(`## Tunnel-MTU { #tunnel-mtu }`) so links and the language switcher land on
+the same section, and a missing translation falls back to English.
 
 ## License
 

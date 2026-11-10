@@ -22,7 +22,6 @@ theme:
     - navigation.indexes
     - navigation.top
     - navigation.footer
-    - navigation.instant
     - navigation.tracking
     - search.suggest
     - search.highlight
@@ -53,6 +52,211 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/derlocke-ng/kiwi-network
       name: kiwi-network on GitHub
+
+plugins:
+  - search
+  - i18n:
+      docs_structure: suffix
+      fallback_to_default: true
+      reconfigure_material: true
+      reconfigure_search: true
+      languages:
+      - locale: en
+        default: true
+        name: English
+        build: true
+      - locale: de
+        name: Deutsch
+        build: true
+        nav_translations:
+          Home: Start
+          Network: Netzwerk
+          How it works: So funktioniert es
+          DNS, names & certificates: DNS, Namen & Zertifikate
+          Routers: Router
+          Overview: Überblick
+          The fleet file: Die Fleet-Datei
+          Roles: Rollen
+          Modules: Module
+          Machines: Maschinen
+          Operations: Betrieb
+          Where it is going: Wohin es geht
+          One machine without a fleet: Eine Maschine ohne Fleet
+          Hubs, not platforms: Hubs statt Plattformen
+          The framework's apps: Die Apps des Frameworks
+          Armory, a distribution: Armory, eine Distribution
+          Running your own hub: Einen eigenen Hub betreiben
+          Catalogs & publishing: Kataloge & Veröffentlichen
+          Client networks: Kundennetze
+          Provider modules: Provider-Module
+          Project: Projekt
+          Repositories & status: Repositories & Status
+          Icons & colours: Icons & Farben
+          Contributing: Mitmachen
+      - locale: fr
+        name: Français
+        build: true
+        nav_translations:
+          Home: Accueil
+          Network: Réseau
+          How it works: Comment ça marche
+          DNS, names & certificates: DNS, noms et certificats
+          Routers: Routeurs
+          Overview: Vue d'ensemble
+          The fleet file: Le fichier fleet
+          Roles: Rôles
+          Operations: Exploitation
+          Where it is going: Où cela va
+          One machine without a fleet: Une machine sans fleet
+          Hubs, not platforms: Des hubs, pas des plateformes
+          The framework's apps: Les apps du framework
+          Armory, a distribution: Armory, une distribution
+          Running your own hub: Héberger votre propre hub
+          Desktop: Bureau
+          Catalogs & publishing: Catalogues et publication
+          Client networks: Réseaux clients
+          Provider modules: Modules de fournisseurs
+          Project: Projet
+          Repositories & status: Dépôts et état
+          Icons & colours: Icônes et couleurs
+          Contributing: Contribuer
+      - locale: es
+        name: Español
+        build: true
+        nav_translations:
+          Home: Inicio
+          Network: Red
+          How it works: Cómo funciona
+          DNS, names & certificates: DNS, nombres y certificados
+          Overview: Visión general
+          The fleet file: El archivo fleet
+          Modules: Módulos
+          Machines: Máquinas
+          Operations: Operaciones
+          Where it is going: Hacia dónde va
+          One machine without a fleet: Una máquina sin fleet
+          Hubs, not platforms: Hubs, no plataformas
+          The framework's apps: Las apps del framework
+          Armory, a distribution: Armory, una distribución
+          Running your own hub: Tu propio hub
+          Desktop: Escritorio
+          Catalogs & publishing: Catálogos y publicación
+          Client networks: Redes de clientes
+          Provider modules: Módulos de proveedores
+          Project: Proyecto
+          Repositories & status: Repositorios y estado
+          Icons & colours: Iconos y colores
+          Contributing: Contribuir
+      - locale: it
+        name: Italiano
+        build: true
+        nav_translations:
+          Network: Rete
+          How it works: Come funziona
+          DNS, names & certificates: DNS, nomi e certificati
+          Routers: Router
+          Overview: Panoramica
+          The fleet file: Il file fleet
+          Roles: Ruoli
+          Modules: Moduli
+          Machines: Macchine
+          Operations: Operazioni
+          Where it is going: Dove sta andando
+          One machine without a fleet: Una macchina senza fleet
+          Hubs: Hub
+          Hubs, not platforms: Hub, non piattaforme
+          The framework's apps: Le app del framework
+          Armory, a distribution: Armory, una distribuzione
+          Running your own hub: Gestire un proprio hub
+          Catalogs & publishing: Cataloghi e pubblicazione
+          Client networks: Reti dei clienti
+          Provider modules: Moduli dei provider
+          Project: Progetto
+          Repositories & status: Repository e stato
+          Icons & colours: Icone e colori
+          Contributing: Contribuire
+      - locale: nl
+        name: Nederlands
+        build: true
+        nav_translations:
+          Home: Start
+          Network: Netwerk
+          How it works: Hoe het werkt
+          DNS, names & certificates: DNS, namen en certificaten
+          Overview: Overzicht
+          The fleet file: Het fleet-bestand
+          Roles: Rollen
+          Operations: Beheer
+          Where it is going: Waar het heen gaat
+          One machine without a fleet: Eén machine zonder fleet
+          Hubs, not platforms: Hubs, geen platforms
+          The framework's apps: De apps van het framework
+          Armory, a distribution: Armory, een distributie
+          Running your own hub: Je eigen hub draaien
+          Catalogs & publishing: Catalogi en publiceren
+          Client networks: Klantnetwerken
+          Provider modules: Providermodules
+          Repositories & status: Repository's en status
+          Icons & colours: Iconen en kleuren
+          Contributing: Bijdragen
+      - locale: pl
+        name: Polski
+        build: true
+        nav_translations:
+          Home: Start
+          Network: Sieć
+          How it works: Jak to działa
+          DNS, names & certificates: DNS, nazwy i certyfikaty
+          Routers: Routery
+          Overview: Przegląd
+          The fleet file: Plik fleet
+          Roles: Role
+          Modules: Moduły
+          Machines: Maszyny
+          Operations: Eksploatacja
+          Where it is going: Dokąd to zmierza
+          One machine without a fleet: Jedna maszyna bez floty
+          Hubs: Huby
+          Hubs, not platforms: Huby, nie platformy
+          The framework's apps: Aplikacje frameworka
+          Armory, a distribution: Armory, dystrybucja
+          Running your own hub: Własny hub
+          Desktop: Pulpit
+          Catalogs & publishing: Katalogi i publikowanie
+          Client networks: Sieci klientów
+          Provider modules: Moduły dostawców
+          Project: Projekt
+          Repositories & status: Repozytoria i stan
+          Icons & colours: Ikony i kolory
+          Contributing: Współtworzenie
+      - locale: pt
+        name: Português
+        build: true
+        nav_translations:
+          Home: Início
+          Network: Rede
+          How it works: Como funciona
+          DNS, names & certificates: DNS, nomes e certificados
+          Overview: Visão geral
+          The fleet file: O ficheiro fleet
+          Roles: Papéis
+          Modules: Módulos
+          Machines: Máquinas
+          Operations: Operações
+          Where it is going: Para onde vai
+          One machine without a fleet: Uma máquina sem fleet
+          Hubs, not platforms: Hubs, não plataformas
+          The framework's apps: As apps do framework
+          Armory, a distribution: Armory, uma distribuição
+          Running your own hub: O teu próprio hub
+          Desktop: Ambiente de trabalho
+          Catalogs & publishing: Catálogos e publicação
+          Client networks: Redes de clientes
+          Provider modules: Módulos de fornecedores
+          Project: Projeto
+          Repositories & status: Repositórios e estado
+          Icons & colours: Ícones e cores
+          Contributing: Contribuir
 
 markdown_extensions:
   - admonition
