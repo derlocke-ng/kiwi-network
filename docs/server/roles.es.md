@@ -57,8 +57,8 @@ sorbet:
 ## `node` { #node }
 
 El preset determina qué módulos ejecuta un node. Si escribes tu propia lista
-`modules:`, esta sustituye a la del preset, y los módulos que necesitan los de
-tu lista se añaden automáticamente. Los contenedores de un node se llaman
+`modules:`, esta sustituye a la del preset. Si los módulos de tu lista
+necesitan otros, estos se añaden automáticamente. Los contenedores de un node se llaman
 `kn-…` y están conectados a la red `knet-node` (`172.128.0.0/24`).
 
 ```yaml

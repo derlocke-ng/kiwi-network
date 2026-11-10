@@ -1,8 +1,8 @@
 # syncman
 
-syncman mantiene sincronizadas, en ambos sentidos, parejas de carpetas de una
-máquina Linux. Aparezca un archivo nuevo o cambiado en la carpeta que sea de
-una pareja, se copia a la otra. syncman se hizo para las partidas guardadas de
+syncman mantiene sincronizados, en ambos sentidos, pares de carpetas de una
+máquina Linux. Cuando aparece un archivo nuevo o modificado en una de las dos
+carpetas de un par, se copia a la otra. syncman se hizo para las partidas guardadas de
 los juegos, pero sirve para cualquier carpeta. **Su única dependencia es
 rsync**, e inotify-tools es opcional. syncman se instala y funciona solo en el
 ámbito de usuario, es decir, para tu propia cuenta de usuario.
@@ -11,7 +11,7 @@ rsync**, e inotify-tools es opcional. syncman se instala y funciona solo en el
 - Última versión: **v0.4.1**. Está en el [catálogo de Kiwi](catalogs.md), en el ámbito de usuario.
 
 Lo que hay que sincronizar se describe en un **job**. Un job es un archivo de
-texto con una pareja de carpetas en cada línea. El formato no es YAML y no hace
+texto con un par de carpetas en cada línea. El formato no es YAML y no hace
 falta poner comillas, así que una ruta con espacios se escribe tal cual:
 
 ```

@@ -70,12 +70,13 @@ Fritz!OS tiene un cliente de WireGuard y rutas estáticas, pero no puede reenvia
 las consultas DNS de un solo dominio. Por eso, de la regla de DNS tiene que
 encargarse un node:
 
-1. **Túnel:** ve a Internet → Permitir acceso → VPN (WireGuard) → Añadir
-   conexión, elige la opción de conectar con otro servicio WireGuard e importa
-   la configuración que emitió el master. La línea `AllowedIPs` de esa
+1. **Túnel:** ve a Internet → Permit Access → VPN (WireGuard) → Add
+   Connection, elige la opción para conectar con otro servicio WireGuard
+   (connect to another WireGuard service) e importa la configuración que emitió
+   el master. La línea `AllowedIPs` de esa
    configuración decide si el túnel es split o full.
-2. **O bien una ruta estática:** ve a Red doméstica → Red → Configuración de
-   red → Rutas IPv4. Introduce `10.8.0.0` como destino, `255.255.0.0` como
+2. **O bien una ruta estática:** ve a Home Network → Network → Network
+   Settings → IPv4 Routes. Introduce `10.8.0.0` como destino, `255.255.0.0` como
    máscara de subred y, como puerta de enlace, la dirección de LAN del node
    `gateway`.
 3. **DNS:** haz que la LAN use un Pi-hole como servidor DNS. Puedes indicar el

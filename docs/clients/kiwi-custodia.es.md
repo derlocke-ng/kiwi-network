@@ -1,80 +1,104 @@
 # kiwi-custodia
 
-Contenedores de distribuciones en los que cada byte sale por una salida de
-[kiwi-proxy](kiwi-proxy.md). *Piensa en distrobox, con la red bajo custodia.*
+kiwi-custodia te da un entorno Linux separado para cada red de cliente en la
+que trabajas. Cada entorno es un contenedor con la distribución de Linux que
+elijas, y todo su tráfico de red pasa por un exit de
+[kiwi-proxy](kiwi-proxy.md). Un exit es una conexión a un upstream, guardada
+con un nombre y con su propio contenedor, por ejemplo el proxy SOCKS5 que lleva
+a la red de un cliente. Así puedes trabajar para diez clientes sin tener diez
+conexiones VPN en el host, y las herramientas y claves de cada cliente se
+quedan en el entorno de ese cliente. *Si conoces distrobox: es la misma idea,
+pero el contenedor solo puede llegar a la red a través de su exit.*
 
 - Repositorio: [derlocke-ng/kiwi-custodia](https://github.com/derlocke-ng/kiwi-custodia), GPL-3.0-or-later
-- Última versión: **v0.2.3**. Está en el [catálogo de Kiwi](../desktop/catalogs.md), ámbito de usuario.
-- Una CLI (`kiwi-custodia`) y una app GTK4 (**Kiwi Custodia**)
+- Última versión: **v0.2.3**. Está en el [catálogo de Kiwi](../desktop/catalogs.md), en el ámbito de usuario.
+- Tiene una herramienta de línea de comandos (`kiwi-custodia`) y una app GTK4 (**Kiwi Custodia**).
 
-Una **box** es una distribución Linux en un contenedor Podman sin root, con un
-home propio, unida al gateway sellado de una salida. Instala lo que quieras en
-ella con su gestor de paquetes, ejecuta sus apps de escritorio en tu escritorio y
-ponlas en la cuadrícula de aplicaciones. La box no tiene más ruta que la salida:
-ni para `dnf`, ni para el cliente de un juego, ni para un binario estático que
-nunca ha oído hablar de `$ALL_PROXY`. Si la salida desaparece, la box no tiene
-ninguna ruta.
+Una **box** es una distribución de Linux en un contenedor de Podman rootless,
+es decir, un contenedor que se ejecuta con tu propio usuario y sin permisos de
+root. La box tiene su propia carpeta personal y está conectada al gateway de un
+exit. El gateway es el contenedor que kiwi-proxy arranca para un exit, y la
+única ruta que sale de él lleva al upstream de ese exit. Dentro de la box
+puedes instalar lo que quieras con el gestor de paquetes de la distribución.
+Sus apps de escritorio se abren en tu escritorio, y puedes añadirlas a la
+cuadrícula de aplicaciones. La box no tiene más ruta que el exit, y eso vale
+para todos los programas que contiene: para `dnf`, para el cliente de un juego
+y para un programa enlazado estáticamente que no hace caso de `$ALL_PROXY`. Si
+el exit se detiene, la box se queda sin ninguna conexión.
 
-Eso hace de una box por red de cliente una forma limpia de trabajar: las
-herramientas, las claves y el historial de shell del cliente A en una box, los
-del cliente B en otra, y cada una llega solo a su propio cliente.
+Por eso es buena idea trabajar con una box para cada red de cliente. Las
+herramientas, las claves y el historial de la shell del cliente A están en una
+box, y los del cliente B, en otra, y cada box solo llega a su propio cliente.
 
 ## Instalación { #install }
 
 ```bash
-kiwi install kiwi-custodia   # trae consigo kiwi-proxy; o ./install.sh install
-kiwi-custodia setup          # the tunnel image, plus kiwi-proxy's gateway image and DNS data
+kiwi install kiwi-custodia   # instala también kiwi-proxy; o ./install.sh install
+kiwi-custodia setup          # la imagen del túnel, más la imagen del gateway y los datos de DNS de kiwi-proxy
 ```
 
-Necesita Podman sin root con `catatonit`, kiwi-proxy, una sesión Wayland,
-Python 3.12+ con pydantic, GTK4 + libadwaita para la app, y `/dev/net/tun`
-utilizable por contenedores sin root. Las imágenes de las distribuciones se
-descargan cuando una box arranca por primera vez. Vuelve a ejecutar
-`kiwi-custodia setup` después de una actualización.
+kiwi-custodia necesita Podman rootless con `catatonit`, kiwi-proxy, una sesión
+de Wayland y Python 3.12+ con pydantic. La app necesita GTK4 y libadwaita.
+Además, los contenedores rootless tienen que poder usar `/dev/net/tun`. Las
+imágenes de las distribuciones no se descargan durante la instalación: cada
+imagen se descarga la primera vez que arranca una box que la usa. Después de
+una actualización, vuelve a ejecutar `kiwi-custodia setup`.
 
 ## Uso { #use }
 
 ```bash
-kiwi-proxy add client-a socks5://user:pass@host:1080       # una salida, definida una vez, en kiwi-proxy
-kiwi-custodia new work --exit client-a --distro fedora     # una box en ella; el primer arranque instala una base
+kiwi-proxy add client-a socks5://user:pass@host:1080       # un exit, definido una vez, en kiwi-proxy
+kiwi-custodia new work --exit client-a --distro fedora     # una box que lo usa; el primer arranque instala una base
 kiwi-custodia enter work                                   # una shell dentro: sudo dnf install …
 kiwi-custodia run work -- firefox                          # un comando dentro
-kiwi-custodia check work                                   # lo que el mundo ve desde dentro
+kiwi-custodia check work                                   # qué ve el mundo desde dentro
 kiwi-custodia apps work                                    # las apps de escritorio que tiene
-kiwi-custodia export work firefox                          # "Firefox (work)" in the app grid
+kiwi-custodia export work firefox                          # "Firefox (work)" en la cuadrícula de aplicaciones
 kiwi-custodia stop work
-kiwi-custodia reset work                                   # vuelve a la imagen base; el home se queda
+kiwi-custodia reset work                                   # volver a la imagen base; la carpeta personal se queda
 kiwi-custodia-gui
 ```
 
-Distribuciones: `fedora` (por defecto), `fedora-toolbox`, `ubuntu`,
-`ubuntu-toolbox`, `debian`, `debian-toolbox`, `kali`, `arch`, `arch-toolbox`,
-`opensuse`, `rocky`, `alpine`, o `custom` con `--image`.
+Las distribuciones disponibles son `fedora` (la predeterminada),
+`fedora-toolbox`, `ubuntu`, `ubuntu-toolbox`, `debian`, `debian-toolbox`,
+`kali`, `arch`, `arch-toolbox`, `opensuse`, `rocky` y `alpine`. También puedes
+elegir `custom` e indicar tú una imagen con `--image`.
 
-## Cómo se construye una box { #how-a-box-is-built }
+## Cómo está hecha una box { #how-a-box-is-built }
 
-Tres contenedores comparten un espacio de nombres de red: el **gateway** de
-kiwi-proxy, un **sidecar de túnel** (tun2socks en un dispositivo TUN que se
-convierte en la ruta por defecto) y la propia **box**. Todo el tráfico sale por
-el TUN hacia el SOCKS5 de la salida, así que también quedan cubiertos los
-programas que ignoran los ajustes de proxy.
+Una box en marcha se compone de tres contenedores que comparten un namespace
+de red, es decir, las mismas interfaces de red, rutas y reglas de cortafuegos.
+El primero es el **gateway** de kiwi-proxy. El segundo es un **sidecar de
+túnel**, un contenedor auxiliar que ejecuta tun2socks sobre un dispositivo TUN.
+Un dispositivo TUN es una interfaz de red virtual, y aquí se convierte en la
+ruta por defecto. El tercer contenedor es la propia **box**. Todo el tráfico de
+la box entra en el dispositivo TUN y de ahí va al proxy SOCKS5 del exit. Esto
+funciona mediante la ruta por defecto y no mediante ajustes de proxy, así que
+también quedan cubiertos los programas que no hacen caso de esos ajustes.
 
-- La box se ejecuta con tu usuario, con el mismo uid y `sudo` sin contraseña. Su
-  home es `~/.local/share/kiwi-custodia/boxes/<id>/home`, uno por box en lugar de
-  tu home real: dos boxes son dos identidades.
-- Los cambios dentro de una box se guardan en una instantánea por box cuando se
-  detiene, y `reset` vuelve a la imagen base.
-- Se pasan Wayland, X11 (mediante Xwayland), PipeWire, el bus de sesión y
-  `/dev/dri`, así que las apps de escritorio y los juegos funcionan.
-- El DNS va a través del resolvedor del gateway (con bloqueo de anuncios), o a
-  través del upstream en una salida con DNS remoto.
+- La box se ejecuta con tu usuario, con el mismo uid, y dentro de ella `sudo`
+  funciona sin contraseña. Su carpeta personal es
+  `~/.local/share/kiwi-custodia/boxes/<id>/home`. Cada box tiene su propia
+  carpeta personal y no usa la tuya de verdad, así que dos boxes son dos
+  identidades separadas.
+- Cuando una box se detiene, los cambios hechos dentro se guardan en un
+  snapshot que pertenece a esa box. `reset` devuelve la box a la imagen base.
+- Wayland, X11 (a través de Xwayland), PipeWire, el bus de sesión y `/dev/dri`
+  están disponibles dentro de la box, para que funcionen las apps de escritorio
+  y los juegos.
+- Las consultas DNS las responde el resolvedor del gateway, que además bloquea
+  los dominios publicitarios. En un exit que usa DNS remoto, es el upstream el
+  que resuelve los nombres.
 
 ## Lo que no es { #what-it-is-not }
 
-Una box es **custodia de red, no un sandbox respecto a tu escritorio**. Como
-distrobox, recibe tu pantalla y tu bus de sesión, así que un programa de la box
-puede mostrar ventanas, leer el portapapeles y usar los portales. Lo que no puede
-hacer es llegar a la red salvo a través de su salida. UDP no tiene salida (ni
-QUIC, ni medios WebRTC), e IPv6 no tiene ruta.
+Una box **limita la red. No es un sandbox que proteja tu escritorio de los
+programas que hay dentro.** Igual que un contenedor de distrobox, la box tiene
+acceso a tu pantalla y a tu bus de sesión. Por eso, un programa de la box
+puede mostrar ventanas, leer el portapapeles y usar los portales del
+escritorio. Lo que no puede es llegar a la red de ninguna otra forma que no sea
+su exit. UDP no se reenvía, así que QUIC y los medios de WebRTC no funcionan, y
+no hay ruta para IPv6.
 
-Las boxes que no deben compartir salida usan salidas distintas.
+Las boxes que usan el mismo exit lo comparten. Las boxes que tienen que estar
+separadas entre sí necesitan exits distintos.

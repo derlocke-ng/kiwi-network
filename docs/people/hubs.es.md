@@ -111,9 +111,9 @@ docker run --rm -p 8080:80 \
 función que aún está por llegar: seguir un espacio que el hub no incluye.
 
 El hub tiene que servirse por HTTPS, porque WebCrypto necesita un contexto
-seguro, y sus relays tienen que servirse por `wss://`. Si alguien abre el hub
-por `http://`, sin cifrar, en cualquier sitio que no sea localhost, la página
-lo avisa y se detiene.
+seguro, y sus relays tienen que servirse por `wss://`. Si el hub se abre por
+`http://`, sin cifrar, y no es en localhost, la página lo indica y se
+detiene.
 
 ### Un hub en tu Kiwi Network { #on-a-kiwi-network }
 
@@ -130,8 +130,8 @@ certificados de Let's Encrypt.
 
 El relay de un hub público acepta las publicaciones que llegan desde la mesh.
 Desde Internet solo acepta las de los miembros que demuestran que tienen su
-clave (NIP-42). Son miembros las personas de la lista que firman los
-administradores (`write_pubkeys`). Con `members: registered`, es miembro
+clave (NIP-42). Son miembros las personas que figuran en la lista
+firmada por los administradores (`write_pubkeys`). Con `members: registered`, es miembro
 cualquiera que tenga una cuenta en el hub. Consulta la
 [referencia de los módulos](../server/modules.md#people).
 
@@ -164,5 +164,5 @@ existen:
 - Iniciar sesión con una extensión del navegador (NIP-07) o con un firmante
   remoto (NIP-46).
 - Un servidor TURN en el stack de kiwi. El trabajo está pendiente en
-  kiwi-modules. Sin TURN, es frecuente que dos móviles con datos móviles no
-  consigan establecer una conexión directa.
+  kiwi-modules. Sin TURN, es frecuente que dos teléfonos que usan datos móviles
+  no consigan establecer una conexión directa.

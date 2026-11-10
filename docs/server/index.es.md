@@ -49,9 +49,9 @@ También puedes instalarlo desde un clon del repositorio: ejecuta
 kiwi-server necesita Python 3.9+ con PyYAML y Jinja2, además de los programas
 `openssl` y `ssh`. El almacén de secretos necesita `age`. Para construir las ISO
 hacen falta `butane`, `coreos-installer` y `xorriso`, y para Debian también
-`cpio`, `gzip` y `curl`. En Silverblue o Bluefin no añadas estos paquetes al
-sistema como capas. Es mejor construir las herramientas para las ISO como una
-sola imagen de contenedor:
+`cpio`, `gzip` y `curl`. En Silverblue o Bluefin no instales estos paquetes
+como capas del sistema (layering). En su lugar, construye las herramientas para
+las ISO como una sola imagen de contenedor:
 
 ```bash
 kiwi-server toolchain build     # se usa automáticamente cuando faltan las herramientas
@@ -85,10 +85,10 @@ kiwi-server enroll fleet.yaml laptop --group devices
 kiwi-server status fleet.yaml             # lo que comunica cada máquina
 ```
 
-Por defecto, una ISO de instalación **no contiene ningún secreto del stack**,
-que es el conjunto de contenedores y configuración de una máquina. La ISO solo
-lleva el sistema base, y el rol y su stack se envían después a la máquina con
-`apply`. Si a una máquina no se puede llegar por SSH, `build --offline` mete en
+Por defecto, una ISO de instalación **no contiene ningún secreto del stack**
+(el stack son todos los contenedores y la configuración de una máquina). La ISO
+solo lleva el sistema base, y el rol y su stack se envían después a la máquina con
+`apply`. Si a una máquina no se puede llegar por SSH, `build --offline` pone en
 la ISO el rol completo con sus secretos. No subas una ISO así al almacén de ISO
 de un proveedor de hosting, y bórrala después de la instalación.
 
@@ -99,7 +99,7 @@ script contiene el rol completo.
 En un VPS de netcup, `kiwi-server vps install fleet.yaml sorbet` borra el
 servidor e instala la ISO mediante la API de netcup, sin que nadie tenga que
 sentarse delante de una consola. Por ahora, netcup es el único proveedor de
-hosting con el que funciona. Hay otros
+hosting con el que funciona esto. Hay otros
 [previstos](roadmap.md#more-hosters-and-network-boot).
 
 ## Comandos { #commands }

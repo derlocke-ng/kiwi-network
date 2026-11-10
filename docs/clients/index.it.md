@@ -1,18 +1,25 @@
-# Lavorare con molte reti di clienti
+# Lavorare nelle reti di molti clienti
 
-Dieci clienti remoti spesso significano dieci VPN o endpoint SOCKS, uno per raggiungere la rete
-di ciascun cliente. Eseguirli tutti sull'host è un caos: dieci tunnel insieme,
-route che si scontrano e una rete che trapela nella successiva. Le app desktop di Kiwi
-danno invece a ciascuno un'**uscita sigillata**: un container la cui unica route è quell'unico
-upstream. I tuoi strumenti si agganciano all'uscita di cui hanno bisogno, e nient'altro sull'host
-cambia.
+Se lavori da remoto per molti clienti, di solito ti serve una connessione VPN o
+SOCKS separata per raggiungere la rete di ciascuno. Dieci clienti significano
+allora dieci connessioni. Tenerle tutte sull’host crea problemi: dieci tunnel
+attivi contemporaneamente, rotte che si ostacolano a vicenda e traffico
+destinato alla rete di un cliente che rischia di finire in quella di un altro.
 
-| App | Cosa fa |
+Le app desktop di Kiwi ti permettono di lavorare nella rete di ogni cliente in
+modo isolato. L’host non si riempie di tunnel e di rotte, e non hai dieci
+connessioni VPN attive nello stesso momento. Ogni connessione viene messa in un
+container tutto suo, e l’unica strada per uscire da quel container porta a
+quel cliente. Una connessione di questo tipo si chiama **exit**. I tuoi
+strumenti girano in un container o in un profilo del browser che usa l’exit di
+cui hanno bisogno, e sull’host non cambia nient’altro.
+
+| App | Che cosa fa |
 |---|---|
-| [**kiwi-proxy**](kiwi-proxy.md) | Il motore. Un'**uscita** (exit) è un upstream con un nome: un SOCKS5 che ti è stato fornito, o uno creato da un modulo provider. Avviarla crea un **gateway**, un namespace di rete la cui unica route è quell'upstream. Le app dell'host possono usarlo come porta SOCKS5 locale |
-| [**kiwi-custodia**](kiwi-custodia.md) | **Box di distribuzioni su un'uscita**: Fedora, Ubuntu, Debian, Kali, Arch, openSUSE, Rocky o Alpine in un container rootless con una home propria. *Tutto* ciò che è nella box esce dall'uscita: gestori di pacchetti, giochi, binari statici che non hanno mai sentito parlare di proxy |
-| [**kiwi-fox**](kiwi-fox.md) | **Profili del browser su un'uscita**: Camoufox, Firefox o Tor Browser, ogni profilo con il proprio storage |
-| [**Moduli dei provider**](providers.md) | Uscite da Tor, una VPN (gluetun), 9proxy o Mysterium. Tor e Mysterium sono il modo rapido per avere più IP d'uscita, comodo per i test |
+| [**kiwi-proxy**](kiwi-proxy.md) | Il motore su cui si basano le altre app. Un **exit** è una connessione a un upstream, salvata con un nome. L’upstream è il proxy a cui viene inviato il tuo traffico: un proxy SOCKS5 che ti è stato fornito, oppure uno creato da un modulo provider. Quando attivi un exit, kiwi-proxy crea per lui un **gateway**. Un gateway è un namespace di rete (uno stack di rete separato, con rotte e firewall propri) la cui unica rotta porta a quell’upstream. I programmi sull’host possono usare un exit attraverso una porta SOCKS5 locale |
+| [**kiwi-custodia**](kiwi-custodia.md) | **Distribuzioni Linux in box che usano un exit.** Una box è un container rootless (cioè che gira senza permessi di root) con Fedora, Ubuntu, Debian, Kali, Arch, openSUSE, Rocky o Alpine e con una sua cartella home. *Tutto* il traffico di rete della box passa dall’exit, compreso quello dei gestori di pacchetti, dei giochi e dei programmi compilati staticamente che ignorano le impostazioni del proxy |
+| [**kiwi-fox**](kiwi-fox.md) | **Profili del browser che usano un exit.** Ogni profilo esegue Camoufox, Firefox o Tor Browser e ha un proprio archivio dei dati |
+| [**Moduli provider**](providers.md) | Moduli che creano exit attraverso Tor, una VPN (con gluetun), 9proxy o Mysterium. Tor e Mysterium sono un modo rapido per ottenere altri indirizzi IP, utile per i test |
 
 ```
  client A: socks5://…  ─┐                                   ┌─ box "client-a" (Fedora: ssh, ansible, dnf …)
@@ -21,40 +28,53 @@ cambia.
                                                is the exit
 ```
 
-## Come resta pulito { #how-it-stays-clean }
+## Come gli exit restano separati { #how-it-stays-clean }
 
-- **Fail closed.** Il firewall di un gateway scarta tutto tranne il suo unico
-  upstream. Se il gateway muore, tutto ciò che vi era agganciato perde la sua route. Il kill
-  switch è l'assenza di una route, non un software che deve accorgersene.
-- **Non gira niente che non venga usato.** Un gateway avviato da una box o da un browser
-  sparisce quando l'ultimo se ne va. Restano attive solo le uscite che avvii con
+- **Un gateway è fail-closed.** Significa che un guasto interrompe il traffico e
+  non gli apre mai un’altra strada. Il firewall di un gateway scarta tutto ciò
+  che non è diretto all’unico upstream del gateway. Se il gateway si ferma,
+  tutto ciò che gli è collegato resta senza rotta. Nessun programma deve
+  accorgersi del guasto e reagire, perché senza il gateway una rotta non c’è.
+- **Gira soltanto ciò che usi.** Quando una box o un browser avvia un gateway,
+  il gateway viene rimosso non appena si ferma l’ultima box o l’ultimo browser
+  che lo usava. Restano attivi soltanto gli exit che avvii tu stesso con
   `kiwi-proxy up`.
-- **Ciò che è separato resta separato.** Le cose sulla stessa uscita la condividono (un IP, un
-  namespace). I clienti che non devono incontrarsi ricevono uscite diverse, e ogni box ha
-  la propria home, così chiavi SSH e profili del browser non si incrociano.
-- **Niente root, niente route sull'host.** Tutto gira in Podman rootless, e la
-  rete dell'host resta intatta.
-- **Anche il DNS passa dall'uscita.** Di default i nomi si risolvono via DoH attraverso
-  l'uscita, con liste di blocco della pubblicità. Per gli **hostname interni** di un cliente, passa invece
-  i nomi al lato del cliente con `--dns remote` (che è anche la modalità per
-  Tor e i nomi `.onion`).
+- **I clienti restano separati.** Box e browser che usano lo stesso exit lo
+  condividono, quindi hanno lo stesso indirizzo IP e lo stesso namespace di
+  rete. I clienti che non devono vedersi a vicenda ricevono exit diversi. Ogni
+  box ha inoltre la sua cartella home, così le chiavi SSH e i profili del
+  browser di un cliente non sono disponibili nella box di un altro.
+- **Nessun permesso di root e nessuna rotta sull’host.** Tutto gira in Podman
+  rootless, che esegue i container con il tuo utente. La rete dell’host non
+  viene modificata.
+- **Anche le query DNS passano dall’exit.** Per impostazione predefinita i nomi
+  vengono risolti con DNS over HTTPS (DoH) attraverso l’exit, e le liste di
+  domini pubblicitari vengono bloccate. Per risolvere i **nomi host interni** di
+  un cliente usa invece `--dns remote`: i nomi vengono passati dalla parte del
+  cliente e risolti lì. Anche Tor e i nomi `.onion` hanno bisogno di questa
+  modalità.
 
 ## Limiti { #limits }
 
-Questi vengono dai repository:
+Questi limiti sono dichiarati nei repository:
 
-- **Solo TCP, solo IPv4.** L'UDP non esce da nessuna parte (niente QUIC, niente media WebRTC), e
-  l'IPv6 non ha alcuna route.
-- **Una configurazione VPN per macchina.** Il modulo provider VPN contiene una sola
-  configurazione gluetun (un `vpn.json`, una configurazione WireGuard personalizzata), e le sue
-  uscite differiscono solo per il paese del server. Per avere fianco a fianco le VPN di più clienti,
-  oggi la strada è un endpoint SOCKS5 per cliente.
-- **Una box è custodia della rete, non una sandbox.** Condivide il tuo display, il session
-  bus e gli appunti, come distrobox. Quello che non può fare è raggiungere la rete
-  se non attraverso la sua uscita.
-- **Mysterium:** un'identità mantiene una sola connessione alla volta.
+- **Solo TCP e solo IPv4.** UDP non viene inoltrato, quindi QUIC e i flussi
+  multimediali di WebRTC non funzionano. Per IPv6 non c’è alcuna rotta.
+- **Una sola configurazione VPN per macchina.** Il modulo provider per le VPN ha
+  un’unica configurazione di gluetun, con un solo `vpn.json` e una sola
+  configurazione WireGuard personalizzata. I suoi exit si distinguono soltanto
+  per il paese del server. Se ti servono contemporaneamente le VPN di più
+  clienti, oggi la soluzione è un endpoint SOCKS5 per ciascun cliente.
+- **Una box limita la rete, ma non è una sandbox.** Come un container di
+  distrobox, condivide il tuo schermo, il bus della tua sessione e i tuoi
+  appunti. Quello che non può fare è raggiungere la rete in un modo diverso dal
+  suo exit.
+- **Mysterium:** un’identità può avere una sola connessione alla volta.
 
-## Per iniziare { #get-started }
+## Primi passi { #get-started }
+
+I comandi seguenti installano le app, salvano come exit il proxy SOCKS5 di un
+cliente e aprono una shell in una box Fedora che usa quell’exit:
 
 ```bash
 kiwi install kiwi-custodia            # porta con sé kiwi-proxy
@@ -62,5 +82,5 @@ kiwi-custodia setup                   # immagini e dati DNS
 
 kiwi-proxy add client-a socks5://user:pass@jump.client-a.example:1080 --dns remote
 kiwi-custodia new client-a --exit client-a --distro fedora
-kiwi-custodia enter client-a          # a shell whose only way out is client A's SOCKS5
+kiwi-custodia enter client-a          # una shell che può uscire soltanto dal SOCKS5 del cliente A
 ```

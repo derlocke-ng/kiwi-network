@@ -24,7 +24,7 @@ El software está repartido en tres repositorios:
 | Repositorio | Qué es |
 |---|---|
 | [**kiwi-framework**](https://github.com/derlocke-ng/kiwi-framework) | El software general del que sale cualquier hub. Incluye la identidad y las cuentas, los relays y la sincronización, los amigos y la forma de compartir con ellos, la moderación, el kit de diseño, las páginas del hub y diez apps. El framework no se puede abrir por sí solo como sitio web: es una distribución la que lo convierte en un hub. La versión actual es la v0.32.1 y la licencia es GPL-3.0-or-later. |
-| [**Armory**](armory.md) | La primera **distribución**, es decir, un hub concreto hecho con el framework. Aporta un nombre, unos relays por defecto y las diez apps, cada una con un nombre propio de Armory. Es la plantilla de la que partes, con un fork, para hacer tu propio hub. La licencia es GPL-3.0-or-later. **En línea:** [derlocke-ng.github.io/armory](https://derlocke-ng.github.io/armory/) |
+| [**Armory**](armory.md) | La primera **distribución**, es decir, un hub concreto hecho con el framework. Aporta un nombre, unos relays por defecto y las diez apps, cada una con un nombre propio de Armory. Es la plantilla de la que puedes hacer un fork para crear tu propio hub. La licencia es GPL-3.0-or-later. **En línea:** [derlocke-ng.github.io/armory](https://derlocke-ng.github.io/armory/) |
 | [**kiwi-web-catalog**](hubs.md#kiwi-web-catalog) | Un catálogo, es decir, un repositorio git con una lista de hubs y de sus apps. Tiene el mismo formato que el [kiwi-catalog](../desktop/catalogs.md) del escritorio. |
 
 ## Cómo encaja todo { #how-it-fits-together }
@@ -84,15 +84,15 @@ hub.
 - La primera vez que abres un hub en un dispositivo, el navegador crea una
   clave para ese dispositivo y la guarda.
 - Una **cuenta** es un nombre de usuario y una contraseña. Se basa en eventos
-  normales de nostr, y no existe ningún registro de cuentas. La contraseña pasa
-  por scrypt, una función que es lenta de calcular a propósito, y el resultado
-  desbloquea tu clave. Sin la contraseña, nadie puede apoderarse de una cuenta
+  normales de nostr, y no existe ningún registro de cuentas. La contraseña se
+  procesa con scrypt, una función pensada para ser lenta de calcular, y el
+  resultado desbloquea tu clave. Sin la contraseña, nadie puede apoderarse de una cuenta
   ni sobrescribirla. **La contraseña no se puede restablecer.**
 - También puedes iniciar sesión con una clave de nostr que ya tengas, en
-  formato `nsec`, hexadecimal o `ncryptsec`. Iniciar sesión con una extensión
-  del navegador (NIP-07) o con un firmante remoto (NIP-46) está previsto, pero
-  aún sin implementar.
-- Una misma cuenta sirve para todas las apps del hub y en todos los
+  formato `nsec`, hexadecimal o `ncryptsec`. El inicio de sesión con una
+  extensión del navegador (NIP-07) o con un firmante remoto (NIP-46) está
+  previsto, pero todavía no está implementado.
+- Una misma cuenta sirve en todas las apps del hub y en todos los
   dispositivos en los que inicies sesión.
 
 ## Modelo de privacidad { #privacy-model }
@@ -100,8 +100,8 @@ hub.
 **Qué se cifra.** El navegador cifra el contenido antes de enviarlo a ningún
 sitio. Usa AES-256-GCM con claves derivadas mediante HKDF. Los mensajes
 privados son mensajes NIP-17 dentro de un «gift wrap» de NIP-59. El gift wrap
-es una segunda capa de cifrado, con la que un relay solo ve que alguna clave ha
-recibido un mensaje envuelto. Cada archivo se cifra con su propia clave
+es una segunda capa de cifrado, de modo que un relay solo ve que una clave
+cualquiera ha recibido un mensaje envuelto. Cada archivo se cifra con su propia clave
 AES-256-GCM aleatoria antes de subirse a un servidor multimedia. Las fotos se
 vuelven a codificar antes, y con ello desaparecen los metadatos que añaden las
 cámaras. El Vault se cifra con una frase de contraseña propia (scrypt +

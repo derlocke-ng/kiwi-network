@@ -1,105 +1,134 @@
 # Hacia dónde va
 
-!!! info "Diseñado, no construido"
+En esta página se describe en qué está previsto que se convierta kiwi-server y
+qué partes de ese plan existen ya.
+
+!!! info "Diseñado, aún sin implementar"
     Esta página resume el
     [diseño del plano de control](https://github.com/derlocke-ng/kiwi-server/blob/main/docs/design/control-plane.md)
-    de kiwi-server, acordado en octubre de 2026. Salvo que una línea diga
-    *construido*, nada de esto existe todavía. La
-    [hoja de ruta](https://github.com/derlocke-ng/kiwi-server/blob/main/docs/ROADMAP.md)
-    sigue el orden.
+    de kiwi-server, que se acordó en octubre de 2026. Nada de lo que se
+    describe aquí existe todavía, salvo cuando una línea dice *implementado*.
+    El orden de los trabajos se sigue en la
+    [hoja de ruta](https://github.com/derlocke-ng/kiwi-server/blob/main/docs/ROADMAP.md).
 
-Hoy kiwi-server es una herramienta de escritorio: el archivo fleet, los secretos
-y la CA viven en la máquina del operador. El plan es convertirlo en un
-**servicio** que pueda funcionar en un node, para que una red se pueda crear y
-gestionar sin un escritorio Linux, desde un teléfono y por más de una persona.
-Las máquinas siguen siendo reproducibles a partir del archivo fleet. El plano de
-control es solo lo que guarda ese archivo y ejecuta el renderizador.
+Hoy kiwi-server es una herramienta de escritorio. El archivo fleet, los
+secretos y la CA (la autoridad de certificación de la fleet) están en tu propio
+ordenador. El plan es convertirlo en un **servicio** que pueda funcionar en un
+node. Así se podrá crear y administrar una red sin un escritorio Linux, desde
+un teléfono y entre varias personas. Las máquinas se seguirán pudiendo
+reproducir a partir del archivo fleet. El plano de control es la parte que
+guarda ese archivo y ejecuta el generador, el programa que convierte el archivo
+fleet en la configuración de cada máquina.
 
 ## Las capas { #the-layers }
 
-1. **kiwi-modules**: los módulos y el contrato de renderizado para una máquina. *Construido.*
-2. **kiwi-stack**: la parte de la máquina, a partir de `kiwi-stack apply`. *Construido.*
-3. **El núcleo de kiwi-server**: la fleet, los hosts, los targets, las ISOs, la
-   CA, las altas y el apply, sin interfaz gráfica como hoy. *Construido.*
-4. **El módulo de control**: el núcleo como contenedor, con una API y una
-   interfaz web, funcionando como módulo en un node como cualquier otro.
-5. **Clientes**: primero la interfaz web. La app GTK se queda y habla con la CLI
-   local o con un controlador a través de la malla, y la CLI también se queda.
-   Ninguna interfaz desarrolla lógica propia.
+El diseño divide el software en cinco capas.
+
+1. **kiwi-modules** contiene los módulos y el contrato de generación, que
+   define cómo se genera la configuración de una máquina. *Implementado.*
+2. **kiwi-stack** es la parte que se ejecuta en la máquina. Empieza con
+   `kiwi-stack apply`, que instala en la máquina una configuración generada.
+   *Implementado.*
+3. **El núcleo de kiwi-server** se ocupa de la fleet, los hosts, los sistemas
+   de destino, las ISO, la CA, el alta de dispositivos y `apply`. No tiene
+   interfaz gráfica propia, igual que hoy. *Implementado.*
+4. **El módulo de control** es el núcleo empaquetado como contenedor, con una
+   API y una interfaz web. Funciona en un node como un módulo más.
+5. **Los clientes** son los programas con los que trabajas con el módulo de
+   control. Lo primero será la interfaz web. La app GTK se mantiene y se
+   comunica o bien con la CLI local, o bien con un controlador (un módulo de
+   control en marcha) a través de la mesh, la red WireGuard privada. La CLI
+   también se mantiene. Toda la lógica se queda en el núcleo, así que ningún
+   cliente tiene lógica propia.
 
 ## El node de control { #the-control-node }
 
-El controlador funciona en un node en casa (el *node de control*), accesible
-desde la malla solo para administradores, en un disco cifrado. Guarda la
-semilla, la clave de la CA, el archivo fleet y todas las configuraciones.
+El controlador funciona en un node de casa, al que se llama *node de control*.
+Solo pueden acceder a él los administradores, solo desde la mesh, y su disco
+está cifrado. Guarda el seed, la clave de la CA, el archivo fleet y todas las
+configuraciones.
 
-El **master alquilado pasa a ser infraestructura de relay sustituible**. Solo
-guarda lo que necesita para funcionar: sus claves y peers de WireGuard, sus
-propias contraseñas y su certificado. Perderlo cuesta un nuevo apply desde el
-node de control. Perder el node de control cuesta restaurar la copia de seguridad
-de la fleet.
+El **master alquilado pasa a ser un simple punto de paso, fácil de sustituir**.
+Se limita a reenviar
+el tráfico de la red y solo guarda lo que necesita para funcionar: sus claves y
+peers de WireGuard, sus propias contraseñas y su certificado. Si pierdes el
+master, lo vuelves a aplicar desde el node de control. Si pierdes el node de
+control, restauras la copia de seguridad de la fleet.
 
 ## Usuarios { #users }
 
-Un bloque `users:` con dos roles: un **administrador de la fleet** que puede
-hacerlo todo, y **administradores de node** ligados a sus propios hosts. Un
-administrador de node ve el estado, los logs, las cargas de trabajo y las copias
-de seguridad de esos hosts, y da de alta dispositivos en los grupos que permite
-el administrador de la fleet, pero no ve nada del master, de la CA ni de los
-demás nodes. El inicio de sesión es una contraseña más un certificado de cliente
-de la CA de la fleet o WebAuthn, y cada cambio va a un registro de auditoría.
+Un bloque `users:` define usuarios con uno de dos roles. Un **administrador de
+la fleet** puede hacerlo todo. Un **administrador de node** está limitado a sus
+propios hosts: ve el estado, los logs, las cargas de trabajo y las copias de
+seguridad de esos hosts, y puede dar de alta dispositivos en los grupos que le
+permita el administrador de la fleet. Un administrador de node no ve nada del
+master, de la CA ni de los demás nodes. Para iniciar sesión, un usuario
+necesita una contraseña y, además, un certificado de cliente de la CA de la
+fleet o WebAuthn. Cada cambio queda registrado en un log de auditoría.
 
-## Unir una máquina { #joining-a-machine }
+## Incorporar una máquina { #joining-a-machine }
 
-Se mantienen ambos caminos:
+Una máquina puede entrar en la red de dos maneras, y las dos se mantienen:
 
-- **Una ISO por host** con su rol (el `build --offline` de hoy), para
-  instalaciones sin conexión.
-- **Una ISO de arranque genérica** por target, construida una vez por la CI y
-  sin ningún secreto. En el primer arranque obtiene su rol del controlador con un
-  **token de unión** de un solo uso. Una máquina instalada a mano o un VPS se une
-  con una línea: `curl https://control.<host>.<tld>/join/<token> | sudo bash`.
+- **Una ISO por host** que lleva el rol de la máquina, como el
+  `build --offline` actual. Es para instalaciones sin conexión.
+- **Una ISO de arranque genérica** por sistema de destino, que la CI construye
+  una sola vez y que no lleva ningún secreto. En el primer arranque, la máquina
+  obtiene su rol del controlador con un **token de alta** de un solo uso. Una
+  máquina instalada a mano, o un VPS, entra con una sola línea:
+  `curl https://control.<host>.<tld>/join/<token> | sudo bash`.
 
-La idea es que cada máquina de la familia CoreOS ejecute **una imagen bootc**, y
-que el rol llegue en el primer arranque.
+Está previsto que todas las máquinas de la familia CoreOS usen **una única
+imagen bootc**, una imagen de contenedor arrancable que es la misma para todas.
+La máquina recibe su rol en el primer arranque.
 
 ## Federación y multi-hop { #federation-and-multi-hop }
 
-Las redes que confían en la CA de la otra y se delegan nombres entre sí se
-convierten en clientes la una de la otra. Con el tercer modo de salida, el
-master de una red puede salir a Internet a través del de otra: **multi-hop**,
-donde el segundo master solo ve al primero. Varios masters gestionados por un
-mismo operador forman entonces un servicio VPN propio: masters de entrada en un
-país, masters de salida en otros, Tor dentro.
+La federación conecta Kiwi Networks independientes. Las redes que confían en la
+CA de la otra y se delegan nombres entre sí pasan a ser clientes la una de la
+otra. Un master tiene tres modos de salida, que determinan cómo llega su
+tráfico a Internet. Con el tercero, el master de una red envía su tráfico hacia
+Internet a través del master de otra red. A esto se le llama **multi-hop**, y el
+segundo master solo ve al primero. Quien gestiona varios masters de esta forma
+tiene su propio servicio de VPN, con masters de entrada en un país, masters de
+salida en otros y Tor dentro de la red.
 
-## El huerto { #the-orchard }
+## El orchard { #the-orchard }
 
-El huerto (orchard) es para quienes gestionan muchos masters para otras
-personas. Es una app aparte o un plugin de kiwi-server que crea VPS mediante las
-API de los proveedores, entrega a cada master su instalación y un token de
-registro, recoge un latido de cada master (versión, salud, disco, última
-actualización) y despliega actualizaciones moviendo tags de imagen por canal.
+El orchard («huerto de frutales» en inglés) es el servicio previsto para quien
+gestiona muchos masters para otras personas. Será una app aparte o un plugin de
+kiwi-server. Crea VPS mediante la API de los proveedores de hosting y entrega a
+cada master su instalación y un token de registro. Recoge de cada master un
+heartbeat, un informe de estado periódico (versión, estado, disco, última
+actualización). Distribuye las actualizaciones cambiando el tag de imagen de
+cada canal de actualización.
 
-No puede iniciar sesión en un master, leer una fleet ni tocar un node. El node de
-control de cada cliente, en su casa, guarda su red. Quien aloja el master no
-puede leerla, y ejecuta una VM por cliente. El soporte de netcup de kiwi-server
-(`kiwi-server
-vps`, *construido*) es la primera pieza de su controlador de proveedores.
+El orchard no puede iniciar sesión en un master, leer una fleet ni modificar un
+node. Cada inquilino, es decir, cada persona a la que otro le gestiona el master, guarda
+su red en su propio node de control, en casa. La fleet y las claves se quedan
+allí, de modo que el proveedor de hosting en el que funciona la máquina virtual
+del master no puede leer los datos de la red del inquilino. El master de cada
+inquilino funciona en su propia máquina virtual. El orchard necesita un driver
+para la API de los proveedores, y la compatibilidad de kiwi-server con netcup
+(`kiwi-server vps`, *implementado*) es la primera pieza.
 
-## Más proveedores, y arranque por red { #more-hosters-and-network-boot }
+## Más proveedores de hosting y arranque por red { #more-hosters-and-network-boot }
 
-*Previsto.* El objetivo es una instalación totalmente automatizada, esté donde
-esté la máquina.
+*Previsto.* El objetivo es que una máquina se pueda instalar de forma
+totalmente automática, esté donde esté.
 
-- **Proveedores como plugins.** netcup viene integrado hoy. El plan es un
-  repositorio propio para las API de proveedores, para que cualquiera pueda
-  añadir AWS, Hetzner y los demás tal como funciona netcup ahora: crear o borrar
-  un servidor, poner la instalación en él y arrancarlo.
-- **Wake-on-LAN y arranque PXE** para máquinas en casa: un node se despierta y se
-  instala por la red, sin memoria USB.
+- **Los proveedores de hosting como plugins.** Hoy, kiwi-server ya funciona con
+  netcup de serie. El plan es tener un repositorio aparte para la API de los
+  proveedores, de modo que cualquiera pueda añadir AWS, Hetzner y otros. Un
+  plugin funcionaría igual que lo hace hoy la parte de netcup: crea o borra un
+  servidor, pone en él la instalación y lo arranca.
+- **Wake-on-LAN y arranque PXE** están previstos para las máquinas de casa.
+  Wake-on-LAN enciende una máquina por la red, y PXE le permite arrancar desde
+  la red. Así, un node se despierta y se instala por la red, sin necesidad de
+  una memoria USB.
 
-## También en la lista { #also-on-the-list }
+## Más cosas en la lista { #also-on-the-list }
 
-Un master de reserva, podman sin root, IPv6 de extremo a extremo, placas ARM,
-rangos de puertos y un módulo de juegos, y una restauración de los datos de un
-node en el primer arranque.
+La hoja de ruta incluye también un master de reserva, podman rootless, IPv6 de
+extremo a extremo, placas ARM, rangos de puertos y un módulo de juegos, y la
+restauración de los datos de un node en su primer arranque.

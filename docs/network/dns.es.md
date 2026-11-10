@@ -74,9 +74,9 @@ master es público.
 
 Los proxies SOCKS5 de Mullvad tienen direcciones de un rango privado, y esta
 función te permite usarlos por su nombre. Desde kiwi-server 2.2.0, el Pi-hole
-del master responde por todos los **proxies SOCKS5 de Mullvad**, tanto con su
-nombre completo (por ejemplo, `de-fra-wg-socks5-001.relays.mullvad.net`) como
-con un nombre corto (por ejemplo, `de-fra-001.mullvad.home`). gluetun rechaza
+del master resuelve los nombres de todos los **proxies SOCKS5 de Mullvad**, tanto
+el nombre completo (por ejemplo, `de-fra-wg-socks5-001.relays.mullvad.net`) como
+un nombre corto (por ejemplo, `de-fra-001.mullvad.home`). gluetun rechaza
 las respuestas DNS que apuntan a direcciones privadas: es su protección contra
 el DNS rebinding. Sin estos registros, esos nombres solo se resolverían a través
 de los servidores DNS de reserva. Un temporizador del host

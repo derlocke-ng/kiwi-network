@@ -10,12 +10,12 @@ quiere. Montar una app significa usarla para un espacio, que es una comunidad
 con sus propios moderadores y relays, y darle un nombre propio del hub. Una
 misma app se puede montar muchas veces. Un banco de semillas y una tienda de
 gemas, por ejemplo, son el mismo código de `market` en dos espacios. Cada uno
-tiene sus moderadores y sus relays, y en el hub aparecen como dos baldosas
+tiene sus moderadores y sus relays, y en el hub aparecen como dos tarjetas
 distintas.
 
 | App | Qué es | Nombre del montaje en Armory |
 |---|---|---|
-| `market` | **Un mercado abierto** para la comunidad a la que sirve el montaje. Un anuncio tiene fotos, un precio y, o bien los lugares desde los que se envía y a los que se envía, o bien la opción de recogerlo en persona. Los compradores encuentran los anuncios por categoría y según su propia ubicación. La búsqueda usa etiquetas que los relays pueden comparar, pero no leer. El comprador escribe al vendedor en el chat, donde ya le espera el borrador de un mensaje sobre el anuncio. Un anuncio se puede reservar, marcar como vendido, renovar y denunciar, y caduca al cabo de entre 30 y 90 días. Un montaje puede exigir que los vendedores hayan participado antes en un feed o que los haya aprobado un moderador. | Trading Post |
+| `market` | **Un mercado abierto** para la comunidad a la que sirve el montaje. Un anuncio tiene fotos, un precio y, o bien desde dónde y adónde se envía, o bien la opción de recogerlo en persona. Los compradores encuentran los anuncios por categoría y según su propia ubicación. La búsqueda usa etiquetas que los relays pueden comparar, pero no leer. El comprador escribe al vendedor en el chat, donde ya le espera el borrador de un mensaje sobre el anuncio. Un anuncio se puede reservar, marcar como vendido, renovar y denunciar, y caduca al cabo de entre 30 y 90 días. Un montaje puede exigir que los vendedores hayan participado antes en un feed o que los haya aprobado un moderador. | Trading Post |
 | `feed` | **Un feed para la comunidad.** La gente publica entradas con fotos y hashtags, y los demás pueden comentarlas y darles «me gusta». Una entrada puede ser para todo el espacio, para tus amigos, para un círculo (un grupo de amigos tuyos) o solo para ti. Un diario es una serie de entradas con una portada. Las entradas se pueden marcar como +18 o como anuncio publicitario. | Outpost |
 | `chat` | **Mensajes.** Envías mensajes privados y archivos a tus amigos (NIP-17). Los grupos existen hasta que su anfitrión los cierra, y las salas en directo desaparecen cuando sale la última persona. El chat tiene respuestas, reacciones, edición de mensajes, mensajes fijados, búsqueda en el dispositivo y mensajes que desaparecen. Las llamadas de voz y de vídeo funcionan entre un máximo de seis personas. | Uplink |
 | `notices` | **Un tablón de anuncios** para notas públicas. Cada nota va firmada por su autor y exige una prueba de trabajo, un pequeño cálculo que encarece publicar en masa. Las notas se pueden votar y denunciar, y caducan. | DevBoard |
@@ -43,7 +43,7 @@ del propio hub.
   nombre y su icono. Para añadir a tu hub la tienda de otra comunidad, basta
   una línea que defina el montaje.
 - **Un enlace indica la app, el espacio y el elemento, pero nunca el
-  servidor.** Un hub abre un enlace así con su propio montaje de esa app y ese
+  sitio que lo aloja.** Un hub abre un enlace así con su propio montaje de esa app y ese
   espacio. Si no tiene ninguno, te dice de quién es el espacio y te ofrece una
   forma de volver.
 - **Los espacios están federados**, es decir, un espacio no está atado a un

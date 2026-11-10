@@ -137,7 +137,7 @@ git tag -s v1.3.0 -m v1.3.0 && git push origin v1.3.0
 ```
 
 kiwi-updater incluye un flujo de trabajo para publicar versiones,
-`templates/release.yml`. Solo publica una release de GitHub para una etiqueta
+`templates/release.yml`. Solo publica una versión (release) en GitHub para una etiqueta
 firmada con una clave que figure en `.github/allowed_signers`, y nunca crea
 etiquetas por su cuenta. Por último, abre una pull request que añada tu URL al
 catálogo. Es bienvenida cualquier app de código abierto que de verdad se pueda

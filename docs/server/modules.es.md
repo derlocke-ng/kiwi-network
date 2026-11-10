@@ -32,7 +32,7 @@ tus máquinas, y controlan cómo sale su tráfico a Internet.
 |---|---|---|---|---|
 | `vpn-server` | **wg-easy**, el servidor WireGuard al que se conectan todos los clientes y nodes. Su ruta por defecto es el cliente de VPN, así que el tráfico hacia Internet continúa por la VPN comercial del master (el doble salto) | master | nada | `51820/udp`, y la interfaz web en `127.0.0.1:51821` |
 | `vpn-client` | **gluetun**, el túnel VPN por el que pasa el tráfico de una máquina. En un node, el túnel lleva al master; en el master, a una VPN comercial | ambos | nada | nada |
-| `dns` | **Pi-hole 6**, un servidor DNS que bloquea la publicidad para la mesh o para la LAN. Responde por los nombres de la fleet y puede dar también nombres a los proxies SOCKS5 de Mullvad | ambos | nada | `53` en un node |
+| `dns` | **Pi-hole 6**, un servidor DNS que bloquea la publicidad para la mesh o para la LAN. Resuelve los nombres de la fleet y también puede resolver por su nombre los proxies SOCKS5 de Mullvad | ambos | nada | `53` en un node |
 | `tor` | Un proxy **SOCKS5 de Tor** para los clientes de la mesh. Solo usa nodos de Tor de los países que indiques | ambos | nada | `127.0.0.1:9050` en un node, y la dirección en la mesh `:9050` en un master |
 | `reverse-proxy` | **nginx** con TLS. Tiene un bloque server por servicio, de modo que cada servicio es accesible con su propio nombre. Las páginas de administración solo se pueden abrir desde la mesh. Los nombres públicos con certificados de Let's Encrypt son opcionales | ambos | nada | `80`, `443` en un node, o en un master con `public` activado |
 | `gateway` | Enrutamiento por políticas en el host. El tráfico a Internet de los dispositivos de la LAN que usan esta máquina como puerta de enlace se envía por la VPN | node | vpn-client | una unidad de systemd en el host |
@@ -42,7 +42,7 @@ tus máquinas, y controlan cómo sale su tráfico a Internet.
 
 | Módulo | Qué es | Funciona en | Necesita |
 |---|---|---|---|
-| `cloud` | **Nextcloud**, montado con los contenedores del proyecto AIO, pero *sin* el contenedor maestro de AIO. Por eso no necesita el socket de docker y funciona con podman. Collabora, OnlyOffice, Talk, Imaginary, ClamAV, la búsqueda de texto completo y Whiteboard se pueden activar o desactivar uno por uno | node | vpn-client, reverse-proxy |
+| `cloud` | **Nextcloud**, construido con los contenedores del proyecto AIO, pero *sin* el contenedor maestro de AIO. Por eso no necesita el socket de docker y funciona con podman. Collabora, OnlyOffice, Talk, Imaginary, ClamAV, la búsqueda de texto completo y Whiteboard se pueden activar o desactivar uno por uno | node | vpn-client, reverse-proxy |
 | `vault` | **Vaultwarden**, un gestor de contraseñas compatible con Bitwarden | node | vpn-client, reverse-proxy |
 | `downloader` | **Transmission** y **JDownloader**. Los dos funcionan en el namespace de red del cliente de VPN, es decir, usan su conexión de red y no tienen ninguna propia. Mientras el túnel está caído, no transfieren nada | node | vpn-client |
 | `sftp` | Un servidor SFTP en su propio puerto (`2224`), desde el que puedes recoger las descargas | node | nada |
@@ -64,7 +64,7 @@ ejecutan un hub y el relay en el que el hub guarda sus eventos.
 | `nostr-relay` | **strfry**, el relay en el que un hub guarda sus eventos. Es accesible en `relay.<host>`. Quien se conecta desde Internet solo puede publicar si es miembro y ha demostrado que la clave es suya (NIP-42). Con `approved`, los miembros son las claves de una lista que firman los administradores. Con `registered`, es miembro cualquiera que tenga una cuenta. Las conexiones desde la mesh siempre pueden publicar | master | reverse-proxy |
 | `hub` | Un **hub de kiwi-framework** que funciona como contenedor. Por defecto es Armory, y es accesible en `hub.<host>`. Un hub puede ser privado, semipúblico o público | master | reverse-proxy |
 
-Consulta [Tener tu propio hub](../people/hubs.md).
+Consulta [Tu propio hub](../people/hubs.md).
 
 ## Copias de seguridad y discos { #backups-and-disks }
 

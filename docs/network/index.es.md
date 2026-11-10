@@ -39,8 +39,8 @@ la red se describe en un único archivo, el archivo fleet (`fleet.yaml`), y
 
 ## El master { #the-master }
 
-El master es la máquina a la que se conectan todas las demás. Su rol, `master`,
-ejecuta los cinco módulos que se describen a continuación. Pi-hole, Tor y nginx
+El master es la máquina a la que se conectan todas las demás. Tiene el rol
+`master`, que incluye los cinco módulos que se describen a continuación. Pi-hole, Tor y nginx
 comparten el namespace de red del servidor WireGuard. Un namespace de red es el
 conjunto propio de interfaces, direcciones y rutas de un contenedor, de modo que
 estos tres servicios usan la red del servidor WireGuard en lugar de tener una
@@ -143,7 +143,7 @@ preparadas:
 | Preset | En qué se convierte la máquina |
 |---|---|
 | `gateway` (por defecto) | Una puerta de enlace para la red local (LAN). Los dispositivos de la LAN que usan esta máquina como puerta de enlace predeterminada salen a Internet por la VPN y pueden acceder a la mesh. Pi-hole es el servidor DNS de la LAN y, si quieres, también su servidor DHCP. Los programas de descarga Transmission y JDownloader funcionan *dentro* del namespace de red del cliente de VPN, así que no tienen ninguna ruta mientras el túnel está caído. El preset incluye también nginx, Portainer y SFTP. |
-| `cloud` | Tu propia nube: Nextcloud con Collabora para archivos, calendarios y documentos, y Vaultwarden para las contraseñas. Estos servicios están detrás de nginx, y también se incluye Portainer. Nextcloud se monta con los contenedores del proyecto AIO, pero sin el contenedor maestro de AIO. |
+| `cloud` | Tu propia nube: Nextcloud con Collabora para archivos, calendarios y documentos, y Vaultwarden para las contraseñas. Estos servicios están detrás de nginx, y también se incluye Portainer. Nextcloud se construye con los contenedores del proyecto AIO, pero sin el contenedor maestro de AIO. |
 | `minimal` | Solo el cliente de VPN y nginx. Los módulos que quieras los añades tú. |
 
 En un node también pueden funcionar las copias de seguridad, un servidor de
@@ -175,7 +175,7 @@ el tráfico de la mesh llega a Internet. La salida tiene tres modos:
 |---|---|---|
 | **provider** | Por un proveedor de VPN comercial (gluetun). Es el doble salto, y es lo que configura el preset del master. | implementado |
 | **direct** | Directamente por la conexión a Internet del propio master. Para usar este modo, indica los módulos del master sin `vpn-client`. | implementado |
-| **master** | Por *el master de otra red*. Tu master es cliente allí, en uno de sus grupos que puede salir a Internet y a nada más. A esto se le llama multi-hop. | diseñado; hace falta poder dar de alta máquinas entre redes, es decir, la federación |
+| **master** | Por *el master de otra red*. Tu master es un cliente de esa red, dentro de un grupo que solo tiene acceso a Internet. A esto se le llama multi-hop. | diseñado; hace falta poder dar de alta máquinas entre redes, es decir, la federación |
 
 Sea cual sea su modo de salida, todo master ofrece además a la mesh el proxy
 SOCKS5 de Tor.
@@ -186,11 +186,11 @@ Cada red tiene su propia mesh, con su propio rango de direcciones. El rango por
 defecto es `10.8.0.0/16`. Los masters y los nodes están en `10.8.0.0/24`, y a
 continuación van los grupos: guests en `.1`, pentest en `.2`, devices en `.3` y
 routers en `.4`. Una segunda red usa otro rango, por ejemplo `10.9.0.0/16`, para
-que un dispositivo que pertenece a las dos pueda distinguirlas. Hoy por hoy el
-rango no se define en un solo ajuste, sino que está repartido entre varios:
-`mesh_subnet`; `server_ip`, `wg_subnet`, `wg_default_address` y `groups` del
-vpn-server; y `socks_policy_accept` de Tor. El archivo fleet los establece
-todos.
+que un dispositivo que pertenece a las dos pueda distinguirlas. Hoy por hoy, el
+rango no es un único ajuste, sino que aparece en varios: `mesh_subnet`, los
+ajustes `server_ip`, `wg_subnet`, `wg_default_address` y `groups` del
+vpn-server, y `socks_policy_accept` de Tor. El archivo fleet se encarga de
+ponerlos todos.
 
 ## Direcciones { #addressing }
 

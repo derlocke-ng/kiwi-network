@@ -1,8 +1,8 @@
 # El archivo fleet
 
 En el archivo fleet, `fleet.yaml`, describes todas las máquinas de tu Kiwi
-Network. Para cada una indica qué sistema operativo recibe, para qué se usa y
-cómo se configuran sus servicios. kiwi-server construye todas las máquinas a
+Network. Para cada máquina, el archivo indica qué sistema operativo recibe,
+para qué se usa y cómo se configuran sus servicios. kiwi-server construye todas las máquinas a
 partir de esta descripción: escribes una sola vez lo que quieres y no tienes que
 configurar ninguna máquina a mano.
 
@@ -121,8 +121,8 @@ valor incorporado que aparece en esta tabla.
   módulo**. El stack es el conjunto de contenedores que una máquina ejecuta para
   sus módulos, y los ajustes del stack se aplican a todos ellos.
 - Una lista `modules:` dentro de ese bloque **sustituye** la lista de módulos
-  del preset. Un preset es una lista de módulos ya preparada. Los módulos que
-  necesitan los de la lista se añaden automáticamente.
+  del preset. Un preset es una lista de módulos ya preparada. Si los módulos de
+  la lista necesitan otros, estos se añaden automáticamente.
 - Los **ajustes de archivo**, como los certificados y los archivos de
   configuración, se indican como rutas relativas al archivo fleet. kiwi-server
   copia el contenido de esos archivos en el script de rol del host, que es el
@@ -157,8 +157,8 @@ su valor por defecto.
 
 ## Comprobar lo que has escrito { #checking-what-you-wrote }
 
-kiwi-server puede revisar el archivo fleet por ti y mostrarte cómo interpreta
-un host.
+kiwi-server puede revisar el archivo fleet por ti y mostrarte cómo entiende la
+configuración de un host.
 
 ```bash
 kiwi-server validate fleet.yaml          # errores y avisos
@@ -174,7 +174,7 @@ kiwi-server también comprueba el dominio. Rechaza `.local` y avisa si usas
 Una máquina que funcionaba con uno de los antiguos stacks v1 puede pasar a la
 fleet sin perder sus datos. El entorno de ejecución por defecto es ahora podman,
 y el script de rol no detiene los contenedores de docker que sigan en marcha.
-Así que pon `runtime: docker` o detén primero el stack antiguo. Después, pon en
+Por eso, pon `runtime: docker` o detén primero el stack antiguo. Después, pon en
 `docker_subnet` la subred que usaba el stack antiguo y cambia el nombre de los
 directorios de datos por los nuevos nombres de módulo (`kmvpn-server` →
 `km-vpn-server`, `knvault` → `kn-vault`, …). Así, los contenedores conservan sus

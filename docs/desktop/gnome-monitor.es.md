@@ -11,7 +11,7 @@ necesita. Tiene una herramienta de línea de comandos y un panel GTK4.
 - Repositorio: [derlocke-ng/gnome-monitor](https://github.com/derlocke-ng/gnome-monitor), GPL-3.0-or-later
 - Última versión: **v0.3.2**. Está en el [catálogo de Kiwi](catalogs.md), en el ámbito de usuario.
 
-Un caso típico es un escritorio con dos ordenadores y tres pantallas. Cuando el
+Un caso típico es una mesa de trabajo con dos ordenadores y tres pantallas. Cuando el
 otro ordenador también necesita el monitor 4K, lo apagas en este ordenador y
 sigues trabajando con las demás pantallas. Al volver a encenderlo, recupera la
 posición y el modo que tenía, y vuelve a ser la pantalla principal si lo era

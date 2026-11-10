@@ -1,98 +1,118 @@
 # ensconce
 
-Configurazione post-installazione modulare per [Bluefin-DX](https://projectbluefin.io/).
-ensconce trasforma un Bluefin appena installato nella tua postazione di lavoro configurata, a partire da
-semplici file di elenco: pacchetti aggiunti al sistema, Flatpak, estensioni GNOME, sincronizzazione Nextcloud,
-una configurazione SSH sincronizzata, impostazioni del desktop e della schermata di login, e le tue app Kiwi.
+ensconce configura al posto tuo un [Bluefin-DX](https://projectbluefin.io/)
+appena installato, così non devi sistemare a mano ogni macchina nuova. Descrivi
+la tua postazione in semplici file di elenco, ed ensconce trasforma
+l’installazione nuova in quella postazione. Si occupa dei pacchetti stratificati,
+dei Flatpak, delle estensioni di GNOME, della sincronizzazione con Nextcloud, di
+una configurazione SSH sincronizzata tra le tue macchine, delle impostazioni del
+desktop e della schermata di accesso, e delle tue app Kiwi. I pacchetti
+stratificati sono pacchetti RPM aggiunti sopra l’immagine di sistema. La
+configurazione è modulare: è divisa in passi separati, che puoi eseguire o
+saltare.
 
-- Repository: [derlocke-ng/ensconce](https://github.com/derlocke-ng/ensconce),
-  GPL-3.0-or-later (secondo il suo manifest; il README dice GPL-3.0)
-- Ultima release: **v2.5.0**. È nel [catalogo Kiwi](catalogs.md), ambito utente.
+- Repository: [derlocke-ng/ensconce](https://github.com/derlocke-ng/ensconce).
+  Secondo il manifest la licenza è GPL-3.0-or-later, mentre il README indica
+  GPL-3.0.
+- Ultima release: **v2.5.0**. È nel [catalogo Kiwi](catalogs.md) e viene
+  installato nell’ambito utente, cioè nella tua cartella home.
 
 ```bash
 kiwi install ensconce
-ensconce --init          # crea ~/.config/ensconce dagli esempi
+ensconce --init          # crea ~/.config/ensconce a partire dagli esempi
 ensconce                 # esegue la configurazione
 ```
 
-Oppure da un clone: `./ensconce.sh --init`, modifica `config/`, poi `./ensconce.sh`.
+Puoi eseguirlo anche da un clone del repository: lancia `./ensconce.sh --init`,
+modifica i file in `config/` e poi lancia `./ensconce.sh`.
 
-## Passi { #steps }
+## I passi { #steps }
 
-Ogni fase è uno script in `steps/`, eseguito in ordine:
+La configurazione è divisa in passi. Ogni passo è uno script in `steps/`, e i
+passi vengono eseguiti in questo ordine:
 
-| # | Passo | Cosa fa |
+| # | Passo | Che cosa fa |
 |---|---|---|
-| 01 | `rebase` | passa a Bluefin-DX |
-| 02 | `ujust` | gruppi per sviluppatori e strumenti CLI |
+| 01 | `rebase` | passa il sistema a Bluefin-DX |
+| 02 | `ujust` | configura i gruppi per sviluppatori e gli strumenti da riga di comando |
 | 03 | `repos` | aggiunge repository RPM |
-| 04 | `packages` | aggiunge pacchetti RPM al sistema |
-| 05 | `flatpaks` | installa app Flatpak (`FLATPAK_LANGUAGES` sceglie le loro traduzioni) |
-| 06 | `overrides` | override dei permessi Flatpak |
-| 07 | `extensions` | estensioni di GNOME Shell |
-| 08 | `cacert` | certificati CA personalizzati |
-| 09 | `nextcloud` | preconfigura la sincronizzazione delle cartelle Nextcloud |
-| 10 | `dconf` | impostazioni del desktop GNOME |
-| 11 | `gdm` | la schermata di login |
-| 12 | `ssh` | una configurazione SSH sincronizzata, con Bitwarden o GNOME come agente SSH |
-| 13 | `kiwi` | installa kiwi-updater (`KIWI_INSTALL=recommended\|manual\|minimal`) e ogni app in `kiwi-apps.list` |
-| 14 | `sysctl` | drop-in da `sysctl.d/` (un esempio limita il dirty writeback per gli SSD lenti) |
-| 15 | `power` | `SYSTEM_SLEEP=off` maschera i target di sospensione |
+| 04 | `packages` | aggiunge pacchetti RPM stratificati |
+| 05 | `flatpaks` | installa app Flatpak. `FLATPAK_LANGUAGES` sceglie le lingue delle loro traduzioni |
+| 06 | `overrides` | imposta eccezioni ai permessi dei Flatpak |
+| 07 | `extensions` | installa estensioni di GNOME Shell |
+| 08 | `cacert` | installa certificati di CA personalizzati |
+| 09 | `nextcloud` | prepara in anticipo la sincronizzazione delle cartelle con Nextcloud |
+| 10 | `dconf` | applica le impostazioni del desktop GNOME |
+| 11 | `gdm` | configura la schermata di accesso |
+| 12 | `ssh` | prepara la configurazione SSH sincronizzata, con Bitwarden o GNOME come agente SSH |
+| 13 | `kiwi` | installa kiwi-updater nel modo scelto da `KIWI_INSTALL=recommended\|manual\|minimal`, e poi ogni app elencata in `kiwi-apps.list` |
+| 14 | `sysctl` | installa i file di impostazioni del kernel presenti in `sysctl.d/`. Un file di esempio limita la quantità di dati non ancora scritti su disco che il kernel tiene in memoria, il che aiuta con gli SSD lenti |
+| 15 | `power` | con `SYSTEM_SLEEP=off` maschera i target di sospensione, così la macchina non può andare in sospensione |
 
-ensconce controlla prima l'ambiente (un'immagine Bluefin, `rpm-ostree`,
-`flatpak`, `dconf`, `jq`, `curl`). Salva i suoi progressi e riprende dopo i
-riavvii, e tiene la macchina sveglia per tutta l'esecuzione, ripristinando poi le tue impostazioni
-di alimentazione.
+Prima di iniziare, ensconce controlla l’ambiente. Il sistema deve essere
+un’immagine Bluefin, e devono essere disponibili `rpm-ostree`, `flatpak`,
+`dconf`, `jq` e `curl`. ensconce salva i progressi, quindi dopo un riavvio
+riprende da dove si era fermato. Per tutta la durata dell’esecuzione tiene la
+macchina sveglia, e alla fine ripristina le tue impostazioni di risparmio
+energetico.
+
+Queste opzioni controllano un’esecuzione:
 
 ```bash
-ensconce --dry-run                  # anteprima senza cambiare nulla
+ensconce --dry-run                  # anteprima, senza cambiare nulla
 ensconce --skip rebase,ujust        # salta dei passi
-ensconce --only extensions,dconf    # esegue solo questi
+ensconce --only extensions,dconf    # esegue soltanto questi
 ensconce --status | --list-steps | --reset
-ensconce --log [file]               # salva il suo output
-ensconce --config-dir               # stampa la directory di configurazione attiva
+ensconce --log [file]               # salva l’output
+ensconce --config-dir               # mostra la directory di configurazione attiva
 ```
 
 ## Configurazione { #configuration }
 
-La directory di configurazione è la prima che esiste tra: `$ENSCONCE_CONFIG`,
-`~/.config/ensconce/` (installata tramite kiwi), `config/` in un clone, e
-`config.example/` (con un avviso).
+ensconce cerca la sua directory di configurazione in quattro posti e usa il
+primo che esiste: prima `$ENSCONCE_CONFIG`, poi `~/.config/ensconce/` (usata
+quando ensconce è stato installato con kiwi), poi `config/` in un clone, e
+infine `config.example/`. Se usa `config.example/`, mostra un avviso.
 
-| File / directory | Scopo |
+| File / directory | A che cosa serve |
 |---|---|
-| `settings.sh` | URL dei server e interruttori: SSH, kiwi-updater, lingue Flatpak, sospensione |
-| `packages.list`, `flatpaks.list`, `extensions.list` | un elemento per riga |
+| `settings.sh` | gli URL dei server, e gli interruttori per SSH, kiwi-updater, le lingue dei Flatpak e la sospensione |
+| `packages.list`, `flatpaks.list`, `extensions.list` | i pacchetti, i Flatpak e le estensioni di GNOME da installare, uno per riga |
 | `kiwi-apps.list` | le app Kiwi da installare |
-| `repos.d/`, `flatpak-overrides/` | file dei repository; override per app nel formato di Flatpak |
-| `nextcloud/folders.list` | cartelle da sincronizzare come `localPath\|remotePath[\|tags]` |
-| `nextcloud/exclude.lst`, `exclude.d/` | esclusioni dalla sincronizzazione globali e per cartella (con tag) |
-| `certs/` | certificati CA (`.pem`), per esempio il `kiwiCA.pem` della tua fleet |
+| `repos.d/`, `flatpak-overrides/` | i file dei repository, e le eccezioni per singole app nel formato proprio di Flatpak |
+| `nextcloud/folders.list` | le cartelle da sincronizzare, nella forma `localPath\|remotePath[\|tags]` |
+| `nextcloud/exclude.lst`, `exclude.d/` | che cosa escludere dalla sincronizzazione, per tutte le cartelle e per le singole cartelle che hanno un tag |
+| `certs/` | certificati di CA (`.pem`), per esempio il `kiwiCA.pem` della tua fleet |
 | `sysctl.d/` | impostazioni del kernel |
-| `dconf-settings.ini`, `gtk3-bookmarks` | impostazioni di GNOME, segnalibri di Nautilus |
-| `gdm/dconf.d/`, `gdm/monitors.xml` | le impostazioni e la disposizione degli schermi della schermata di login |
+| `dconf-settings.ini`, `gtk3-bookmarks` | impostazioni di GNOME e segnalibri di Nautilus |
+| `gdm/dconf.d/`, `gdm/monitors.xml` | le impostazioni e la disposizione degli schermi della schermata di accesso |
 
-Un tag di esclusione per cartella come `browser` mette `exclude.d/browser.lst` in
-quella cartella, il che evita che i database di un profilo del browser vengano sincronizzati (e
-corrotti), mentre `user.js` continua a sincronizzarsi.
+Un tag in `nextcloud/folders.list` dà a una cartella le sue esclusioni. Il tag
+`browser`, per esempio, mette `exclude.d/browser.lst` in quella cartella. I
+database di un profilo del browser non vengono allora sincronizzati, perché la
+sincronizzazione potrebbe danneggiarli, mentre `user.js` continua a essere
+sincronizzato.
 
 ## Clonare una macchina { #cloning-a-machine }
 
-`--export` legge il sistema in uso e scrive un albero di configurazione di ensconce,
-l'inverso dei passi:
+`--export` fa il contrario dei passi: legge il sistema in esecuzione e ne ricava
+una directory di configurazione per ensconce. Con quella directory puoi poi
+configurare una macchina nuova:
 
 ```bash
-ensconce --export ./my-setup        # sulla macchina configurata
+ensconce --export ./my-setup        # sulla macchina già configurata
 ensconce --init                     # su quella nuova
 cp -rT ./my-setup "$(ensconce --config-dir)"
 ensconce --dry-run && ensconce
 ```
 
-Cattura solo ciò che hai aggiunto tu: i pacchetti richiesti invece dell'intera
-immagine, le estensioni che vengono davvero da extensions.gnome.org, i tuoi file dei repository, e
-sottoalberi dconf selezionati invece di un dump completo. Consideralo un punto di partenza.
-`certs/` e `nextcloud/` possono contenere materiale privato.
+L’esportazione contiene soltanto ciò che hai aggiunto al sistema. Elenca i
+pacchetti che hai richiesto tu e non l’intera immagine. Elenca solo le
+estensioni che provengono davvero da extensions.gnome.org. Contiene i tuoi file
+di repository e, invece di un dump completo, alcuni sottoalberi di dconf scelti.
+Considera l’esportazione un punto di partenza: `certs/` e `nextcloud/` possono
+contenere materiale privato.
 
-ensconce è un'app con **ambito utente**. I passi che richiedono root lo chiedono
-da soli. Aggiungi un tuo passo come `steps/NN-<name>.sh` con una funzione
-`step_<name>()`.
+ensconce è un’app dell’**ambito utente**. I passi che hanno bisogno di root lo
+chiedono da soli. Per aggiungere un passo tuo, crea un file
+`steps/NN-<name>.sh` con una funzione `step_<name>()`.

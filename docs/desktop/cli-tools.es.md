@@ -1,53 +1,65 @@
 # kiwi-cli-tools-desktop
 
-Cuatro pequeñas utilidades de línea de comandos para un escritorio Linux.
+kiwi-cli-tools-desktop es un paquete de cuatro pequeñas herramientas de línea
+de comandos para un escritorio Linux. `torlink` te da acceso por Tor a un
+servicio de otra máquina, `pweb` comparte una carpeta por HTTPS,
+`select-server` te deja elegir un host SSH en un menú y `tethering` ajusta el
+TTL del tráfico de los dispositivos que comparten tu conexión.
 
 - Repositorio: [derlocke-ng/kiwi-cli-tools-desktop](https://github.com/derlocke-ng/kiwi-cli-tools-desktop), GPL-3.0-or-later
-- Última versión: **v1.2.1**. Está en el [catálogo de Kiwi](catalogs.md), ámbito de usuario.
+- Última versión: **v1.2.1**. Está en el [catálogo de Kiwi](catalogs.md), en el ámbito de usuario.
 
 ```bash
 kiwi install kiwi-cli-tools-desktop   # o ./install.sh install, en ~/.local/bin
 ```
 
-## `torlink`: llegar a una máquina por Tor { #torlink-reach-a-machine-over-tor }
+## `torlink`: acceder a una máquina por Tor { #torlink-reach-a-machine-over-tor }
 
-Una VPN de andar por casa: llega a cualquier servicio TCP (SSH, una interfaz web,
-una base de datos) de otra máquina a través de Tor, sin puertos abiertos, sin
-cuentas y sin servidor. Tor y socat se ejecutan en un único contenedor Podman sin
-root, así que solo necesitas Podman.
+Con `torlink` puedes acceder por la red Tor a cualquier servicio TCP de otra
+máquina, como SSH, una interfaz web o una base de datos. Es un sustituto
+sencillo de una VPN: ninguna de las dos máquinas necesita un puerto abierto, no
+hace falta ninguna cuenta y no hay que mantener ningún servidor. Tor y socat
+funcionan juntos en un único contenedor de Podman rootless, así que solo
+necesitas Podman.
 
-Una dirección onion es la identidad. El lado que ofrece genera un **código de
-invitación** para un par, y el otro lado lo acepta. El código lleva una clave de
-autorización de cliente de Tor, así que el servicio es invisible para cualquiera
-que no la tenga: trata el código como una contraseña.
+Una máquina que ofrece servicios se identifica por su dirección onion, que es
+una dirección dentro de la red Tor. En esa máquina creas un **código de
+invitación** para un peer, es decir, para la otra parte que debe tener acceso.
+El peer acepta el código en la otra máquina. El código contiene una clave de
+autorización de cliente de Tor, y sin ella nadie puede ver siquiera que el
+servicio existe. Así que trata el código como una contraseña.
 
 ```bash
-# máquina A: ofrece SSH y una interfaz web a bob
+# máquina A: ofrecer SSH y una interfaz web a "bob"
 torlink add-service ssh 22
 torlink add-service web 8080
-torlink invite bob ssh web          # imprime torlink1:…  (¡secreto!)
+torlink invite bob ssh web          # muestra torlink1:…  (¡secreto!)
 
-# máquina B: úsalos
+# máquina B: usarlos
 torlink accept torlink1:… alice
 torlink up
 torlink ssh alice                   # SSH por Tor
-torlink connect alice web           # 127.0.0.1:2200 → alice's web UI
-torlink ssh-config >> ~/.ssh/config # then `ssh alice-tor`; `select-server tor` lists them
+torlink connect alice web           # 127.0.0.1:2200 → la interfaz web de alice
+torlink ssh-config >> ~/.ssh/config # después `ssh alice-tor`; `select-server tor` los muestra
 ```
 
-Cada invitación es su propio servicio onion con solo los servicios que
-enumeraste, así que `torlink revoke bob` retira ese acceso para siempre.
-`torlink ls` muestra servicios, pares y reenvíos. Tor es solo TCP, y la primera
-conexión tarda un rato. El puerto SOCKS del contenedor (19050) solo escucha en
-loopback. El estado, incluidas tus claves onion, vive en
-`~/.local/share/torlink`, y `torlink purge` lo borra.
+Cada invitación es un servicio onion independiente que solo contiene los
+servicios que indicaste en ella. Por eso `torlink revoke bob` retira ese acceso
+para siempre. `torlink ls` muestra tus servicios, tus peers y tus redirecciones,
+es decir, los puertos locales que llevan a los servicios de un peer. Tor solo
+transporta TCP, y la primera conexión tarda un rato. El puerto SOCKS del
+contenedor (19050) solo escucha en la interfaz de loopback. El estado de
+`torlink`, incluidas tus claves onion, se guarda en `~/.local/share/torlink`, y
+`torlink purge` lo borra.
 
 ## `pweb`: compartir una carpeta por HTTPS { #pweb-share-a-folder-over-https }
 
-Sirve el **directorio actual** por HTTPS en un puerto libre aleatorio, para
-pasar un archivo a otra máquina de la misma red. En la primera ejecución se crea
-un certificado autofirmado que luego se reutiliza. Sirve a toda la LAN, así que
-arráncalo en la carpeta que quieres compartir y detenlo con Ctrl+C.
+`pweb` sirve el **directorio actual** por HTTPS en un puerto libre elegido al
+azar. Úsalo para pasar un archivo a otra máquina de la misma red. La primera
+vez que se ejecuta crea un certificado autofirmado, y después lo reutiliza.
+Mientras `pweb` está en marcha, cualquier máquina de la red local puede acceder
+a la carpeta. Arráncalo en la carpeta que de verdad quieres compartir y
+detenlo con Ctrl+C.
 
 ```
 $ cd ~/Downloads && pweb
@@ -57,25 +69,31 @@ on https://yourhost:40123  (also https://localhost:40123)
 
 ## `select-server`: elegir un host SSH { #select-server-pick-an-ssh-host }
 
-Un menú numerado con cada alias `Host` concreto de tu `~/.ssh/config`. Elige uno
-y se conecta. Etiqueta los hosts con un comentario `# tags: work prod` dentro del
-bloque `Host` para filtrar:
+`select-server` muestra un menú numerado con todos los alias `Host` concretos
+de tu `~/.ssh/config`, es decir, todos los que no son un patrón con comodines.
+Eliges uno y se conecta a ese host. Para filtrar el menú, etiqueta tus hosts:
+añade un comentario como `# tags: work prod` dentro del bloque `Host` y pasa
+una etiqueta en la línea de comandos:
 
 ```
-$ select-server work            # only hosts tagged "work"
+$ select-server work            # solo los hosts con la etiqueta "work"
 $ select-server --tags          # las etiquetas que tienes
 $ select-server -f other.conf   # otro archivo de configuración
 ```
 
-## `tethering`: el arreglo del TTL { #tethering-the-ttl-fix }
+## `tethering`: ajustar el TTL para los dispositivos conectados { #tethering-the-ttl-fix }
 
-Fija el TTL a 64 en el tráfico que llega por una interfaz, para que los
-dispositivos que comparten la conexión a través de esta máquina parezcan tráfico
-propio de la máquina ante un operador que cuenta saltos. Pide sudo, añade una
-regla mangle de `iptables`, y la regla **no** sobrevive a un reinicio.
+`tethering` sirve para cuando otros dispositivos usan la conexión a Internet de
+esta máquina, lo que se conoce como tethering o compartir conexión. Algunas
+operadoras cuentan los saltos de red del tráfico y así distinguen los
+dispositivos conectados de la propia máquina. `tethering` pone el TTL a 64 en
+todo el tráfico que llega por una interfaz. Para la operadora, el tráfico de
+los dispositivos conectados parece entonces tráfico de la propia máquina. La
+herramienta pide sudo y añade una regla `iptables` de tipo mangle. La regla
+**no** sobrevive a un reinicio.
 
 ```
-tethering            # elige la interfaz, fija la regla
+tethering            # elegir la interfaz, aplicar la regla
 tethering --status
 tethering --off
 ```

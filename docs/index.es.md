@@ -76,8 +76,8 @@ pierden.
 - **Una copia de seguridad cada noche.** Cada máquina envía una copia de
   seguridad cifrada a un servidor de copias de seguridad que es tuyo. Puede
   añadir a sus copias, pero no borrarlas, así que un intruso no puede
-  destruirlas. También se hace copia de seguridad del archivo fleet, que es el
-  archivo donde describes tus máquinas, y de sus secretos.
+  destruirlas. También se hace copia de seguridad del archivo fleet (el archivo
+  que describe tus máquinas) y de sus secretos.
 - **Recuperación cuando hace falta.** Los discos están cifrados. Las máquinas
   los desbloquean solas al arrancar, o los desbloqueas tú a distancia. Si hay
   que reconstruir una máquina, su configuración sale del archivo fleet y sus

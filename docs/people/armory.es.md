@@ -19,8 +19,8 @@ como aplicación web.
 - **Ábrelo:** [derlocke-ng.github.io/armory](https://derlocke-ng.github.io/armory/)
 - El repositorio es [derlocke-ng/armory](https://github.com/derlocke-ng/armory)
   y la licencia es GPL-3.0-or-later.
-- Armory es una distribución de [kiwi-framework](index.md) 0.32.1, que fija
-  por commit. El propio Armory todavía no tiene etiquetas de versión.
+- Armory es una distribución de [kiwi-framework](index.md) 0.32.1 y fija esa
+  versión por commit. El propio Armory todavía no tiene etiquetas de versión.
 - Está disponible en inglés, alemán, francés, español, italiano, neerlandés,
   polaco y portugués.
 
@@ -52,7 +52,7 @@ Outpost es `feed`, Trading Post es `market`, DevBoard es `notices` y pongjs es
 
 En la página de inicio inicias sesión o creas una cuenta, con un nombre de
 usuario y una contraseña o con una clave de nostr. A partir de ahí, todas las
-herramientas usan esa cuenta. Las listas que hubieras creado en un dispositivo
+herramientas usan esa cuenta. Las listas que hayas creado en un dispositivo
 antes de iniciar sesión pasan a la cuenta. Si no usas una cuenta, cada
 dispositivo trabaja con su propia clave.
 
@@ -78,8 +78,8 @@ cifrado antes de enviarse. En el
 
 Los moderadores de Armory se ocupan de Outpost, Trading Post y DevBoard. Una
 entrada de Outpost se puede marcar como +18 o como anuncio publicitario. La
-marca la puede poner el autor o un moderador, y también se pone sola con dos
-denuncias. Las entradas marcadas solo se muestran a quienes tienen una cuenta.
+marca la puede poner el autor o un moderador, y también se pone automáticamente
+cuando hay dos denuncias. Las entradas marcadas solo se muestran a quienes tienen una cuenta.
 
 ## Tu propio Armory { #your-own-armory }
 
