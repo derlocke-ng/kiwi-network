@@ -1,14 +1,13 @@
 # ensconce
 
 Modular post-installation setup for [Bluefin-DX](https://projectbluefin.io/).
-ensconce turns a fresh Bluefin install into your configured workstation:
-layered packages, Flatpaks, GNOME extensions, Nextcloud sync, desktop settings,
-the login screen and more, all from plain list files.
+ensconce turns a fresh Bluefin install into your configured workstation from
+plain list files: layered packages, Flatpaks, GNOME extensions, Nextcloud sync,
+a synced SSH config, desktop and login-screen settings, and your Kiwi apps.
 
-- Repository: [derlocke-ng/ensconce](https://github.com/derlocke-ng/ensconce), GPL-3.0-or-later (its `kiwi.manifest`; the README says GPL-3.0)
-- Latest release: **v2.1.1**. It is in the [Kiwi catalog](catalogs.md).
-
-## Quick start
+- Repository: [derlocke-ng/ensconce](https://github.com/derlocke-ng/ensconce),
+  GPL-3.0-or-later (its manifest; the README says GPL-3.0)
+- Latest release: **v2.5.0**. It is in the [Kiwi catalog](catalogs.md), user scope.
 
 ```bash
 kiwi install ensconce
@@ -16,96 +15,84 @@ ensconce --init          # create ~/.config/ensconce from the examples
 ensconce                 # run the setup
 ```
 
-Or from a clone:
-
-```bash
-git clone https://github.com/derlocke-ng/ensconce.git && cd ensconce
-./ensconce.sh --init     # creates config/ from the examples
-./ensconce.sh
-```
+Or from a clone: `./ensconce.sh --init`, edit `config/`, then `./ensconce.sh`.
 
 ## Steps
 
-Each phase is a self-contained script in `steps/`, run in order:
+Each phase is a script in `steps/`, run in order:
 
-| Step | Does |
-|---|---|
-| `rebase` | switch to Bluefin-DX |
-| `ujust` | developer groups and CLI tools |
-| `repos` | add RPM repositories |
-| `packages` | layer RPM packages |
-| `flatpaks` | install Flatpak apps |
-| `overrides` | Flatpak permission overrides |
-| `extensions` | GNOME Shell extensions |
-| `cacert` | custom CA certificates (your fleet's `kiwiCA.pem`, for example) |
-| `nextcloud` | preseed Nextcloud folder sync |
-| `dconf` | GNOME desktop settings |
-| `gdm` | login screen (GDM) settings |
+| # | Step | Does |
+|---|---|---|
+| 01 | `rebase` | switch to Bluefin-DX |
+| 02 | `ujust` | developer groups and CLI tools |
+| 03 | `repos` | add RPM repositories |
+| 04 | `packages` | layer RPM packages |
+| 05 | `flatpaks` | install Flatpak apps (`FLATPAK_LANGUAGES` picks their translations) |
+| 06 | `overrides` | Flatpak permission overrides |
+| 07 | `extensions` | GNOME Shell extensions |
+| 08 | `cacert` | custom CA certificates |
+| 09 | `nextcloud` | preseed Nextcloud folder sync |
+| 10 | `dconf` | GNOME desktop settings |
+| 11 | `gdm` | the login screen |
+| 12 | `ssh` | a synced SSH config, with Bitwarden or GNOME as the SSH agent |
+| 13 | `kiwi` | install kiwi-updater (`KIWI_INSTALL=recommended\|manual\|minimal`) and every app in `kiwi-apps.list` |
+| 14 | `sysctl` | drop-ins from `sysctl.d/` (an example caps dirty writeback for slow SSDs) |
+| 15 | `power` | `SYSTEM_SLEEP=off` masks the sleep targets |
 
-ensconce saves its progress and resumes after reboots. It checks the
-environment before running, and keeps the machine awake for the whole run
-(logind inhibitor, a GNOME session inhibitor and the power settings, which are
-restored afterwards).
+ensconce checks the environment first (a Bluefin image, `rpm-ostree`,
+`flatpak`, `dconf`, `jq`, `curl`). It saves its progress and resumes after
+reboots, and keeps the machine awake for the whole run, restoring your power
+settings afterwards.
 
 ```bash
 ensconce --dry-run                  # preview without changing anything
 ensconce --skip rebase,ujust        # skip steps
 ensconce --only extensions,dconf    # run only these
-ensconce --status                   # progress
-ensconce --list-steps
-ensconce --reset                    # clear progress, start fresh
+ensconce --status | --list-steps | --reset
 ensconce --log [file]               # save the output
+ensconce --config-dir               # print the active config directory
 ```
 
 ## Configuration
 
-`ensconce --config-dir` prints the active directory: `$ENSCONCE_CONFIG`, then
-`~/.config/ensconce/` (installed via kiwi), then `config/` in a clone.
+The config directory is the first that exists of: `$ENSCONCE_CONFIG`,
+`~/.config/ensconce/` (installed via kiwi), `config/` in a clone, and
+`config.example/` (with a warning).
 
 | File / directory | Purpose |
 |---|---|
-| `settings.sh` | server URLs, feature toggles |
-| `packages.list` | RPM packages to layer, one per line |
-| `flatpaks.list` | Flatpak app IDs |
-| `extensions.list` | GNOME extension UUIDs |
-| `repos.d/` | `.repo` files for `/etc/yum.repos.d/` |
-| `flatpak-overrides/` | per-app overrides, in Flatpak's own format |
+| `settings.sh` | server URLs and switches: SSH, kiwi-updater, Flatpak languages, sleep |
+| `packages.list`, `flatpaks.list`, `extensions.list` | one item per line |
+| `kiwi-apps.list` | the Kiwi apps to install |
+| `repos.d/`, `flatpak-overrides/` | repo files; per-app overrides in Flatpak's own format |
 | `nextcloud/folders.list` | sync folders as `localPath\|remotePath[\|tags]` |
 | `nextcloud/exclude.lst`, `exclude.d/` | global and per-folder (tagged) sync exclusions |
-| `certs/` | CA certificates (`.pem`) |
-| `dconf-settings.ini` | GNOME settings |
-| `gtk3-bookmarks` | Nautilus sidebar bookmarks |
-| `gdm/dconf.d/`, `gdm/monitors.xml` | login screen settings and display layout |
+| `certs/` | CA certificates (`.pem`), for example your fleet's `kiwiCA.pem` |
+| `sysctl.d/` | kernel settings |
+| `dconf-settings.ini`, `gtk3-bookmarks` | GNOME settings, Nautilus bookmarks |
+| `gdm/dconf.d/`, `gdm/monitors.xml` | the login screen's settings and display layout |
 
-A per-folder exclusion tag such as `browser` places `exclude.d/browser.lst` as
-`.sync-exclude.lst` in that folder. That keeps a browser profile's SQLite
-databases from being synced (and corrupted), while files like `user.js` still
-sync.
+A per-folder exclusion tag such as `browser` places `exclude.d/browser.lst` in
+that folder, which keeps a browser profile's databases from being synced (and
+corrupted) while `user.js` still syncs.
 
 ## Cloning a machine
 
-`--export` reads the live system and writes an ensconce config tree, the inverse
-of the steps. Set one machine up by hand, export it, edit, and run ensconce on
-the next one:
+`--export` reads the live system and writes an ensconce config tree, the
+inverse of the steps:
 
 ```bash
 ensconce --export ./my-setup        # on the configured machine
-ensconce --init                     # on the new machine
+ensconce --init                     # on the new one
 cp -rT ./my-setup "$(ensconce --config-dir)"
 ensconce --dry-run && ensconce
 ```
 
-The export captures only what you added: requested `rpm-ostree` packages (not
-the whole image), extensions actually from extensions.gnome.org, your own repo
-files (Bluefin's own are exported as `.repo.disabled`), and curated dconf
-subtrees rather than a full dump. Treat an export as a starting point. `certs/`
-and `nextcloud/` can contain private material, so check before sharing one.
+It captures only what you added: requested packages rather than the whole
+image, extensions actually from extensions.gnome.org, your own repo files, and
+curated dconf subtrees rather than a full dump. Treat it as a starting point.
+`certs/` and `nextcloud/` can hold private material.
 
-## Notes
-
-- It is a **user-scope** app. The steps that need root (`rpm-ostree`, `/etc`,
-  GDM) ask for it themselves. Installing it as root would apply your dconf and
-  Flatpak settings to the wrong account.
-- Add your own step by dropping `NN-<name>.sh` with a `step_<name>()` function
-  into `steps/` (e.g. `step_mystep` in `12-mystep.sh`). It is discovered
-  automatically.
+ensconce is a **user-scope** app. The steps that need root ask for it
+themselves. Add your own step as `steps/NN-<name>.sh` with a `step_<name>()`
+function.

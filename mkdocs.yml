@@ -1,5 +1,5 @@
 site_name: Kiwi Network
-site_description: Open-source tools for your own private network — a WireGuard mesh built from one file — and a Fedora Atomic desktop with privacy apps.
+site_description: Open-source tools to connect what is yours — a private WireGuard mesh built from one file, peer-to-peer tools over nostr, and apps for Fedora Atomic desktops.
 site_url: https://kiwi-network.eu/docs/
 repo_url: https://github.com/derlocke-ng/kiwi-network
 repo_name: derlocke-ng/kiwi-network
@@ -16,8 +16,8 @@ validation:
 theme:
   name: material
   language: en
-  logo: assets/kiwi.svg
-  favicon: assets/kiwi.svg
+  logo: assets/icons/kiwi-network.svg
+  favicon: assets/icons/kiwi-network.svg
   font: false
   features:
     - navigation.tabs
@@ -72,24 +72,35 @@ nav:
       - How it works: network/index.md
       - DNS, names & certificates: network/dns.md
       - Routers: network/routers.md
-  - kiwi-server:
-      - Quick start: server/index.md
-      - The fleet file: server/fleet.md
-      - Roles: server/roles.md
-      - Modules: server/modules.md
-      - Targets, updates & first boot: server/targets.md
+      - kiwi-server:
+          - Overview: server/index.md
+          - The fleet file: server/fleet.md
+          - Roles: server/roles.md
+          - Modules: server/modules.md
+          - Machines: server/machines.md
+          - Operations: server/operations.md
+      - One machine without a fleet: server/single.md
+  - People:
+      - Hubs on nostr: people/index.md
+      - Armory: people/armory.md
+      - Running your own hub: people/hubs.md
   - Desktop:
       - Overview: desktop/index.md
       - kiwi-updater: desktop/kiwi-updater.md
-      - Catalogs & publishing apps: desktop/catalogs.md
+      - Catalogs & publishing: desktop/catalogs.md
       - ensconce: desktop/ensconce.md
-  - Apps:
-      - kiwi-killswitch: apps/kiwi-killswitch.md
-      - kiwi-fox: apps/kiwi-fox.md
-      - kiwi-fox providers: apps/kiwi-fox-providers.md
-      - kiwi-cli-tools-desktop: apps/cli-tools.md
-      - kiwi-gen: apps/kiwi-gen.md
-      - kiwi-pentesting: apps/kiwi-pentesting.md
+      - kiwi-killswitch: desktop/kiwi-killswitch.md
+      - Client networks:
+          - Overview: clients/index.md
+          - kiwi-proxy: clients/kiwi-proxy.md
+          - kiwi-custodia: clients/kiwi-custodia.md
+          - kiwi-fox: clients/kiwi-fox.md
+          - Provider modules: clients/providers.md
+      - gnome-monitor: desktop/gnome-monitor.md
+      - syncman: desktop/syncman.md
+      - kiwi-cli-tools-desktop: desktop/cli-tools.md
+      - kiwi-gen: desktop/kiwi-gen.md
   - Project:
       - Repositories & status: project/status.md
+      - Icons & colours: project/brand.md
       - Contributing: project/contributing.md

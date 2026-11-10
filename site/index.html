@@ -3,9 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Kiwi Network — your own private network, built from one file</title>
-  <meta name="description" content="Open-source tools for running your own private network: kiwi-server builds a WireGuard mesh with its own DNS, CA and services from one fleet file; kiwi-updater puts privacy apps on a Fedora Atomic desktop.">
-  <link rel="icon" href="kiwi.svg" type="image/svg+xml">
+  <title>Kiwi Network — connect your machines, your people and your desktop</title>
+  <meta name="description" content="Open-source tools to connect what is yours: kiwi-server builds a private WireGuard mesh with its own DNS, CA and services; Armory and kiwi-framework connect people over nostr; kiwi-updater puts privacy apps on a Fedora Atomic desktop.">
+  <meta name="theme-color" content="#11161c" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f6f7f1" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="icons/kiwi-network.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
   <script>
     try { var t = localStorage.getItem('kiwi-theme'); if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t); } catch (e) {}
@@ -17,12 +19,12 @@
   <header class="bar">
     <div class="wrap bar__inner">
       <a class="brand" href="./">
-        <img src="kiwi.svg" alt="" width="28" height="28">
+        <img src="icons/kiwi-network.svg" alt="" width="30" height="30">
         <span>Kiwi Network</span>
       </a>
       <nav class="nav" id="nav" aria-label="Main">
         <a href="#network">Network</a>
-        <a href="#server">kiwi-server</a>
+        <a href="#people">People</a>
         <a href="#desktop">Desktop</a>
         <a href="#status">Status</a>
         <a href="docs/">Docs</a>
@@ -41,271 +43,280 @@
   </header>
 
   <main id="main">
-    <!-- Hero -->
+    <!-- ============ HERO ============ -->
     <section class="hero">
       <div class="wrap hero__grid">
         <div class="hero__text">
           <p class="eyebrow">Open source · self-hosted · no accounts</p>
-          <h1>Your own private network, built from&nbsp;one&nbsp;file.</h1>
+          <h1>Connect what&nbsp;is <span class="hl">yours.</span></h1>
           <p class="lede">
-            Kiwi Network is a set of open-source tools.
-            <strong>kiwi-server</strong> turns a VPS and the machines you own into a WireGuard mesh
-            with its own DNS, its own certificate authority and your services behind it.
-            <strong>kiwi-updater</strong> puts privacy apps on your Fedora Atomic desktop and keeps them current, straight from git.
+            Kiwi Network is a family of open-source tools for connecting your
+            <a href="#network" class="pill pill--net">machines</a>, your
+            <a href="#people" class="pill pill--ppl">people</a> and your
+            <a href="#desktop" class="pill pill--dsk">desktop</a>,
+            without a platform in between. A private WireGuard mesh built from one file,
+            peer-to-peer tools that encrypt before anything leaves your device,
+            and apps that install straight from git.
           </p>
           <div class="cta">
-            <a class="btn btn--primary" href="docs/server/">Build a network</a>
-            <a class="btn" href="docs/desktop/">Set up a desktop</a>
+            <a class="btn btn--primary" href="docs/">Read the docs</a>
+            <a class="btn" href="https://derlocke-ng.github.io/armory/">Try Armory</a>
           </div>
         </div>
 
-        <figure class="file">
-          <figcaption class="file__name"><span>fleet.yaml</span><span class="file__hint">one file, every machine</span></figcaption>
-<pre><code><span class="k">hosts:</span>
-  <span class="h">gate:</span>                       <span class="c"># a VPS</span>
-    <span class="k">role:</span> master
-    <span class="k">target:</span> debian
-    <span class="k">master:</span>
-      <span class="k">vpn-client:</span> { <span class="k">vpn_provider:</span> mullvad, … }
-      <span class="k">vpn-server:</span> { <span class="k">wg_host:</span> vpn.example.org }
-  <span class="h">sh3:</span>                        <span class="c"># a box at home</span>
-    <span class="k">role:</span> node-cloud
-    <span class="k">target:</span> ucore
-    <span class="k">node-cloud:</span>
-      <span class="k">vpn-client:</span> { <span class="k">wireguard_config:</span> secrets/sh3.home.conf }</code></pre>
-          <div class="file__out">
-            <code>$ kiwi-server build fleet.yaml</code>
-            <span>→ a first-boot script and an <strong>unattended install ISO</strong> per host</span>
-          </div>
+        <figure class="orbit" aria-label="The Kiwi tools around the network">
+          <svg class="orbit__lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <circle cx="50" cy="50" r="39" />
+            <circle cx="50" cy="50" r="24" class="inner" />
+            <line x1="50" y1="50" x2="50" y2="11" /><line x1="50" y1="50" x2="77.6" y2="22.4" />
+            <line x1="50" y1="50" x2="89" y2="50" /><line x1="50" y1="50" x2="77.6" y2="77.6" />
+            <line x1="50" y1="50" x2="50" y2="89" /><line x1="50" y1="50" x2="22.4" y2="77.6" />
+            <line x1="50" y1="50" x2="11" y2="50" /><line x1="50" y1="50" x2="22.4" y2="22.4" />
+          </svg>
+          <img class="orbit__core" src="icons/kiwi-network.svg" alt="">
+          <a class="orbit__dot" style="--x:50%;--y:11%;--d:0s"   href="#network" title="kiwi-server"><img src="icons/kiwi-server.svg" alt="kiwi-server"></a>
+          <a class="orbit__dot" style="--x:77.6%;--y:22.4%;--d:-1s" href="#people" title="Armory"><img src="icons/kiwi-chat.svg" alt="Armory"></a>
+          <a class="orbit__dot" style="--x:89%;--y:50%;--d:-2s" href="#desktop" title="kiwi-updater"><img src="icons/kiwi-updater.svg" alt="kiwi-updater"></a>
+          <a class="orbit__dot" style="--x:77.6%;--y:77.6%;--d:-3s" href="#clients" title="kiwi-proxy"><img src="icons/kiwi-proxy.svg" alt="kiwi-proxy"></a>
+          <a class="orbit__dot" style="--x:50%;--y:89%;--d:-4s" href="#desktop" title="kiwi-killswitch"><img src="icons/kiwi-killswitch.svg" alt="kiwi-killswitch"></a>
+          <a class="orbit__dot" style="--x:22.4%;--y:77.6%;--d:-5s" href="#clients" title="kiwi-custodia"><img src="icons/kiwi-custodia.svg" alt="kiwi-custodia"></a>
+          <a class="orbit__dot" style="--x:11%;--y:50%;--d:-6s" href="#clients" title="kiwi-fox"><img src="icons/kiwi-fox.svg" alt="kiwi-fox"></a>
+          <a class="orbit__dot" style="--x:22.4%;--y:22.4%;--d:-7s" href="#desktop" title="ensconce"><img src="icons/ensconce.svg" alt="ensconce"></a>
         </figure>
+      </div>
+
+      <div class="wrap pillars">
+        <a class="pillar pillar--net" href="#network">
+          <img src="icons/kiwi-server.svg" alt="" width="44" height="44">
+          <span class="pillar__k">Network</span>
+          <strong>Your machines, one mesh</strong>
+          <span>A VPS and the boxes at home become a WireGuard mesh with its own DNS, CA, cloud and backups.</span>
+        </a>
+        <a class="pillar pillar--ppl" href="#people">
+          <img src="icons/kiwi-chat.svg" alt="" width="44" height="44">
+          <span class="pillar__k">People</span>
+          <strong>Your people, no platform</strong>
+          <span>Lists, chat, files, passwords and more, synced over nostr, sealed in your browser.</span>
+        </a>
+        <a class="pillar pillar--dsk" href="#desktop">
+          <img src="icons/kiwi-updater.svg" alt="" width="44" height="44">
+          <span class="pillar__k">Desktop</span>
+          <strong>Your desktop, from git</strong>
+          <span>Privacy apps for Fedora Atomic, installed and updated straight from open catalogs.</span>
+        </a>
       </div>
     </section>
 
-    <!-- Network -->
-    <section class="section" id="network">
+    <!-- ============ NETWORK ============ -->
+    <section class="section section--net" id="network">
       <div class="wrap">
         <header class="section__head">
-          <p class="eyebrow">The network</p>
+          <p class="eyebrow"><img src="icons/kiwi-network.svg" alt="" width="22" height="22"> The network</p>
           <h2>One door in. Everything else behind it.</h2>
-          <p>A Kiwi Network is a WireGuard mesh with one hub, the <em>kiwi-master</em>. It is the only machine that has to be reachable from the Internet. Nodes, laptops, phones and routers dial out to it and meet in the mesh.</p>
+          <p>A Kiwi Network is a WireGuard mesh with one hub, the <em>kiwi-master</em>, the only machine that has to be reachable from the Internet. Nodes, laptops, phones and routers dial out to it and meet in the mesh. All of it is described in one file and built by <strong>kiwi-server</strong>.</p>
         </header>
 
         <figure class="topo" aria-label="Network topology">
           <div class="topo__cap">Internet</div>
-          <div class="topo__edge"><span>the mesh's traffic leaves through a commercial VPN<br class="br-sm"> (gluetun · Mullvad by default): the <strong>double hop</strong></span></div>
-
+          <div class="topo__edge"><span>the mesh's traffic leaves through a commercial VPN: the <strong>double hop</strong></span></div>
           <div class="topo__master">
             <div class="topo__title">
+              <img src="icons/kiwi-server.svg" alt="" width="34" height="34">
               <strong>kiwi-master</strong>
-              <span>role <code>master</code> · a VPS or any reachable box</span>
+              <span>a VPS, or any box people can reach</span>
             </div>
             <ul class="chips">
               <li><b>wg-easy</b> WireGuard server · 10.8.0.1</li>
               <li><b>gluetun</b> the master's own exit</li>
               <li><b>Pi-hole</b> DNS for the mesh</li>
               <li><b>Tor</b> SOCKS5 for mesh clients</li>
+              <li><b>nginx</b> admin pages, mesh only</li>
+              <li><b>+ relay &amp; hub</b> for your people</li>
             </ul>
-            <div class="topo__port"><span class="dot"></span>UDP 51820: the one port the stack publishes</div>
+            <div class="topo__port"><span class="dot"></span>UDP 51820: the one port it publishes</div>
           </div>
-
-          <div class="topo__edge topo__edge--mesh"><span>WireGuard mesh · <code>10.8.0.0/16</code> · every device dials out to the master</span></div>
-
+          <div class="topo__edge topo__edge--mesh"><span>WireGuard mesh · <code>10.8.0.0/16</code> · everyone dials out</span></div>
           <div class="topo__row">
-            <div class="topo__node">
-              <strong>kiwi-node · cloud</strong>
-              <span>Nextcloud AIO, Vaultwarden, behind nginx with the fleet's certificate</span>
-            </div>
-            <div class="topo__node">
-              <strong>kiwi-node · gateway</strong>
-              <span>routes its LAN through the VPN; Pi-hole, DHCP relay, a download station that has no route if the tunnel drops, SFTP</span>
-            </div>
-            <div class="topo__node">
-              <strong>Laptops &amp; phones</strong>
-              <span>WireGuard clients of wg-easy, optionally in an isolated subnet that sees services but not each other</span>
-            </div>
-            <div class="topo__node">
-              <strong>Routers</strong>
-              <span>OpenWrt (a generated script), FritzBox and others bring a whole LAN into the mesh</span>
-            </div>
+            <div class="topo__node"><strong>node · cloud</strong><span>Nextcloud with Collabora and Vaultwarden, behind nginx with the fleet's certificate</span></div>
+            <div class="topo__node"><strong>node · gateway</strong><span>routes a LAN through the VPN: Pi-hole, DHCP, a download station with no route when the tunnel drops</span></div>
+            <div class="topo__node"><strong>devices &amp; guests</strong><span>client groups decide who reaches what: devices everything, guests only the nodes</span></div>
+            <div class="topo__node"><strong>routers</strong><span>OpenWrt (a generated script), FritzBox and others bring a whole LAN in</span></div>
           </div>
         </figure>
-
-        <div class="facts">
-          <article class="fact">
-            <h3>One resolver chain</h3>
-            <p>Every Pi-hole asks the master's first, so the whole network shares one blocklist and every lookup leaves through the master's exit. Quad9 only answers while the master is unreachable.</p>
-            <a href="docs/network/dns/">DNS &amp; names →</a>
-          </article>
-          <article class="fact">
-            <h3>Names that can't leak</h3>
-            <p>Services are <code>cloud.sh3.home</code>, <code>vault.sh3.home</code>. <code>.home</code> is never delegated as a public TLD, so nobody else can register your names or get a certificate for them.</p>
-            <a href="docs/network/dns/#names-servicehostnamehome">Why .home →</a>
-          </article>
-          <article class="fact">
-            <h3>Your own CA</h3>
-            <p>One certificate authority for the fleet, which can be name-constrained to your domain. Every machine kiwi-server builds trusts it; import <code>kiwiCA.pem</code> on your devices and internal HTTPS just works.</p>
-            <a href="docs/network/dns/#one-ca-for-the-fleet">The fleet CA →</a>
-          </article>
-          <article class="fact">
-            <h3>Reboots in your window</h3>
-            <p>Updates install continuously: Zincati on CoreOS, staged rpm-ostree on uCore, unattended-upgrades on Debian. A machine only reboots inside the window you choose.</p>
-            <a href="docs/server/targets/#updates">Updates →</a>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- kiwi-server -->
-    <section class="section section--alt" id="server">
-      <div class="wrap">
-        <header class="section__head">
-          <p class="eyebrow">kiwi-server</p>
-          <h2>Describe it. Boot it. Walk away.</h2>
-          <p>kiwi-server renders each host's role into one bash script, an Ignition or preseed config and an unattended install ISO. All templating happens on your machine; the host only needs docker. A CLI and a GTK4 app, installed in <code>~/.local</code>.</p>
-        </header>
 
         <ol class="steps">
           <li>
             <span class="steps__n">1</span>
-            <h3>Write the fleet</h3>
-            <pre><code>kiwi-server init
-$EDITOR fleet.yaml
-kiwi-server validate fleet.yaml</code></pre>
+            <h3>Describe</h3>
+            <p>Every host, its role and its disk in one <code>fleet.yaml</code>. Passwords you leave out are generated from a seed.</p>
           </li>
           <li>
             <span class="steps__n">2</span>
-            <h3>Build the media</h3>
-            <pre><code>kiwi-server build fleet.yaml
-sudo dd if=output/sh3/sh3.iso \
-  of=/dev/sdX bs=4M oflag=sync</code></pre>
+            <h3>Build</h3>
+            <pre><code>kiwi-server build fleet.yaml</code></pre>
+            <p>An unattended ISO per host: Fedora CoreOS, uCore or Debian. It wipes the disk you named and powers off.</p>
           </li>
           <li>
             <span class="steps__n">3</span>
-            <h3>Boot</h3>
-            <p>The ISO installs to the disk you named <strong>without asking</strong>, reboots, and runs the role once. The stack comes up; <code>kiwi-stack</code> runs it from then on.</p>
+            <h3>Apply</h3>
+            <pre><code>kiwi-server apply fleet.yaml sh3</code></pre>
+            <p>The role arrives over SSH. Podman quadlets come up, and the apply fails loudly unless every container runs.</p>
+          </li>
+          <li>
+            <span class="steps__n">4</span>
+            <h3>Run it</h3>
+            <pre><code>kiwi-server enroll fleet.yaml phone --qr
+kiwi-server status fleet.yaml</code></pre>
+            <p>Add devices, read every machine's health, back up, unlock encrypted disks.</p>
           </li>
         </ol>
 
-        <div class="roles">
-          <article class="role">
-            <h3><code>master</code></h3>
-            <p>The WireGuard entry point with the double hop, Pi-hole and Tor.</p>
-            <ul class="mods"><li>vpn-client</li><li>vpn-server</li><li>dns</li><li>tor</li></ul>
-          </article>
-          <article class="role">
-            <h3><code>node-gw</code></h3>
-            <p>A LAN gateway through the VPN, with DNS, DHCP relay and a download station.</p>
-            <ul class="mods"><li>vpn-client</li><li>dns</li><li>dhcp-relay</li><li>reverse-proxy</li><li>downloader</li><li>gateway</li><li>portainer</li><li>sftp</li></ul>
-          </article>
-          <article class="role">
-            <h3><code>node-cloud</code></h3>
-            <p>Your cloud and your passwords, on the LAN and in the mesh.</p>
-            <ul class="mods"><li>vpn-client</li><li>reverse-proxy</li><li>cloud</li><li>vault</li><li>portainer</li></ul>
-          </article>
-          <article class="role">
-            <h3><code>bare</code></h3>
-            <p>Admin user, SSH keys, automatic updates. A clean base to build on.</p>
-            <ul class="mods"><li class="mods__none">no modules</li></ul>
-          </article>
+        <div class="facts">
+          <div class="fact"><h3>Client groups</h3><p>Devices, guests, routers and a pentest group, each with its own reach. Guests see your services, not your network.</p></div>
+          <div class="fact"><h3>Names that can't leak</h3><p><code>cloud.sh3.home</code>: one resolver chain through the master, names under a domain that is never public, and your own CA.</p></div>
+          <div class="fact"><h3>Encrypted disks</h3><p>LUKS on Debian and CoreOS, unlocked at boot by your own Tang rings, or by you over SSH into the initramfs.</p></div>
+          <div class="fact"><h3>Backups built in</h3><p>restic to a backup node every night, append-only. The fleet itself is backed up, encrypted, after every build.</p></div>
+          <div class="fact"><h3>Reboots in your window</h3><p>Updates install continuously; machines reboot only when you said they may.</p></div>
+          <div class="fact"><h3>Proven on hardware</h3><p>Booted end to end on VPSes, a mini PC and a VM, with a dead-node drill: back in about 14 minutes.</p></div>
         </div>
 
-        <p class="targets">
-          <span>Targets</span>
-          <b>Fedora CoreOS</b><b>uCore</b><b>Debian stable</b>
-          <a href="docs/server/">kiwi-server quick start →</a>
-        </p>
+        <p class="more"><a href="docs/network/">How the network works →</a> <a href="docs/server/">kiwi-server →</a> <a href="docs/server/modules/">All 20 modules →</a></p>
       </div>
     </section>
 
-    <!-- Desktop -->
-    <section class="section" id="desktop">
+    <!-- ============ PEOPLE ============ -->
+    <section class="section section--ppl" id="people">
       <div class="wrap">
         <header class="section__head">
-          <p class="eyebrow">The desktop</p>
+          <p class="eyebrow"><img src="icons/kiwi-chat.svg" alt="" width="22" height="22"> People</p>
+          <h2>Your people, no platform in between.</h2>
+          <p><strong>Armory</strong> is a set of peer-to-peer web tools that run entirely in your browser and sync over <a href="https://nostr.com">nostr</a> relays you choose. There is no sign-up and no server of ours, and everything private is sealed on your device before it leaves. It is built on <strong>kiwi-framework</strong>, and you can fork it into a hub for your own community.</p>
+        </header>
+
+        <div class="armory">
+          <a class="tool" href="https://derlocke-ng.github.io/armory/loadout/"><img src="icons/armory/loadout.svg" alt=""><strong>Loadout</strong><span>Shared lists, inventories and notes</span></a>
+          <a class="tool" href="https://derlocke-ng.github.io/armory/uplink/"><img src="icons/armory/uplink.svg" alt=""><strong>Uplink</strong><span>Messages, groups, rooms and calls</span></a>
+          <a class="tool" href="https://derlocke-ng.github.io/armory/payload/"><img src="icons/armory/payload.svg" alt=""><strong>Payload</strong><span>Encrypted file links, or browser to browser</span></a>
+          <a class="tool" href="https://derlocke-ng.github.io/armory/vault/"><img src="icons/armory/vault.svg" alt=""><strong>Vault</strong><span>Passwords, SSH keys and certificates</span></a>
+          <a class="tool" href="https://derlocke-ng.github.io/armory/authenticator/"><img src="icons/armory/authenticator.svg" alt=""><strong>Authenticator</strong><span>Two-factor codes on every device</span></a>
+          <a class="tool" href="https://derlocke-ng.github.io/armory/calendar/"><img src="icons/armory/calendar.svg" alt=""><strong>Calendar</strong><span>Your Nextcloud or CalDAV calendars</span></a>
+          <a class="tool" href="https://derlocke-ng.github.io/armory/outpost/"><img src="icons/armory/outpost.svg" alt=""><strong>Outpost</strong><span>Grow reports and diaries</span></a>
+          <a class="tool" href="https://derlocke-ng.github.io/armory/tradingpost/"><img src="icons/armory/tradingpost.svg" alt=""><strong>Trading Post</strong><span>A hemp marketplace</span></a>
+          <a class="tool" href="https://derlocke-ng.github.io/armory/devboard/"><img src="icons/armory/devboard.svg" alt=""><strong>DevBoard</strong><span>Hiring and available, signed notes</span></a>
+          <a class="tool" href="https://derlocke-ng.github.io/armory/pongjs/"><img src="icons/armory/pongjs.svg" alt=""><strong>pongjs</strong><span>Two-player Pong, browser to browser</span></a>
+        </div>
+
+        <div class="trio">
+          <div class="trio__item">
+            <h3>Sealed in your browser</h3>
+            <p>AES-256-GCM before anything leaves, private messages in NIP-17 gift wraps, and files encrypted with a key of their own. Relays store what they cannot read.</p>
+          </div>
+          <div class="trio__item">
+            <h3>Local first</h3>
+            <p>Every write lands on your device first, so the tools work offline, and a reconnecting device puts back whatever a relay forgot.</p>
+          </div>
+          <div class="trio__item">
+            <h3>Your own hub</h3>
+            <p>Fork Armory for your community, or run a private hub with its own relay on your kiwi-master, reachable from the mesh only.</p>
+          </div>
+        </div>
+        <p class="note">Relays still see metadata (who writes when, from which IP), and calls reveal IPs to each other. The <a href="docs/people/#privacy-model">privacy model</a> lists every limit.</p>
+
+        <div class="cta cta--center">
+          <a class="btn btn--ppl" href="https://derlocke-ng.github.io/armory/">Open Armory</a>
+          <a class="btn" href="docs/people/hubs/">Run your own hub</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DESKTOP ============ -->
+    <section class="section section--dsk" id="desktop">
+      <div class="wrap">
+        <header class="section__head">
+          <p class="eyebrow"><img src="icons/kiwi-updater.svg" alt="" width="22" height="22"> The desktop</p>
           <h2>Apps from git, on an image-based desktop.</h2>
-          <p>Built for Fedora Silverblue and Bluefin. <strong>kiwi-updater</strong> installs apps from git catalogs: an app is a repo with a <code>kiwi.manifest</code> and an <code>install.sh</code>, a release is a git tag. Everything goes in your home; an app that needs root says why before it asks. The immutable <code>/usr</code> is never touched.</p>
+          <p>Built for Fedora Silverblue and Bluefin. <strong>kiwi-updater</strong> installs apps from open git catalogs: an app is a repo, a release is a tag. Everything goes in your home. An app that needs root says why before it asks, and updates it without a password only when the release is signed.</p>
         </header>
 
         <div class="install">
           <div class="install__row">
-            <code id="get-kiwi">curl -fsSL https://raw.githubusercontent.com/derlocke-ng/kiwi-updater/main/get-kiwi.sh | bash -s -- --with-system</code>
+            <code id="get-kiwi">curl -fsSL https://raw.githubusercontent.com/derlocke-ng/kiwi-updater/main/get-kiwi.sh | bash</code>
             <button class="copy js-copy" type="button" data-copy="get-kiwi">Copy</button>
-          </div>
-          <div class="install__row">
-            <code id="add-cat">kiwi catalog add https://github.com/derlocke-ng/kiwi-catalog.git</code>
-            <button class="copy js-copy" type="button" data-copy="add-cat">Copy</button>
           </div>
         </div>
 
         <div class="apps">
-          <a class="app" href="docs/apps/kiwi-killswitch/">
-            <span class="app__meta"><span class="tag tag--rel">v0.2.2</span> user + root</span>
-            <h3>kiwi-killswitch</h3>
-            <p>A fail-closed VPN kill switch for GNOME. A root nftables daemon, driven from Quick Settings, a GTK4 app or the CLI, never asking for a password. If the tunnel drops, nothing leaves.</p>
-          </a>
-          <a class="app" href="docs/apps/kiwi-fox/">
-            <span class="app__meta"><span class="tag tag--rel">v0.1.3</span> rootless Podman</span>
-            <h3>kiwi-fox</h3>
-            <p>Isolated Windows&nbsp;11 browser identities, each with its own storage, exit, ad-blocking DNS and frozen fingerprint. The kill switch is the absence of a route.</p>
-          </a>
-          <a class="app" href="docs/apps/kiwi-fox-providers/">
-            <span class="app__meta"><span class="tag tag--main">tracks main</span> 4 modules</span>
-            <h3>kiwi-fox providers</h3>
-            <p>Exits for kiwi-fox: Tor (a circuit per profile), a VPN through gluetun, 9proxy residential, the Mysterium dVPN. Each one speaks SOCKS5 and nothing else.</p>
-          </a>
-          <a class="app" href="docs/desktop/ensconce/">
-            <span class="app__meta"><span class="tag tag--rel">v2.1.1</span> Bluefin-DX</span>
-            <h3>ensconce</h3>
-            <p>Turns a fresh Bluefin into your workstation from plain list files: packages, Flatpaks, extensions, Nextcloud sync, dconf, the login screen. <code>--export</code> clones a machine.</p>
-          </a>
-          <a class="app" href="docs/apps/cli-tools/">
-            <span class="app__meta"><span class="tag tag--rel">v1.0.0</span> CLI</span>
-            <h3>kiwi-cli-tools-desktop</h3>
-            <p><code>pweb</code> serves a folder over HTTPS, <code>select-server</code> picks a host from your SSH config, <code>tethering</code> fixes the TTL for hotspot traffic.</p>
-          </a>
-          <a class="app" href="docs/desktop/kiwi-updater/">
-            <span class="app__meta"><span class="tag tag--rel">v2.0.0</span> CLI + GTK4</span>
-            <h3>kiwi-updater</h3>
-            <p>Itself an app in the catalog. One user timer updates everything every six hours, root halves through a fixed-purpose polkit helper. <code>kiwi diff</code> before, <code>kiwi pin</code> to hold.</p>
-          </a>
+          <a class="app" style="--a:var(--c-updater)" href="docs/desktop/kiwi-updater/"><img src="icons/kiwi-updater.svg" alt=""><div><h3>kiwi-updater <span class="tag">v2.4.0</span></h3><p>Kiwi Apps: install, update, pin and diff apps from git catalogs. One user timer, signed releases for root.</p></div></a>
+          <a class="app" style="--a:var(--c-ensconce)" href="docs/desktop/ensconce/"><img src="icons/ensconce.svg" alt=""><div><h3>ensconce <span class="tag">v2.5.0</span></h3><p>A fresh Bluefin-DX set up from plain list files. <code>--export</code> clones a machine.</p></div></a>
+          <a class="app" style="--a:var(--c-killswitch)" href="docs/desktop/kiwi-killswitch/"><img src="icons/kiwi-killswitch.svg" alt=""><div><h3>kiwi-killswitch <span class="tag">v0.2.3</span></h3><p>A fail-closed VPN kill switch for GNOME: if the tunnel drops, nothing leaves.</p></div></a>
+          <a class="app" style="--a:var(--c-monitor)" href="docs/desktop/gnome-monitor/"><img src="icons/gnome-monitor.svg" alt=""><div><h3>gnome-monitor <span class="tag">v0.3.2</span></h3><p>Save and switch display layouts; hand a screen to another computer and get it back.</p></div></a>
+          <a class="app" style="--a:var(--c-syncman)" href="docs/desktop/syncman/"><img src="icons/syncman.svg" alt=""><div><h3>syncman <span class="tag">v0.4.1</span></h3><p>Two-way folder sync for game saves and more. rsync is the only dependency.</p></div></a>
+          <a class="app" style="--a:var(--c-cli)" href="docs/desktop/cli-tools/"><img src="icons/kiwi-cli-tools-desktop.svg" alt=""><div><h3>kiwi-cli-tools <span class="tag">v1.2.1</span></h3><p><code>torlink</code> reaches a machine over Tor, plus <code>pweb</code>, <code>select-server</code> and <code>tethering</code>.</p></div></a>
+          <a class="app" style="--a:var(--c-server)" href="docs/server/"><img src="icons/kiwi-server.svg" alt=""><div><h3>Kiwi Server <span class="tag">v2.42.0</span></h3><p>Build and run your network from a GTK app: live status, apply, unlock.</p></div></a>
+          <a class="app" style="--a:var(--c-gen)" href="docs/desktop/kiwi-gen/"><img src="icons/kiwi-gen.svg" alt=""><div><h3>kiwi-gen <span class="tag tag--web">web</span></h3><p>SSH and TLS keys and certificates, made offline in your browser.</p></div></a>
         </div>
 
-        <p class="aside">
-          Also: <a href="docs/apps/kiwi-gen/"><strong>kiwi-gen</strong></a>, SSH and TLS keys and certificates made offline in your browser, in an encrypted vault
-          (<a href="https://derlocke-ng.github.io/kiwi-gen/">try it</a>).
-        </p>
+        <!-- client networks -->
+        <div class="clients" id="clients">
+          <div class="clients__text">
+            <p class="eyebrow eyebrow--cli"><img src="icons/kiwi-proxy.svg" alt="" width="22" height="22"> Many client networks</p>
+            <h3>Ten clients, ten exits, zero mess.</h3>
+            <p>Give each client's SOCKS5 endpoint its own <strong>sealed exit</strong>: a rootless container whose only route is that upstream. Your tools join the exit they need. Nothing runs that isn't in use, and the host's own network is never touched.</p>
+            <ul class="ticks">
+              <li><b>kiwi-proxy</b> exits and gateways, and a local SOCKS5 port per exit for any app</li>
+              <li><b>kiwi-custodia</b> distro boxes where <em>everything</em> leaves through the exit, from <code>dnf</code> to static binaries</li>
+              <li><b>kiwi-fox</b> browser profiles on an exit: Camoufox, Firefox or Tor Browser</li>
+              <li><b>Tor &amp; Mysterium</b> modules for more exit IPs to test from</li>
+            </ul>
+            <a class="more-link" href="docs/clients/">Working with many client networks →</a>
+          </div>
+          <div class="clients__fig" aria-hidden="true">
+            <div class="cf-col">
+              <span class="cf-chip">client A · socks5</span>
+              <span class="cf-chip">client B · socks5</span>
+              <span class="cf-chip">Tor · Mysterium</span>
+            </div>
+            <div class="cf-mid">
+              <img src="icons/kiwi-proxy.svg" alt="" width="64" height="64">
+              <span>sealed gateways<br><small>one route each</small></span>
+            </div>
+            <div class="cf-col">
+              <span class="cf-chip cf-chip--app"><img src="icons/kiwi-custodia.svg" alt="" width="20" height="20">box: client A</span>
+              <span class="cf-chip cf-chip--app"><img src="icons/kiwi-fox.svg" alt="" width="20" height="20">browser: client B</span>
+              <span class="cf-chip cf-chip--app"><img src="icons/kiwi-plugin.svg" alt="" width="20" height="20">curl :1082</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- Status -->
+    <!-- ============ STATUS ============ -->
     <section class="section section--alt" id="status">
       <div class="wrap">
         <header class="section__head">
           <p class="eyebrow">Status</p>
           <h2>Where each piece stands.</h2>
-          <p>Young projects, described as they are. "Released" means a version tag, which is what kiwi-updater installs.</p>
+          <p>Young projects, described as they are. A version means a release tag, which is what kiwi-updater installs.</p>
         </header>
-
         <div class="table-wrap">
           <table class="status">
-            <thead>
-              <tr><th>Repository</th><th>State</th><th>Notes</th></tr>
-            </thead>
+            <thead><tr><th>Repository</th><th>Release</th><th>Notes</th></tr></thead>
             <tbody>
-              <tr><td><a href="https://github.com/derlocke-ng/kiwi-server">kiwi-server</a></td><td><span class="tag tag--main">main · 2.2.0</span></td><td>Generators tested in CI; first boot on real hardware not yet verified from the new pipeline. Not in the catalog: <code>kiwi add</code> it.</td></tr>
-              <tr><td><a href="https://github.com/derlocke-ng/kiwi-updater">kiwi-updater</a></td><td><span class="tag tag--rel">v2.0.0</span></td><td>Catalog registry and tag signatures planned.</td></tr>
-              <tr><td><a href="https://github.com/derlocke-ng/kiwi-killswitch">kiwi-killswitch</a></td><td><span class="tag tag--rel">v0.2.2</span></td><td>Not independently audited.</td></tr>
-              <tr><td><a href="https://github.com/derlocke-ng/ensconce">ensconce</a></td><td><span class="tag tag--rel">v2.1.1</span></td><td></td></tr>
-              <tr><td><a href="https://github.com/derlocke-ng/kiwi-fox">kiwi-fox</a></td><td><span class="tag tag--rel">v0.1.3</span></td><td>The provider subsystem is on <code>main</code>, after v0.1.3.</td></tr>
-              <tr><td>kiwi-plugin-<a href="https://github.com/derlocke-ng/kiwi-plugin-tor">tor</a> · <a href="https://github.com/derlocke-ng/kiwi-plugin-vpn">vpn</a> · <a href="https://github.com/derlocke-ng/kiwi-plugin-9proxy">9proxy</a> · <a href="https://github.com/derlocke-ng/kiwi-plugin-myst">myst</a></td><td><span class="tag tag--main">main · 0.1.0</span></td><td>Unit-tested; VPN, 9proxy and Mysterium need a real account to validate end to end.</td></tr>
-              <tr><td><a href="https://github.com/derlocke-ng/kiwi-cli-tools-desktop">kiwi-cli-tools-desktop</a></td><td><span class="tag tag--rel">v1.0.0</span></td><td></td></tr>
-              <tr><td><a href="https://github.com/derlocke-ng/kiwi-gen">kiwi-gen</a></td><td><span class="tag tag--web">web page</span></td><td>MIT. Runs from disk or <a href="https://derlocke-ng.github.io/kiwi-gen/">GitHub Pages</a>.</td></tr>
-              <tr><td><a href="https://github.com/derlocke-ng/kiwi-pentesting">kiwi-pentesting</a></td><td><span class="tag tag--wip">scaffold</span></td><td>Core library and catalog only; no CLI, GUI or installer yet.</td></tr>
-              <tr><td><a href="https://github.com/derlocke-ng/kiwi-cloud">kiwi-cloud</a>, <a href="https://github.com/derlocke-ng/kiwi-vpn-monitor">kiwi-vpn-monitor</a></td><td><span class="tag tag--old">superseded</span></td><td>By kiwi-server's <code>node-cloud</code> and by kiwi-killswitch.</td></tr>
+              <tr class="grp"><td colspan="3">Network</td></tr>
+              <tr><td><a href="https://github.com/derlocke-ng/kiwi-server">kiwi-server</a></td><td><span class="tag tag--rel">v2.42.0</span></td><td>Proven on hardware; federation, 5G phones and restoring a node's data not yet.</td></tr>
+              <tr><td><a href="https://github.com/derlocke-ng/kiwi-modules">kiwi-modules</a> · <a href="https://github.com/derlocke-ng/kiwi-stack">kiwi-stack</a></td><td><span class="tag tag--rel">v0.23.0 · v0.5.0</span></td><td>The renderer and the machine side, usable without a fleet.</td></tr>
+              <tr class="grp"><td colspan="3">People</td></tr>
+              <tr><td><a href="https://github.com/derlocke-ng/kiwi-framework">kiwi-framework</a></td><td><span class="tag tag--rel">v0.32.1</span></td><td>Blog, approvals and NIP-07/46 signers still to come.</td></tr>
+              <tr><td><a href="https://github.com/derlocke-ng/armory">Armory</a></td><td><span class="tag tag--main">main</span></td><td>Live on GitHub Pages and as a container image.</td></tr>
+              <tr class="grp"><td colspan="3">Desktop</td></tr>
+              <tr><td><a href="https://github.com/derlocke-ng/kiwi-updater">kiwi-updater</a></td><td><span class="tag tag--rel">v2.4.0</span></td><td>Signed releases for root; other apps' tags not signed yet.</td></tr>
+              <tr><td><a href="https://github.com/derlocke-ng/kiwi-proxy">kiwi-proxy</a> · <a href="https://github.com/derlocke-ng/kiwi-custodia">custodia</a> · <a href="https://github.com/derlocke-ng/kiwi-fox">fox</a></td><td><span class="tag tag--rel">v0.7.3 · v0.2.3 · v0.7.1</span></td><td>TCP and IPv4 only; one VPN configuration per machine.</td></tr>
+              <tr><td>kiwi-plugin-<a href="https://github.com/derlocke-ng/kiwi-plugin-tor">tor</a> · <a href="https://github.com/derlocke-ng/kiwi-plugin-vpn">vpn</a> · <a href="https://github.com/derlocke-ng/kiwi-plugin-9proxy">9proxy</a> · <a href="https://github.com/derlocke-ng/kiwi-plugin-myst">myst</a></td><td><span class="tag tag--rel">v0.3 · v0.2 · v0.2 · v0.5</span></td><td>Mysterium verified end to end; VPN and 9proxy not yet.</td></tr>
+              <tr><td>killswitch · ensconce · gnome-monitor · syncman · cli-tools</td><td><span class="tag tag--rel">released</span></td><td>All in the <a href="https://github.com/derlocke-ng/kiwi-catalog">Kiwi catalog</a>.</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="aside"><a href="docs/project/status/">All repositories and known gaps →</a></p>
+        <p class="more"><a href="docs/project/status/">Every repository and known gap →</a></p>
       </div>
     </section>
   </main>
@@ -313,15 +324,16 @@ sudo dd if=output/sh3/sh3.iso \
   <footer class="foot">
     <div class="wrap foot__inner">
       <div class="brand brand--foot">
-        <img src="kiwi.svg" alt="" width="22" height="22">
+        <img src="icons/kiwi-network.svg" alt="" width="24" height="24">
         <span>Kiwi Network</span>
       </div>
       <nav class="foot__links" aria-label="Footer">
         <a href="docs/">Documentation</a>
+        <a href="https://derlocke-ng.github.io/armory/">Armory</a>
         <a href="https://github.com/derlocke-ng">GitHub</a>
         <a href="https://github.com/derlocke-ng/kiwi-network">Edit this site</a>
       </nav>
-      <p class="foot__note">This page loads nothing from third parties: no fonts, no analytics, no cookies. Site content AGPL-3.0; each tool carries its own license.</p>
+      <p class="foot__note">This page loads nothing from third parties: no fonts, no analytics, no cookies. Site content AGPL-3.0; each tool carries its own license. Icons from <a href="https://github.com/derlocke-ng/kiwi-icons">kiwi-icons</a>.</p>
     </div>
   </footer>
 

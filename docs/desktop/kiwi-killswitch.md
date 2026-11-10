@@ -9,7 +9,8 @@ connect your VPN for you: you bring connections up in GNOME Settings, and the
 kill switch builds a leak-proof firewall around whatever is actually alive.
 
 - Repository: [derlocke-ng/kiwi-killswitch](https://github.com/derlocke-ng/kiwi-killswitch), GPL-3.0-or-later
-- Latest release: **v0.2.2**. It is in the [Kiwi catalog](../desktop/catalogs.md), scopes user + system.
+- Latest release: **v0.2.3**. It is in the [Kiwi catalog](catalogs.md), scopes user + system.
+- GNOME Shell 45 to 50.
 
 ```
 ┌─ your session (unprivileged) ─────────────┐   ┌─ root ──────────────────────┐
@@ -47,7 +48,7 @@ firewall, so enforcement lives in the daemon and the UI only asks.
   "home LAN + kiwi-node" to "tethering + VPN" *while already on tethering*, then
   apply it as one atomic transaction with no disarmed window in between.
 - **Trusted kiwi-nodes.** A gateway that already tunnels for you (a
-  [node-gw](../server/roles.md#node-gw)), matched on IP **and** MAC, can stand
+  [gateway node](../server/roles.md#node)), matched on IP **and** MAC, can stand
   in for the VPN on its own network. It is opt-in and never inferred.
 - **One VPN, enforced.** Only the selected connection's server is reachable. Any
   other tunnel you start cannot connect, and the UI names it.
@@ -99,6 +100,18 @@ kiwi-killswitch pending                  # what is staged; revert discards it
 `kiwi-killswitch disarm`. If the daemon itself is gone:
 `sudo nft delete table inet kiwi_ks` and `sudo nft delete table netdev kiwi_ks_egress`.
 
+**Virtual machines.** A bridged VM never routes through the host, so the kill
+switch leaves it alone (avoid `paranoid`, which filters at the physical card).
+A NAT'd VM routes through the host. `strict` sends it out the tunnel and blocks
+it when the tunnel is down. Add its subnet to `mgmt_subnets` so its DHCP and DNS
+reach the host:
+
+| Setting | Outbound | Inbound | Pinned off the tunnel |
+|---|---|---|---|
+| `allow_lan` | yes (auto) | no | no |
+| `bypass_subnets` | yes | no | no |
+| `mgmt_subnets` | yes | yes | yes |
+
 **Verifying.** Arm it, then take the VPN down (`nmcli connection down …`).
 `curl --max-time 5 ifconfig.me` must **time out**, not show your real IP. Do
 not judge it by comparing exit IPs: prove tunnel use with
@@ -115,12 +128,19 @@ not judge it by comparing exit IPs: prove tunnel use with
   set to *a resolver I choose*. NetworkManager and OpenVPN look the name up
   through the system resolver, which is blocked while no tunnel is up.
   Connections with a literal IP are unaffected.
+- **A resolver you choose is reachable outside the tunnel** while the tunnel is
+  down. Turn on DNS-over-TLS for it.
+- **A trusted node saved without a MAC** is matched on its gateway address alone.
 - **Passwordless control** is the D-Bus bus policy for group `wheel`. It also
   means any program running as you can turn the switch off without asking.
 - It stops network-level leaks. It is not Tails or Whonix and does nothing about
   browser fingerprinting, WebRTC, or an app that phones home through the tunnel.
-- It is a personal tool and has not been independently audited.
+- It is a personal tool and has not been independently audited. `tests/run.sh`
+  exercises the real daemon with real nftables, each test group in its own
+  namespace, without root.
+- Its release tags are not signed yet, so with kiwi-updater 2.4 its root half
+  asks for your password when it updates.
 
 It descends from the author's `gnome-vpn-killswitch` (boot ordering),
-[kiwi-vpn-monitor](https://github.com/derlocke-ng/kiwi-vpn-monitor) (gateway
-detection) and `nova-killswitch` (the daemon architecture).
+`kiwi-vpn-monitor` (gateway detection) and `nova-killswitch` (the daemon
+architecture).

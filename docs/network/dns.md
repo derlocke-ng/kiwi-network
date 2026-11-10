@@ -21,22 +21,34 @@ VPN client ───────────────────────
 
 Every stack host also carries the fleet's names in `/etc/hosts` (its own names
 pointing at itself), so backups and certificate renewals resolve without a
-Pi-hole.
+Pi-hole. On Fedora CoreOS and uCore the host itself resolves through its own
+stack's Pi-hole.
+
+**Neighbours on the same LAN.** A node's Pi-hole and hosts file answer with the
+**LAN address** of fleet nodes that have a static address in its own subnet, so
+traffic between two machines in the same room stays in the room. The master
+keeps answering with mesh addresses.
 
 ## Names: `service.hostname.home`
 
 Each host is `<host>.<domain>` (`sh3.home`), and each service it runs is a name
 under it: `cloud.sh3.home`, `vault.sh3.home`, `portainer.sh3.home`,
-`dl.m1.home`. Every name a module announces goes into the fleet's DNS records at
+`dl.m1.home`, and on the master `wg.gate.home`, `pihole.gate.home`,
+`hub.gate.home`, `relay.gate.home`. Every name a module announces goes into the fleet's DNS records at
 the host's **mesh address**. Every Pi-hole in the fleet resolves every host and
 service name (split-horizon, `fleet_records`). Add your own with
 `extra_records`.
 
-The example fleet uses **`.home`** because ICANN will not delegate it as a
+The default domain is **`.home`**, because ICANN will not delegate it as a
 public top-level domain. A fleet name can never leak to a public registry, and
 nobody else can register it or get a browser-trusted certificate for it.
-`.kiwi` is a real TLD, which is why the fleet moved away from it. `.internal` is
-the formally reserved alternative.
+`.kiwi` is a real TLD, which is why the fleet moved away from it. kiwi-server
+checks your choice: `home`, `corp`, `mail`, `internal`, `arpa` and `test` pass
+silently, `.local` is refused (it belongs to mDNS), `.lan` gets a warning
+(routers answer it themselves), and public TLDs get a warning.
+
+Names *outside* the fleet's domain, for a public hub or relay, get Let's
+Encrypt certificates when the master's reverse proxy is public.
 
 ## Mullvad SOCKS5 proxies by name
 
@@ -56,10 +68,11 @@ It is on in the master preset, whose exit is Mullvad. Turn it off with
 ## One CA for the fleet
 
 With `tls.auto: true` (the default), kiwi-server keeps **one certificate
-authority** for the fleet in `secrets/ca/` (`kiwiCA.key`, `kiwiCA.pem`, valid
-3650 days). Every host that runs the reverse proxy gets a certificate for
+authority** for the fleet in `secrets/ca/` (`kiwiCA.key`, `kiwiCA.pem`, RSA-4096,
+valid 3650 days), created the first time a host needs a certificate. Every host that runs the reverse proxy gets a certificate for
 `<hostname>` and `*.<hostname>` (825 days, the longest lifetime browsers still
-accept), and every machine kiwi-server builds trusts the CA.
+accept, renewed when fewer than 30 days are left), and every machine
+kiwi-server builds installs the CA in its trust store.
 
 Set **name constraints** and the CA can only sign names under the fleet's
 domain: `tls: { name_constraints: [home] }`. The example fleet does this; the

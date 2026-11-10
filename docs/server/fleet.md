@@ -1,65 +1,35 @@
 # The fleet file
 
-`fleet.yaml` describes every machine kiwi-server should build. It has two keys:
+`fleet.yaml` describes every machine kiwi-server builds. It has two keys:
 `defaults`, which applies to every host, and `hosts`, with one entry per
 machine. Anything a host sets overrides the defaults. `kiwi-server init` writes
-a commented starting point. The full reference is
-[examples/fleet.yaml](https://github.com/derlocke-ng/kiwi-server/blob/main/examples/fleet.yaml)
-in the repository.
+a commented starting point, and the full reference is
+[examples/fleet.yaml](https://github.com/derlocke-ng/kiwi-server/blob/main/examples/fleet.yaml).
 
 A host has a **target** (what gets installed) and a **role** (what it becomes):
 
-- `target`: `coreos`, `ucore` or `debian`. See [Targets](targets.md).
-- `role`: `bare`, `master`, `node-gw` or `node-cloud`. See [Roles](roles.md).
+- `target`: `coreos`, `ucore` (the default) or `debian`. See [Machines](machines.md).
+- `role`: `bare` (the default), `master` or `node`. See [Roles](roles.md).
 
-## Defaults
+## Example
 
 ```yaml
 defaults:
   target: ucore
   role: bare
-  domain: home                     # host "sh3" becomes sh3.home; names are service.sh3.home
+  domain: home                       # sh3 becomes sh3.home; services are cloud.sh3.home …
   timezone: Europe/Berlin
-  locale: en_US.UTF-8
-  keyboard: de
-  disk: /dev/sda                   # WIPED by the ISO without asking. nvme: /dev/nvme0n1
-
+  disk: /dev/sda                     # WIPED by the ISO without asking
   admin:
-    user: core                     # passwordless sudo on every target
-    password: change-me            # hashed at render time; or password_hash: $6$...
-    ssh_keys: [~/.ssh/id_ed25519.pub]   # a key, or a file containing keys
-    groups: [docker]
-    ssh_password_auth: false       # keys only; the password is for the console
+    user: core
+    ssh_keys: [~/.ssh/id_ed25519.pub]
+  updates: { enabled: true, days: [Sun], time: "03:30", length_minutes: 90 }
+  install: { on_done: poweroff }
+  tls: { auto: true, ca_dir: secrets/ca, name_constraints: [home] }
+  debian: { release: trixie, partitioning: lvm }
 
-  network:
-    dhcp: true                     # or dhcp: false with address/gateway/dns per host,
-    # iprange: 192.168.1.20-192.168.1.99   # or an iprange handing out addresses in file order
-
-  updates:                         # updates install continuously; this is when a REBOOT may happen
-    enabled: true
-    days: [Sun]                    # [] = any day
-    time: "03:30"                  # local time
-    length_minutes: 90
-
-  tls:
-    auto: true                     # one fleet CA, a *.<hostname> certificate per host
-    ca_dir: secrets/ca
-    name_constraints: [home]       # the CA may only sign names under the fleet's domain (default: [])
-
-  ucore:
-    image: ghcr.io/ublue-os/ucore:stable    # ucore-minimal / ucore / ucore-hci (+ -nvidia, -zfs)
-
-  debian:
-    release: trixie
-    partitioning: lvm              # regular | lvm | crypto (with encrypt: true + passphrase:)
-    packages: [vim, htop]
-```
-
-## Hosts
-
-```yaml
 hosts:
-  gate:                            # the kiwi-master, on Debian
+  gate:                              # the master, a Debian VPS
     role: master
     target: debian
     disk: /dev/vda
@@ -70,87 +40,99 @@ hosts:
         wireguard_addresses: 10.66.1.2/32
         server_countries: Germany
       vpn-server:
-        wg_host: vpn.example.org   # what clients and nodes connect to
-        wg_password: change-me-too # wg-easy admin
-      dns:
-        pihole_password: change-me-three
+        wg_host: vpn.example.org     # what clients and nodes connect to
 
-  m1:                              # a gateway node, on uCore (the default)
-    role: node-gw
-    node-gw:
-      pub_iface: eth0              # the LAN side
-      vpn-client:
-        wireguard_config: secrets/m1.home.conf   # the client config wg-easy issued
-      dns: { pihole_password: … }
-      downloader: { download_dir: /mnt/data/downloads, transmission_password: … }
-      sftp: { sftp_password: … }
-      portainer: { admin_password: … }
+  m1:                                # a gateway node
+    role: node
+    node:
+      preset: gateway
+      pub_iface: eth0                # the LAN side
+      downloader: { download_dir: /mnt/data/downloads }
 
-  sh3:                             # a cloud node on uCore HCI
-    role: node-cloud
+  sh3:                               # a cloud node on uCore HCI
+    role: node
     ucore: { image: ghcr.io/ublue-os/ucore-hci:stable }
-    node-cloud:
+    node:
+      preset: cloud
       vpn_ip: 10.8.0.25
-      vpn-client: { wireguard_config: secrets/sh3.home.conf }
       cloud: { nextcloud_datadir: /mnt/nvme_2tb/docker/knnc-data, memory_limit: 8192M }
-      vault: { signups_allowed: true }    # for the first account; turn it off afterwards
-
-  lab1:                            # just the base system
-    target: coreos
-    role: bare
+      vault: { signups_allowed: true }   # for the first account; turn it off afterwards
 ```
+
+There are no service passwords in it. Every password you leave out is
+generated from `secrets/seed`, and `kiwi-server secrets show fleet.yaml sh3`
+prints them. The nodes' WireGuard configs aren't named either:
+`kiwi-server enroll` writes `secrets/<hostname>.conf`, which each node finds by
+itself, and the node's mesh address is read from it.
+
+## Defaults
+
+| Key | Default |
+|---|---|
+| `target` / `role` / `domain` | `ucore` / `bare` / `home` |
+| `timezone` / `locale` / `keyboard` | `UTC` / `en_US.UTF-8` / `us` |
+| `disk` | none; required for `build`, must start with `/dev/` |
+| `admin` | `user: core`, `ssh_keys: []`, `ssh_password_auth: false`; give a `password_hash` for the console |
+| `network` | `dhcp: true`; static with `address` (CIDR), `gateway`, `dns`, or an `iprange` that hands out addresses in file order |
+| `updates` | `enabled: true`, `days: [Sun]`, `time: "03:30"`, `length_minutes: 90` |
+| `install` | `on_done: poweroff` (or `reboot`) |
+| `tls` | `auto: true`, `ca_dir: secrets/ca`, `name_constraints: []` |
+| `debian` | `release: trixie`, `partitioning: lvm` (`regular`, `lvm`, `crypto`), `encrypt: false` |
+| `ucore` | `image: ghcr.io/ublue-os/ucore:stable` |
+| `unlock` | Tang rings to bind the disk to (see [Operations](operations.md#encrypted-disks-and-unlocking)) |
+| `backup` | where the fleet directory is backed up to (`hosts: []`, `keep: 10`) |
+| `vps` | `server:` a netcup server id, name or nickname |
 
 ## How settings combine
 
 - Hosts override defaults **key by key**. The lists `admin.ssh_keys`,
-  `debian.packages` and the `coreos.*` lists *add* to the defaults instead of
-  replacing them.
-- A module role's block (`master:`, `node-gw:`, `node-cloud:`) holds the
-  **stack settings** at the top (`vpn_ip`, `pub_iface`, `docker_dir`,
-  `service_user`, `docker_subnet`, `master_ip`, the VPN restart and update
-  times) and then **one block per module**.
-- `modules:` inside the role block **replaces** the preset's module list. A
-  cloud node that also downloads is
-  `modules: [vpn-client, reverse-proxy, cloud, vault, downloader]` plus the
-  downloader's settings.
-- **File settings** (WireGuard configs, certificates) are paths relative to the
-  fleet file. Their *content* is embedded into the host's role script.
-- `key:` with no value means the default.
+  `debian.packages`, `debian.kernel_arguments` and the `coreos.*` lists *add*
+  to the defaults instead.
+- A module role keeps its settings in a block named after the role (`master:`,
+  `node:`): the **stack settings** first, then **one block per module**.
+- `modules:` in that block **replaces** the preset's module list. Required
+  modules are added by themselves.
+- **File settings** (certificates, configs) are paths relative to the fleet
+  file. Their content is embedded in the host's role script.
+- A setting given with no value means the default. A misspelled key is an error
+  with a suggestion.
 
-## Values kiwi-server works out for you
+## Stack settings
 
-- **A node's `vpn_ip`** is read from its WireGuard config's `Address` when it is
-  not set. When both are given and differ, `validate` warns.
-- **`master_ip`** (the master's mesh address, the nodes' DNS upstream) comes
-  from the fleet's master host.
-- **Static addresses** without typing them: `network: { dhcp: false, gateway: …,
-  iprange: 192.168.1.20-192.168.1.99 }` in the defaults hands each static host
-  the next free address in file order. A host's own `address:` is reserved
-  first.
-- **The data directories** belong to `service_user`, which is the admin user
-  unless set (uid 1000 on a fresh install, matching the containers' `PUID`
-  defaults). The rendered files stay root's.
+| Setting | Default | Notes |
+|---|---|---|
+| `preset` (node) | `gateway` | `gateway`, `cloud` or `minimal` |
+| `runtime` | `podman` | podman quadlets; `docker` runs docker compose |
+| `auto_update` | `registry` | weekly `podman auto-update`; `off`: images change with an apply |
+| `docker_dir` | `/home/user/docker` | the stack and its data |
+| `service_user` | the admin user | owns the data directories |
+| `vpn_ip` | from the WireGuard config | the machine's mesh address |
+| `master_ip` | from the fleet | the master's mesh address |
+| `mesh_subnet` | `10.8.0.0/16` | |
+| `wg_mtu` / `bridge_mtu` | `1376` / `1500` | measure with `kiwi-server mtu` |
+| `docker_subnet` | `172.64.0.0/24` master, `172.128.0.0/24` node | |
+| `pub_iface` | from the default route | the LAN interface |
+| `daily_vpn_restart` | `07:00` | empty: never |
+| `weekly_update` | `Sun *-*-* 00:00` | empty: never |
+
+`kiwi-server roles -v` and `kiwi-server modules -v` list every setting with its
+default.
 
 ## Checking what you wrote
 
 ```bash
 kiwi-server validate fleet.yaml          # errors and warnings
-kiwi-server show fleet.yaml sh3          # the effective config of one host, secrets masked
-kiwi-server roles -v                     # every role and stack setting with its default
-kiwi-server modules -v                   # every module setting with its default
+kiwi-server show fleet.yaml sh3          # one host's effective config, secrets masked
 ```
 
-## Migrating a v1 machine in place
+kiwi-server also checks the domain: `.local` is refused, `.lan` and public
+top-level domains get a warning (see [DNS](../network/dns.md#names-servicehostnamehome)).
 
-A machine that ran one of the old v1 stacks (kiwi-master, kiwi-node-gw,
-kiwi-cloud) can be taken over without losing data. Before the first start:
+## Taking over a v1 machine
 
-1. Set `docker_subnet` to what the old stack used (e.g. `172.129.0.0/24`), so
-   the containers keep their addresses and wg-easy keeps its peers.
-2. Rename the data directories to the module names: `kmvpn-server` →
-   `km-vpn-server`, `knvault` → `kn-vault`, `kntransmission` →
-   `kn-transmission`, and so on.
-
-SSH to a node over the mesh is one DNAT rule:
-`vpn-client: { extra_dnat_rules: ["2222/tcp:172.128.0.1:22"] }` (the docker
-gateway is the host).
+A machine that ran one of the old v1 stacks can be taken over without losing
+data. The default runtime is now podman, and the role script does not stop
+docker containers. So either set `runtime: docker`, or stop the old stack
+first. Then set `docker_subnet` to what the old stack used, and rename the data
+directories to the module names (`kmvpn-server` → `km-vpn-server`, `knvault` →
+`kn-vault`, …). The containers keep their addresses and wg-easy keeps its peers.

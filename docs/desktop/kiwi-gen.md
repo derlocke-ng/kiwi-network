@@ -6,10 +6,10 @@ and nothing is sent to any server.
 
 - Repository: [derlocke-ng/kiwi-gen](https://github.com/derlocke-ng/kiwi-gen), MIT
 - Live: [derlocke-ng.github.io/kiwi-gen](https://derlocke-ng.github.io/kiwi-gen/)
-- It is a static web page, not a kiwi-updater app.
+- It is a static web page, not a kiwi-updater app. There are no release tags.
 
-It fits the rest of the network: the SSH keys in your `fleet.yaml`, a CA for
-your own services, client certificates, all generated offline in the browser.
+Use it for the SSH keys in your fleet file, a CA for your own services, or
+client certificates, all generated offline in the browser.
 
 ## Features
 
@@ -37,8 +37,9 @@ here. It produces full-chain files and `.p12` bundles. Certificates pass
 certificates.
 
 **Inspect & convert.** Read certificates, CSRs, keys and SSH certificates (PEM
-or DER), check that a key matches a certificate, and convert private keys
-between PKCS#8, PKCS#1 and OpenSSH.
+or DER), check that a key matches a certificate, convert private keys between
+PKCS#8, PKCS#1 and OpenSSH (adding or removing a passphrase), and convert public
+keys between SSH and PEM.
 
 ## Running it
 
@@ -50,7 +51,8 @@ git clone https://github.com/derlocke-ng/kiwi-gen.git && cd kiwi-gen
 python3 -m http.server 8000      # then http://localhost:8000
 ```
 
-WebCrypto only works in secure contexts: HTTPS, `localhost` or `file://`.
+WebCrypto only works in secure contexts: HTTPS, `localhost` or `file://`. Plain
+HTTP from another machine will not work.
 
 ## How it works
 

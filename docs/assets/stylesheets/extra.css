@@ -73,3 +73,9 @@
 .md-typeset table:not([class]) th {
   white-space: nowrap;
 }
+
+/* Home page pillars and icon rows */
+.kiwi-pillars { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); margin: 1.2rem 0 1.6rem; }
+.kiwi-pillars > div { border: 1px solid var(--md-default-fg-color--lightest); border-radius: .6rem; padding: .2rem 1rem .6rem; }
+.kiwi-pillars > div p:first-child { margin-bottom: .2rem; }
+.kiwi-icons-row p { display: flex; flex-wrap: wrap; gap: .6rem; }

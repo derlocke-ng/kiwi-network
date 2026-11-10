@@ -1,69 +1,68 @@
 # Roles
 
-A role is what a machine becomes. Every role runs on all three
-[targets](targets.md).
+A role is what a machine becomes. Every role runs on all three targets.
 
-| Role | Title | Modules |
+| Role | What the machine becomes | Modules |
 |---|---|---|
-| `bare` | Bare system | none |
-| `master` | kiwi-master | `vpn-client`, `vpn-server`, `dns`, `tor` |
-| `node-gw` | kiwi-node (gateway) | `vpn-client`, `dns`, `dhcp-relay`, `reverse-proxy`, `downloader`, `gateway`, `portainer`, `sftp` |
-| `node-cloud` | kiwi-node (cloud) | `vpn-client`, `reverse-proxy`, `cloud`, `vault`, `portainer` |
+| `bare` | the base system: admin user, SSH, automatic updates | none |
+| `master` | the **kiwi-master**: WireGuard entry point with the double hop, Pi-hole, Tor and the admin pages | `vpn-client`, `vpn-server`, `dns`, `tor`, `reverse-proxy` |
+| `node`, preset `gateway` | a **kiwi-node** that routes a LAN through the VPN, with Pi-hole, DHCP relay, a download station and SFTP | `vpn-client`, `dns`, `dhcp-relay`, `reverse-proxy`, `downloader`, `gateway`, `portainer`, `sftp` |
+| `node`, preset `cloud` | a **kiwi-node** with Nextcloud and Vaultwarden | `vpn-client`, `reverse-proxy`, `cloud`, `vault`, `portainer` |
+| `node`, preset `minimal` | a **kiwi-node** to fill with modules of your choice | `vpn-client`, `reverse-proxy` |
 
-`master`, `node-gw` and `node-cloud` are **module roles**: a preset list of
-[modules](modules.md), rendered on your machine into a docker compose stack that
-the host starts on first boot.
+`node-gw` and `node-cloud` still work as names for the `gateway` and `cloud`
+presets.
 
-## `bare`
-
-Admin user, SSH and automatic updates: a clean machine to build on by hand.
+The module roles render a **stack**: podman quadlets by default (docker compose
+with `runtime: docker`), which `kiwi-stack` starts and keeps running. See
+[Modules](modules.md).
 
 ## `master`
 
-The WireGuard entry point, with a double hop through a commercial VPN, Pi-hole
-DNS and a Tor SOCKS proxy for the mesh. The preset changes these module
-defaults:
+The preset changes these module defaults:
 
 - `vpn-client`: `vpn_provider: mullvad`, `mss_clamp: true`
-- `dns`: `network_mode: vpn-server` (Pi-hole answers at the master's mesh
-  address), `mullvad_socks: true`
-- `tor`: `network_mode: vpn-server`
+- `dns`: `network_mode: vpn-server`, `mullvad_socks: true`
+- `tor` and `reverse-proxy`: `network_mode: vpn-server`
 
-Containers are named `km-…` and live on the `knet-master` network
-(`172.64.0.0/24`). See [How the network works](../network/index.md#the-master).
+So Pi-hole, Tor and nginx live in the WireGuard server's network namespace and
+answer at the master's mesh address. Containers are named `km-…` on the
+`knet-master` network (`172.64.0.0/24`).
 
-## `node-gw`
+A master can add `nostr-relay` and `hub` (a [hub for people](../people/hubs.md)),
+`portainer` and `backup` to its `modules:`. The relay and the hub run on
+masters only.
 
-A LAN gateway through the VPN, with Pi-hole, DHCP relay, Transmission and
-JDownloader behind nginx, plus Portainer and SFTP. The preset turns on Pi-hole's
-plain-HTTP web UI (`expose_web_ui: true`) on `web_ui_bind:web_ui_port`, which is
-`127.0.0.1:8080` unless you change it. The reverse proxy serves the admin page
-over TLS at `pihole.<hostname>` either way. Containers are named `kn-…` on
-`knet-node` (`172.128.0.0/24`).
+```yaml
+gate:
+  role: master
+  master:
+    modules: [vpn-client, vpn-server, dns, tor, reverse-proxy, nostr-relay, hub]
+```
 
-## `node-cloud`
+## `node`
 
-Nextcloud AIO and Vaultwarden behind nginx, reachable on the LAN and through
-the mesh, plus Portainer.
-
-## Changing a preset
-
-Inside a host's role block, `modules:` replaces the preset's list. Module
-dependencies are added automatically (for example, `vault` requires
-`vpn-client` and `reverse-proxy`):
+The preset picks the module list. `modules:` replaces it, and required modules
+come in by themselves. Containers are named `kn-…` on the `knet-node` network
+(`172.128.0.0/24`).
 
 ```yaml
 sh3:
-  role: node-cloud
-  node-cloud:
-    modules: [vpn-client, reverse-proxy, cloud, vault, downloader]
-    downloader: { download_dir: /mnt/data/downloads, transmission_password: … }
+  role: node
+  node:
+    preset: cloud
+    modules: [vpn-client, reverse-proxy, cloud, vault, portainer, backup]
+    backup: { server: https://backup.m1.home }   # m1 runs the backup-server module
 ```
+
+The gateway preset turns on Pi-hole's own web page (`expose_web_ui: true`) at
+`127.0.0.1:8080`. The reverse proxy serves it over TLS at `pihole.<hostname>`
+either way.
 
 ## Writing a role
 
 A role is a directory `roles/<name>/` with a `role.yaml` and an `apply.sh`. A
-module role lists its modules and includes the shared stack settings. Its
+module role lists its modules and includes the shared stack settings, and its
 `apply.sh` is one call:
 
 ```yaml
@@ -81,10 +80,7 @@ module_defaults:
 ks_role_apply() { ks_stack_apply; }
 ```
 
-A role without modules does its own thing in `ks_role_apply()` with the library
-in `roles/common/lib.sh`: `ks_say`/`ks_warn`/`ks_die`, `ks_apt`, `ks_file`,
-`ks_write`, `ks_subst`, `ks_ensure_user`, `ks_ensure_docker`, `ks_git_clone`,
-`ks_unit`, `ks_firewall_open`. Settings in `role.yaml` become `KS_ROLE_<KEY>`.
-The script runs as root with `set -euo pipefail` and sees `KS_HOSTNAME`,
-`KS_ADMIN_USER`, `KS_TARGET` and `KS_OS` (`debian` or `ostree`). The tests
-render and shellcheck every role in the tree.
+A role without modules does its own work in `ks_role_apply()`, using the
+library in `roles/common/lib.sh` (which comes from kiwi-stack). Settings in
+`role.yaml` become `KS_ROLE_<KEY>`. The script runs as root with
+`set -euo pipefail`. The tests render and shellcheck every role in the tree.

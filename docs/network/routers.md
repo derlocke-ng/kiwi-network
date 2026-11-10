@@ -5,7 +5,8 @@ behind a router can do the same without each device running WireGuard, in one
 of two ways:
 
 - **The router is a mesh client.** It runs WireGuard with a config the master's
-  wg-easy issued and routes the mesh subnet (`10.8.0.0/16`) into the tunnel.
+  wg-easy issued (`kiwi-server enroll fleet.yaml router --group routers`) and
+  routes the mesh subnet (`10.8.0.0/16`) into the tunnel.
   That is the *split* tunnel: only mesh traffic goes through it. The *full*
   tunnel sends everything, so the whole LAN reaches the Internet through the
   master's exit.
@@ -43,7 +44,8 @@ scp kiwi.sh root@192.168.1.1:/tmp/ && ssh root@192.168.1.1 sh /tmp/kiwi.sh
 ```
 
 The script installs the WireGuard package if it is missing. It creates an
-interface `kiwi` (change the name with `--name`) with one peer for the master
+interface `kiwi` (change the name with `--name`), with the fleet's `wg_mtu` as
+its MTU and one peer for the master
 and `route_allowed_ips`, a firewall zone the LAN may forward into (with
 masquerading and MSS clamping), and the dnsmasq forward for the fleet's domain
 (`server=/home/10.8.0.1`). With `--full`, dnsmasq sends every lookup to the
