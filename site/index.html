@@ -175,7 +175,7 @@ kiwi-server status fleet.yaml</code></pre>
           <div class="fact"><h3>Client groups</h3><p>Devices, guests, routers and a pentest group, each with its own reach. Guests see your services, not your network.</p></div>
           <div class="fact"><h3>Names that can't leak</h3><p><code>cloud.sh3.home</code>: one resolver chain through the master, names under a domain that is never public, and your own CA.</p></div>
           <div class="fact"><h3>Encrypted disks</h3><p>LUKS on Debian and CoreOS, unlocked at boot by your own Tang rings, or by you over SSH into the initramfs.</p></div>
-          <div class="fact"><h3>Backups built in</h3><p>restic to a backup node every night, append-only. The fleet itself is backed up, encrypted, after every build.</p></div>
+          <div class="fact"><h3>Backups built in</h3><p>restic to a backup node every night, append-only. The fleet itself is backed up, encrypted, to the nodes you name after every build.</p></div>
           <div class="fact"><h3>Reboots in your window</h3><p>Updates install continuously; machines reboot only when you said they may.</p></div>
           <div class="fact"><h3>Proven on hardware</h3><p>Booted end to end on VPSes, a mini PC and a VM, with a dead-node drill: back in about 14 minutes.</p></div>
         </div>
@@ -235,7 +235,7 @@ kiwi-server status fleet.yaml</code></pre>
         <header class="section__head">
           <p class="eyebrow"><img src="icons/kiwi-updater.svg" alt="" width="22" height="22"> The desktop</p>
           <h2>Apps from git, on an image-based desktop.</h2>
-          <p>Built for Fedora Silverblue and Bluefin. <strong>kiwi-updater</strong> installs apps from open git catalogs: an app is a repo, a release is a tag. Everything goes in your home. An app that needs root says why before it asks, and updates it without a password only when the release is signed.</p>
+          <p>Built for Fedora Silverblue and Bluefin. <strong>kiwi-updater</strong> installs apps from open git catalogs: an app is a repo, a release is a tag. User apps go in your home; an app that needs root says why before it asks, and updates it without a password only when the release is signed.</p>
         </header>
 
         <div class="install">
@@ -266,7 +266,7 @@ kiwi-server status fleet.yaml</code></pre>
               <li><b>kiwi-proxy</b> exits and gateways, and a local SOCKS5 port per exit for any app</li>
               <li><b>kiwi-custodia</b> distro boxes where <em>everything</em> leaves through the exit, from <code>dnf</code> to static binaries</li>
               <li><b>kiwi-fox</b> browser profiles on an exit: Camoufox, Firefox or Tor Browser</li>
-              <li><b>Tor &amp; Mysterium</b> modules for more exit IPs to test from</li>
+              <li><b>Tor &amp; Mysterium</b> modules for more exit IPs, handy for testing</li>
             </ul>
             <a class="more-link" href="docs/clients/">Working with many client networks →</a>
           </div>

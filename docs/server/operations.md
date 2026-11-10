@@ -59,7 +59,7 @@ sh3:
     backup: { server: https://backup.m1.home }
 ```
 
-Each night at 03:00 (±15 minutes) restic sends what each module asks to keep,
+Each night at 03:00 (within 15 minutes after) restic sends what each module asks to keep,
 encrypted. Each machine can reach only its own repository, and only add to it.
 So removing old snapshots runs from the operator's machine:
 

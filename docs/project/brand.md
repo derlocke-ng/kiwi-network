@@ -36,8 +36,9 @@ theme switcher, the palettes and copyable URLs.
 
 ## In an app
 
-Every Kiwi app ships its own byte-identical copy of the classic SVG and names it
-with `ICON=` in its `kiwi.manifest`. kiwi-updater 2.2 and later draws it from
+Most Kiwi apps ship a byte-identical copy of a classic SVG and name it with
+`ICON=` in their `kiwi.manifest`. gnome-monitor and syncman use the `kiwi-os`
+and `kiwi-cloud` icons, and kiwi-custodia carries its own. kiwi-updater 2.2 and later draws it from
 the app's own clone, so nothing is fetched at install time. An app with a
 `.desktop` launcher also installs it into the hicolor icon theme.
 

@@ -12,7 +12,7 @@ changes.
 | [**kiwi-proxy**](kiwi-proxy.md) | The engine. An **exit** is one upstream by name: a SOCKS5 you were given, or one a provider module makes. Bringing it up makes a **gateway**, a network namespace whose only route is that upstream. Host apps can use it as a local SOCKS5 port |
 | [**kiwi-custodia**](kiwi-custodia.md) | **Distro boxes on an exit**: Fedora, Ubuntu, Debian, Kali, Arch, openSUSE, Rocky or Alpine in a rootless container with its own home. *Everything* in the box leaves through the exit: package managers, games, static binaries that never heard of a proxy |
 | [**kiwi-fox**](kiwi-fox.md) | **Browser profiles on an exit**: Camoufox, Firefox or Tor Browser, each profile with its own storage |
-| [**Provider modules**](providers.md) | Exits from Tor, a VPN (gluetun), 9proxy or Mysterium. Tor and Mysterium give you more exit IPs to test from |
+| [**Provider modules**](providers.md) | Exits from Tor, a VPN (gluetun), 9proxy or Mysterium. Tor and Mysterium are the quick way to more exit IPs, handy for testing |
 
 ```
  client A: socks5://…  ─┐                                   ┌─ box "client-a" (Fedora: ssh, ansible, dnf …)
@@ -34,8 +34,10 @@ changes.
   its own home, so SSH keys and browser profiles do not cross.
 - **No root, no host routes.** Everything runs in rootless Podman, and the
   host's own network is untouched.
-- **DNS goes through the exit too**, with ad-blocking lists, or is handed to the
-  upstream itself (`--dns remote`, for Tor and `.onion` names).
+- **DNS goes through the exit too.** By default names resolve over DoH through
+  the exit, with ad-blocking lists. For a client's **internal hostnames**, hand
+  the names to the client's side instead with `--dns remote` (also the mode for
+  Tor and `.onion` names).
 
 ## Limits
 
@@ -58,7 +60,7 @@ These come from the repositories:
 kiwi install kiwi-custodia            # brings kiwi-proxy along
 kiwi-custodia setup                   # images and DNS data
 
-kiwi-proxy add client-a socks5://user:pass@jump.client-a.example:1080
+kiwi-proxy add client-a socks5://user:pass@jump.client-a.example:1080 --dns remote
 kiwi-custodia new client-a --exit client-a --distro fedora
 kiwi-custodia enter client-a          # a shell whose only way out is client A's SOCKS5
 ```

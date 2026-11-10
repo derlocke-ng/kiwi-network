@@ -82,8 +82,8 @@ INSTALLER=install.sh
 
 Other keys: `AUTHOR`, `CATEGORY`, `TAGS`, `SCREENSHOTS`, `ABOUT` (a file Kiwi
 Apps shows), `DEPENDS` and, for anything with a system half, `ROOT_REASON`.
-`ICON=` is an SVG or PNG of at most 1 MiB inside the repo. The Kiwi apps use
-their icon from [kiwi-icons](../project/brand.md).
+`ICON=` is an SVG or PNG of at most 1 MiB inside the repo. Most Kiwi apps take
+theirs from [kiwi-icons](../project/brand.md).
 
 !!! warning "Comments go on their own line"
     A value runs to the end of the line. `COMPONENTS=cli  # … gui …` makes the

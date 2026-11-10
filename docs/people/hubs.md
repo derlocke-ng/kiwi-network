@@ -13,7 +13,7 @@ three ways to run one:
 | Kind | How | Example |
 |---|---|---|
 | **Public** | Public relays; anyone can open it | Armory |
-| **Private** | The hub's relays are locked (`policy.relays: 'locked'`) and pages wait until one of them answers (`requireHub`), with relays inside a VPN | a company hub on a kiwi-node |
+| **Private** | The hub's relays are locked (`policy.relays: 'locked'`) and pages wait until one of them answers (`requireHub`), with relays inside a VPN | a company hub on its kiwi-master |
 | **Semi-public** | A private hub with a public area for chosen apps (the chat, for example) on public relays | |
 
 Every event belongs to one network (the hub's own, the public area, or a
@@ -96,8 +96,10 @@ at `relay.<host>`) and the `hub` module (this image, Armory by default, at
 `hub.<host>`). They are private by default: reachable from the mesh only, with
 the fleet's certificate. A semi-public hub adds `public_relays` and
 `public_mounts`. A public one adds `reverse-proxy.public`, which gets Let's
-Encrypt certificates. The relay then accepts posts only from the mesh and from
-the keys in `write_pubkeys`. See the [module reference](../server/modules.md#people).
+Encrypt certificates. The relay then accepts posts from the mesh, and from the
+Internet only from members who prove their key (NIP-42): those on the list the
+admins (`write_pubkeys`) sign, or, with `members: registered`, anyone with an
+account on the hub. See the [module reference](../server/modules.md#people).
 
 ## kiwi-web-catalog
 
@@ -108,9 +110,8 @@ hub's repository, `ref=` to pin), and a `kiwi.manifest` in each entry with a
 `CATEGORY` of `Framework`, `Hub` or `App`.
 
 Today it lists kiwi-framework, Armory and Armory's ten apps. It is **not** for
-`kiwi catalog add`: these entries have no installer. The kiwi-server module
-that installs a hub onto a node will read it once that module exists. The
-catalog files are public domain (CC0, per its README).
+`kiwi catalog add`: these entries have no installer, and nothing reads the
+catalog automatically yet. The catalog files are public domain (CC0, per its README).
 
 To add your hub: fork, add a line, make sure the repository carries a
 `kiwi.manifest`, and open a pull request.

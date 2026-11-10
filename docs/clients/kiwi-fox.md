@@ -10,8 +10,8 @@ else.
 
 - Repository: [derlocke-ng/kiwi-fox](https://github.com/derlocke-ng/kiwi-fox), GPL-3.0-or-later
 - Latest release: **v0.7.1**. It is in the [Kiwi catalog](../desktop/catalogs.md), user scope.
-- The engines (Camoufox under MPL-2.0, Firefox, Tor Browser) are fetched and
-  verified at setup, never redistributed.
+- The engines are fetched, never redistributed: Camoufox (MPL-2.0) at setup,
+  Firefox and Tor Browser on request (`kiwi-fox engine fetch`), signature-verified.
 
 | Engine | What a page sees |
 |---|---|

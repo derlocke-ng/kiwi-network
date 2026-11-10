@@ -15,8 +15,9 @@ fork and send a pull request to.
   in the base image, plus `ssh-keygen` for signature checks.
 - **Kiwi Apps** (`kiwi-gui`) is the GTK4 app: search, filters, a detail view per
   app with its icon, screenshots and dependencies. It shows the installer and
-  an update's diff before running either, and queues your clicks. It reads only
-  from the apps' clones, never from the network.
+  an update's diff before running either, and queues your clicks. Its data comes
+  from the CLI; icons and screenshots are read from the apps' clones, so nothing
+  is fetched for them.
 
 ## Install
 

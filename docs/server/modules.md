@@ -44,7 +44,7 @@ The last three are in no preset; add them to `modules:`.
 
 | Module | What it is | Runs on | Requires |
 |---|---|---|---|
-| `nostr-relay` | **strfry**, the relay a hub keeps its events on (at `relay.<host>`). Members are approved or registered (NIP-42). From the Internet only `write_pubkeys` may post | master | reverse-proxy |
+| `nostr-relay` | **strfry**, the relay a hub keeps its events on (at `relay.<host>`). From the Internet, members may post after proving their key (NIP-42): `approved` keys on the admins' signed list, or anyone `registered` with an account. The mesh may always post | master | reverse-proxy |
 | `hub` | a **kiwi-framework hub** as a container (Armory by default, at `hub.<host>`), private, semi-public or public | master | reverse-proxy |
 
 See [Running your own hub](../people/hubs.md).
@@ -53,7 +53,7 @@ See [Running your own hub](../people/hubs.md).
 
 | Module | What it is | Runs on | Requires |
 |---|---|---|---|
-| `backup` | this machine's data with **restic**, encrypted, to a backup-server node: nightly at `03:00` (±15 min) and with `kiwi-stack backup`. Each module says what of it is kept | both | none |
+| `backup` | this machine's data with **restic**, encrypted, to a backup-server node: nightly at `03:00` (within 15 minutes after) and with `kiwi-stack backup`. Each module says what of it is kept | both | none |
 | `backup-server` | a **restic REST server**; each machine reaches only its own repository, append-only | node | vpn-client, reverse-proxy |
 | `tang` | **Tang** servers so encrypted machines unlock at boot; one ring is one server with its own keys (default `infra` on `7500`) | node | none |
 
@@ -83,7 +83,7 @@ See [Operations](operations.md).
 | vault | `signups_allowed` | `false` | turn on for the first account, then off |
 | downloader | `download_dir` | (required) | |
 | nostr-relay | `members` | `approved` | or `registered` |
-| | `write_pubkeys` | `[]` | who may post from outside the mesh |
+| | `write_pubkeys` | `[]` | the admins: they may always post, and only their member and ban lists count |
 | hub | `image` | `ghcr.io/derlocke-ng/armory:latest` | any kiwi-framework hub |
 | | `public_relays`, `public_mounts` | `[]` | a semi-public hub |
 | backup | `server` | (required) | `https://…` of a backup-server node that lists this machine |
@@ -98,7 +98,8 @@ under the host's name:
 
 | Service | Name |
 |---|---|
-| wg-easy / Pi-hole (master) | `wg.<host>` / `pihole.<host>` |
+| wg-easy (master) | `wg.<host>` |
+| Pi-hole (any host with `dns` and the reverse proxy) | `pihole.<host>` |
 | Nextcloud | `cloud.<host>` |
 | Vaultwarden | `vault.<host>` |
 | Transmission / JDownloader | `dl.<host>` / `jd.<host>` |
