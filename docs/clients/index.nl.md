@@ -62,8 +62,8 @@ Deze grenzen staan in de repository’s zelf:
 - **Eén VPN-configuratie per machine.** De providermodule voor VPN heeft één
   gluetun-configuratie, met één `vpn.json` en één eigen WireGuard-configuratie.
   De exits ervan verschillen alleen in het land van de server. Heb je de eigen
-  VPN’s van meerdere klanten tegelijk nodig, dan is een SOCKS5-eindpunt per
-  klant op dit moment de manier om dat te doen.
+  VPN’s van meerdere klanten tegelijk nodig, dan doe je dat op dit moment
+  met een SOCKS5-eindpunt per klant.
 - **Een box beperkt het netwerk, maar is geen sandbox.** Net als een
   distrobox-container deelt hij je scherm, je sessiebus en je klembord. Wat hij
   niet kan, is het netwerk op een andere manier bereiken dan via zijn exit.

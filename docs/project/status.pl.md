@@ -26,7 +26,7 @@ instaluje kiwi-updater. Wersje są podane według stanu na listopad 2026.
 | [Armory](https://github.com/derlocke-ng/armory) | pierwszy hub zbudowany na kiwi-framework, z dziesięcioma narzędziami webowymi peer-to-peer ([na żywo](https://derlocke-ng.github.io/armory/)) | śledzi `main` (0.1.0) | GPL-3.0+ |
 | [kiwi-web-catalog](https://github.com/derlocke-ng/kiwi-web-catalog) | katalog hubów i ich aplikacji | (lista) | CC0 (README) |
 
-## Pulpit { #the-desktop }
+## Desktop { #the-desktop }
 
 | Repozytorium | Co to jest | Wydanie | Katalog | Licencja |
 |---|---|---|---|---|

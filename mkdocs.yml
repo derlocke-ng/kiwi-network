@@ -212,15 +212,14 @@ plugins:
           Modules: Moduły
           Machines: Maszyny
           Operations: Eksploatacja
-          Roadmap: Dokąd to zmierza
-          One machine without a fleet: Jedna maszyna bez floty
+          Roadmap: Plany rozwoju
+          One machine without a fleet: Jedna maszyna bez pliku fleet
           Hubs: Huby
           Hubs, not platforms: Huby, nie platformy
           The framework's apps: Aplikacje frameworka
           Armory, a distribution: Armory, dystrybucja
           Running your own hub: Własny hub
-          Desktop: Pulpit
-          Catalogs & publishing: Katalogi i publikowanie
+          Catalogs & publishing: Katalogi aplikacji i publikowanie
           Client networks: Sieci klientów
           Provider modules: Moduły dostawców
           Project: Projekt

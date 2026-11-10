@@ -2,7 +2,7 @@
 
 kiwi-proxy is bedoeld voor mensen die in de netwerken van veel klanten werken en
 elk netwerk via een eigen VPN- of SOCKS-verbinding bereiken. Je slaat elke
-verbinding op als **exit** met een naam, en start die alleen als je hem nodig
+verbinding op als **exit** met een naam, en start hem alleen als je hem nodig
 hebt. Elke exit is afgeschermd van de andere, en een programma dat een exit
 gebruikt, kan het netwerk alleen via die exit bereiken. Tien klanten betekenen
 dus niet tien VPN-verbindingen tegelijk op de host. Browsers, testtools,
@@ -12,9 +12,9 @@ als je eigen gebruiker draaien.
 
 - Repository: [derlocke-ng/kiwi-proxy](https://github.com/derlocke-ng/kiwi-proxy), GPL-3.0-or-later
 - Nieuwste release: **v0.7.3**. Staat in de [Kiwi-catalogus](../desktop/catalogs.md), scope user.
-- Bestaat uit een opdrachtregeltool (`kiwi-proxy`), een GTK4-app
+- kiwi-proxy bestaat uit een opdrachtregeltool (`kiwi-proxy`), een GTK4-app
   (**Kiwi Proxy**) en systemd-units voor je eigen gebruiker. Het is de
-  proxy-engine die vroeger in kiwi-fox zat. Hij is naar een eigen project
+  proxy-engine die vroeger in kiwi-fox zat. Die is naar een eigen project
   verhuisd, zodat meer dan één app hem kan gebruiken.
 
 Een **exit** is een opgeslagen verbinding naar een upstream, met een eigen naam.
@@ -120,9 +120,9 @@ SOCKS5-proxy die je hebt gekregen of van een providermodule. Voor een exit uit
 een module kies je uit een doorzoekbare lijst met landen of uit een lijst met
 nodes. Je kunt exits starten en stoppen, een exit als SOCKS5-poort op deze
 computer aanbieden en het adres kopiëren, en controleren wat de buitenwereld
-ziet als je er verbinding via maakt. De app laat ook zien welke leden bij een
-gateway zijn aangesloten en wat hun logs zijn, en je installeert en configureert
-er providermodules mee.
+ziet als je er verbinding via maakt. De app toont ook welke leden bij een
+gateway zijn aangesloten, met hun logs, en je installeert en configureert er
+providermodules mee.
 
 ## Op een kiwi-server-machine { #on-a-kiwi-server-machine }
 

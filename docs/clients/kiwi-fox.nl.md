@@ -1,8 +1,8 @@
 # kiwi-fox
 
 kiwi-fox geeft je een aparte browser voor elk klantnetwerk waarin je werkt, en
-voor elk account dat je beheert. Een browserprofiel voor een klant bereikt de
-webconsoles van die klant via de verbinding van die klant, en kan nergens anders
+voor elk account dat je beheert. Het browserprofiel voor een klant bereikt de
+webconsoles van die klant via diens eigen verbinding, en kan nergens anders
 heen. Een VPN-verbinding op de host heb je daarvoor niet nodig.
 
 Elk profiel is één blijvende identiteit. Het heeft een eigen opslag, draait een
@@ -27,8 +27,8 @@ blokkeert.
 | **Firefox** | Ongewijzigde Mozilla Firefox, die niets vervalst. Een pagina ziet de eigen waarden van deze machine. De verbinding gaat wel via de exit van het profiel |
 | **Tor Browser** | Ongewijzigde Tor Browser, verbonden via een exit op de module tor. Elke site krijgt een eigen circuit (een eigen pad door het Tor-netwerk), en `.onion`-namen werken |
 
-kiwi-fox is bedoeld voor mensen die meerdere accounts beheren die van hen zijn
-of die ze mogen beheren, en die niet willen dat die accounts via de fingerprint
+kiwi-fox is bedoeld voor mensen die meerdere accounts beheren die van henzelf
+zijn of waarvoor ze toestemming hebben, en die niet willen dat die accounts via de fingerprint
 van de browser of het IP-adres aan elkaar te koppelen zijn.
 
 ## Installeren { #install }
@@ -73,9 +73,9 @@ geen gateway. De browsercontainer heeft dan een eigen netwerk en gebruikt de
 eigen verbinding van deze machine. In dat geval is er niets afgeschermd: het
 verkeer is niet tot één route beperkt.
 
-De browsercontainer sluit zich aan bij de netwerk-namespace van de gateway. Alle
-Linux-capabilities worden eruit verwijderd, behalve `SYS_CHROOT`, die de eigen
-sandbox van Firefox nodig heeft. De container draait met `no-new-privileges`, en
+De browsercontainer sluit zich aan bij de netwerk-namespace van de gateway. Op
+`SYS_CHROOT` na, die de eigen sandbox van Firefox nodig heeft, krijgt de
+container geen enkele Linux-capability. De container draait met `no-new-privileges`, en
 de engine is alleen-lezen gekoppeld.
 
 ## Een Camoufox-profiel { #a-camoufox-profile }
@@ -91,7 +91,7 @@ het profiel consistent blijft, dus als de waarden nog bij elkaar passen.
 
 ## Wat het niet doet { #what-it-does-not-do }
 
-kiwi-fox belooft niet dat een profiel “onzichtbaar” is. Profielen zijn van
+kiwi-fox belooft niet dat een profiel “niet te detecteren” is. Profielen zijn van
 elkaar gescheiden in hun opslag, hun IP-adres en elke waarde die de engine kan
 vervalsen. Ze zijn **niet** gescheiden in kenmerken die van de hardware komen
 en in elke browser hetzelfde zijn. De beelden die de GPU echt tekent en de

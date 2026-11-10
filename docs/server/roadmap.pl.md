@@ -15,7 +15,7 @@ Dziś kiwi-server to narzędzie, które uruchamiasz na swoim komputerze. Plik
 fleet, sekrety i CA (urząd certyfikacji twojej sieci) są przechowywane na komputerze
 administratora. Plan zakłada, że kiwi-server stanie się **usługą**, która
 może działać na nodzie. Sieć będzie można wtedy tworzyć i nią zarządzać bez
-linuksowego pulpitu, z telefonu, i to w kilka osób. Maszyny nadal będzie można
+komputera z Linuksem, z telefonu, i to w kilka osób. Maszyny nadal będzie można
 odtworzyć z pliku fleet. Warstwa sterowania (control plane) to ta część, która
 przechowuje ten plik i uruchamia program, który zamienia plik fleet w konfigurację każdej maszyny.
 
