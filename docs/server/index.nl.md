@@ -19,10 +19,10 @@ GTK4-app, **Kiwi Server**. Beide worden in `~/.local` geïnstalleerd en hebben
 geen rootrechten nodig.
 
 - Repository: [derlocke-ng/kiwi-server](https://github.com/derlocke-ng/kiwi-server), GPL-3.0-or-later
-- Nieuwste release: **v2.42.0**. Je vindt hem in de [Kiwi-catalogus](../desktop/catalogs.md).
-- kiwi-server is gebouwd op [kiwi-modules](single.md) v0.23.0, met de modules en
+- Nieuwste release: **v2.71.1**. Je vindt hem in de [Kiwi-catalogus](../desktop/catalogs.md).
+- kiwi-server is gebouwd op [kiwi-modules](single.md) v0.29.1, met de modules en
   het programma dat er configuratie uit genereert, en op
-  [kiwi-stack](single.md) v0.5.0, het deel dat op elke machine draait. Van
+  [kiwi-stack](single.md) v0.7.1, het deel dat op elke machine draait. Van
   beide zit een kopie in kiwi-server (vendored), vastgezet op een tag.
 
 ```
@@ -182,9 +182,12 @@ tests (CI) genereren elke rol, halen elk script door shellcheck en valideren
 elke Butane-configuratie. Ook vergelijken ze vier referentiestacks, de golden
 stacks, byte voor byte met hun opgeslagen uitvoer.
 
-Federatie tussen netwerken is nog niet getest. Alles draait op IPv4. De
-Debian-ISO is er alleen voor amd64. Een control plane (`kiwi-server serve`) is
-gepland en ontworpen, maar nog niet gebouwd.
+De federatie tussen twee netwerken is in november 2026 getest tussen twee
+VPS'en. Alles gebruikt IPv4. arm64-boards werken als node: een Odroid N2+ met
+Armbian is ingericht vanaf een image dat kiwi-server heeft gemaakt (`target:
+armbian`); andere boards zijn niet getest. Een control node (`kiwi-server
+serve`, de module `control`) draait kiwi-server op een server thuis, met een
+webpagina voor de telefoon; hij is getest met één fleet.
 
 Lees verder: [Het fleetbestand](fleet.md) · [Rollen](roles.md) · [Modules](modules.md) ·
 [Machines](machines.md) · [Beheer](operations.md) ·

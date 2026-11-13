@@ -18,10 +18,10 @@ e como aplicação GTK4, **Kiwi Server**. Ambas são instaladas em `~/.local` e
 não precisam de permissões de root.
 
 - Repositório: [derlocke-ng/kiwi-server](https://github.com/derlocke-ng/kiwi-server), GPL-3.0-or-later
-- Última versão: **v2.42.0**. Está disponível no [catálogo Kiwi](../desktop/catalogs.md).
-- O kiwi-server assenta no [kiwi-modules](single.md) v0.23.0, que contém os
+- Última versão: **v2.71.1**. Está disponível no [catálogo Kiwi](../desktop/catalogs.md).
+- O kiwi-server assenta no [kiwi-modules](single.md) v0.29.1, que contém os
   módulos e o programa que gera a partir deles a configuração de cada máquina, e
-  no [kiwi-stack](single.md) v0.5.0, que é a parte que corre em cada máquina. O
+  no [kiwi-stack](single.md) v0.7.1, que é a parte que corre em cada máquina. O
   kiwi-server traz uma cópia de cada um (vendored), fixada numa tag.
 
 ```
@@ -180,9 +180,12 @@ afinada em ligações reais, incluindo ligações móveis. Os testes automático
 todas as configurações Butane. Comparam também, byte a byte, quatro stacks de
 referência, as chamadas golden stacks, com o resultado guardado.
 
-A federação entre redes ainda não foi testada. Tudo funciona com IPv4. A ISO de
-Debian só existe para amd64. Um plano de controlo (`kiwi-server serve`) está
-planeado e concebido, mas ainda não implementado.
+A federação entre duas redes foi testada em novembro de 2026 entre dois VPS.
+Tudo usa IPv4. As placas arm64 funcionam como node: uma Odroid N2+ com Armbian
+foi configurada a partir de uma imagem criada pelo kiwi-server (`target:
+armbian`); outras placas não foram testadas. Um control node (`kiwi-server
+serve`, o módulo `control`) executa o kiwi-server num servidor doméstico, com
+uma página web para o telemóvel; foi testado com uma fleet.
 
 Continua a ler: [O ficheiro fleet](fleet.md) · [Funções](roles.md) · [Módulos](modules.md) ·
 [Máquinas](machines.md) · [Operação](operations.md) ·
