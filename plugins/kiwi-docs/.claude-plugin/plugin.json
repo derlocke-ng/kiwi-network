@@ -1,0 +1,8 @@
+{
+  "name": "kiwi-docs",
+  "description": "Write the README and docs/ folder of a Kiwi Network repository: accurate, plain, and ready for kiwi-network.eu",
+  "author": { "name": "derlocke-ng" },
+  "homepage": "https://kiwi-network.eu/docs/project/contributing/",
+  "repository": "https://github.com/derlocke-ng/kiwi-network",
+  "license": "GPL-3.0-or-later"
+}

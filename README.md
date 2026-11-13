@@ -25,6 +25,9 @@ Every repository, with its release and known gaps, is on the
 site/              the homepage: plain HTML, CSS and JS; no build step, no third-party requests
 docs/              the documentation (MkDocs Material): page.md in English, page.de.md, page.fr.md … beside it
 mkdocs.yml         docs configuration (builds into build/docs)
+docs-sources.yml   the tool repositories whose docs/ folder the site shows
+tools/pull-docs.py pulls those docs/ folders in at each tool's latest release
+plugins/kiwi-docs/ the kiwi-docs guide: how a Kiwi repo writes its README and docs/
 .github/workflows/pages.yml   builds the docs, puts site/ at / and the docs at /docs/, deploys to GitHub Pages
 ```
 
@@ -33,7 +36,10 @@ Work on it locally:
 ```bash
 python -m pip install mkdocs-material mkdocs-static-i18n
 mkdocs serve                 # docs at http://127.0.0.1:8000
-mkdocs build --strict        # what CI runs: fails on broken links and anchors
+mkdocs build --strict        # fails on broken links and anchors
+
+python tools/pull-docs.py                    # what CI builds: these docs plus the tools' docs/
+mkdocs build --strict -f build/mkdocs.yml    # into build/docs
 
 python -m http.server -d site 8080   # the homepage
 ```
@@ -47,6 +53,22 @@ the source. A translation sits beside its page with the language as suffix
 (`modules.de.md`), keeps the English anchor on every heading
 (`## Tunnel-MTU { #tunnel-mtu }`) so links and the language switcher land on
 the same section, and a missing translation falls back to English.
+
+## The tools' own docs
+
+Each Kiwi tool keeps its full documentation in its own `docs/` folder. On every
+deploy, and once a day, `tools/pull-docs.py` takes the `docs/` folder of every
+repository in `docs-sources.yml` at its latest release tag, checks it, and puts
+its pages under the tool's translated overview page. A folder with a broken link
+is skipped, and the overview stays.
+
+How a tool writes its README and `docs/` is in the **kiwi-docs** guide in
+`plugins/kiwi-docs/skills/kiwi-docs/`. This repository is also a Claude Code
+plugin marketplace for it (`.claude-plugin/marketplace.json`), and Claude Code
+sessions here load it from `.claude/skills/kiwi-docs`. The tool repositories
+carry a copy in their own `.claude/skills/kiwi-docs/`, because cloud sessions
+load skills from the repository but do not install plugins. When you change the
+guide, bump its `VERSION`; the checker in each copy then says it is out of date.
 
 ## License
 

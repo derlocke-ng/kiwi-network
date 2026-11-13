@@ -1,0 +1,12 @@
+{
+  "name": "kiwi-network",
+  "description": "Skills for working on Kiwi Network repositories",
+  "owner": { "name": "derlocke-ng" },
+  "plugins": [
+    {
+      "name": "kiwi-docs",
+      "source": "./plugins/kiwi-docs",
+      "description": "Write the README and docs/ folder of a Kiwi Network repository: accurate, plain, and ready for kiwi-network.eu"
+    }
+  ]
+}

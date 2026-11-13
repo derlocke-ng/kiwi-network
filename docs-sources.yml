@@ -1,0 +1,59 @@
+# Repositories whose docs/ folder is shown on kiwi-network.eu.
+#
+# tools/pull-docs.py reads this list on every build. For each repository it
+# takes the latest release tag (vX.Y.Z, no pre-releases), checks out docs/ at
+# that tag, checks it with the kiwi-docs checker, and puts the pages next to
+# the translated overview page named here, in the menu under it. A repository
+# whose latest release has no docs/ folder, no docs/kiwi-docs.yml, or a broken
+# link is skipped, and the overview page stays as it is.
+#
+#   repo:      owner/name on GitHub
+#   overview:  the overview page in docs/ that the pages are shown under
+#   menu:      menu title for the pages, only needed when the overview page is
+#              itself the "Overview" entry of a section (as server/index.md is)
+#   ref:       a tag or branch to use instead of the latest release (rarely)
+#
+# How a repository writes its docs/ folder: the kiwi-docs guide in
+# plugins/kiwi-docs/skills/kiwi-docs/.
+
+sources:
+  # The network
+  - repo: derlocke-ng/kiwi-server
+    overview: server/index.md
+    menu: kiwi-server reference
+  - repo: derlocke-ng/kiwi-modules
+    overview: server/modules.md
+  - repo: derlocke-ng/kiwi-stack
+    overview: server/single.md
+
+  # Hubs
+  - repo: derlocke-ng/kiwi-framework
+    overview: people/apps.md
+  - repo: derlocke-ng/armory
+    overview: people/armory.md
+
+  # The desktop
+  - repo: derlocke-ng/kiwi-updater
+    overview: desktop/kiwi-updater.md
+  - repo: derlocke-ng/kiwi-catalog
+    overview: desktop/catalogs.md
+  - repo: derlocke-ng/ensconce
+    overview: desktop/ensconce.md
+  - repo: derlocke-ng/kiwi-killswitch
+    overview: desktop/kiwi-killswitch.md
+  - repo: derlocke-ng/gnome-monitor
+    overview: desktop/gnome-monitor.md
+  - repo: derlocke-ng/syncman
+    overview: desktop/syncman.md
+  - repo: derlocke-ng/kiwi-cli-tools-desktop
+    overview: desktop/cli-tools.md
+  - repo: derlocke-ng/kiwi-gen
+    overview: desktop/kiwi-gen.md
+
+  # Client networks
+  - repo: derlocke-ng/kiwi-proxy
+    overview: clients/kiwi-proxy.md
+  - repo: derlocke-ng/kiwi-custodia
+    overview: clients/kiwi-custodia.md
+  - repo: derlocke-ng/kiwi-fox
+    overview: clients/kiwi-fox.md
