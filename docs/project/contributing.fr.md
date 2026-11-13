@@ -30,6 +30,27 @@ dans le dépôt concerné. La liste des dépôts se trouve sur la page
 - **Ce site et cette documentation** se trouvent dans le dépôt
   [kiwi-network](https://github.com/derlocke-ng/kiwi-network).
 
+## Documenter un outil Kiwi { #documenting-a-kiwi-tool }
+
+Chaque outil Kiwi est documenté dans son propre dépôt. Son `README.md` est
+court : il dit ce qu’est l’outil, comment l’installer et où trouver le reste.
+La documentation complète se trouve dans son dossier `docs/`. Ce site affiche
+pour chaque outil une page de présentation traduite et, en dessous, les pages
+du dossier `docs/` de l’outil, telles qu’elles sont dans sa dernière version.
+Une correction apportée à la documentation d’un outil arrive donc sur ce site
+avec la version suivante de cet outil.
+
+La manière d’écrire un README et un dossier `docs/` est décrite dans le guide
+**kiwi-docs** : le ton, l’organisation des fichiers, la façon de vérifier
+chaque affirmation dans le code, et un script qui contrôle les liens et la
+structure. Sa source se trouve dans ce dépôt, sous
+[plugins/kiwi-docs](https://github.com/derlocke-ng/kiwi-network/tree/main/plugins/kiwi-docs/skills/kiwi-docs).
+Les dépôts des outils en contiennent une copie dans
+`.claude/skills/kiwi-docs/`, si bien que les sessions Claude Code ouvertes dans
+ces dépôts l’utilisent d’elles-mêmes. Les dépôts que ce site intègre, et la
+page sous laquelle chacun apparaît, sont listés dans
+[docs-sources.yml](https://github.com/derlocke-ng/kiwi-network/blob/main/docs-sources.yml).
+
 ## Ce dépôt { #this-repository }
 
 Le dépôt kiwi-network contient la page d’accueil et cette documentation :
@@ -47,8 +68,16 @@ ordinateur, lancez :
 ```bash
 python -m pip install mkdocs-material mkdocs-static-i18n
 mkdocs serve             # aperçu en direct sur http://127.0.0.1:8000
-mkdocs build --strict    # ce que construit la CI : échoue sur les liens et ancres cassés
+mkdocs build --strict    # échoue sur les liens et ancres cassés
 python -m http.server -d site 8080   # la page d'accueil
+```
+
+Ce que construit la CI contient en plus les pages des outils. Pour construire
+cette version, lancez :
+
+```bash
+python tools/pull-docs.py                      # la documentation de ce dépôt, plus le dossier docs/ de chaque outil
+mkdocs build --strict -f build/mkdocs.yml      # le résultat se trouve dans build/docs/
 ```
 
 À chaque push sur `main`, la page d’accueil et la documentation sont publiées

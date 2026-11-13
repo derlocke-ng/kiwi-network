@@ -27,6 +27,27 @@ riferiscono. I repository sono elencati in
 - **Questo sito e questa documentazione** si trovano nel repository
   [kiwi-network](https://github.com/derlocke-ng/kiwi-network).
 
+## Documentare uno strumento Kiwi { #documenting-a-kiwi-tool }
+
+Ogni strumento Kiwi è documentato nel suo repository. Il suo `README.md` è
+breve: dice che cos’è lo strumento, come si installa e dove si trova il resto.
+La documentazione completa sta nella sua cartella `docs/`. Questo sito mostra
+per ogni strumento una pagina di panoramica tradotta e, sotto di essa, le
+pagine della cartella `docs/` dello strumento, prese dalla sua ultima release.
+Una correzione alla documentazione di uno strumento arriva quindi su questo
+sito con la release successiva di quello strumento.
+
+Come si scrivono un README e una cartella `docs/` lo spiega la guida
+**kiwi-docs**: il tono, l’organizzazione dei file, come verificare ogni
+affermazione sul codice, e uno script che controlla i link e la struttura. Il
+codice sorgente della guida si trova in questo repository, in
+[plugins/kiwi-docs](https://github.com/derlocke-ng/kiwi-network/tree/main/plugins/kiwi-docs/skills/kiwi-docs).
+I repository degli strumenti ne contengono una copia in
+`.claude/skills/kiwi-docs/`, così le sessioni di Claude Code in quei repository
+la usano da sole. Quali repository questo sito include, e sotto quale pagina
+compare ciascuno, è indicato in
+[docs-sources.yml](https://github.com/derlocke-ng/kiwi-network/blob/main/docs-sources.yml).
+
 ## Questo repository { #this-repository }
 
 Il repository kiwi-network contiene la homepage e questa documentazione:
@@ -44,8 +65,16 @@ computer, esegui:
 ```bash
 python -m pip install mkdocs-material mkdocs-static-i18n
 mkdocs serve             # anteprima dal vivo su http://127.0.0.1:8000
-mkdocs build --strict    # ciò che compila la CI: fallisce con link e ancore non validi
+mkdocs build --strict    # fallisce con link e ancore non validi
 python -m http.server -d site 8080   # la homepage
+```
+
+Ciò che compila la CI contiene anche le pagine degli strumenti. Per compilare
+questa versione, esegui:
+
+```bash
+python tools/pull-docs.py                      # la documentazione di questo repository più la cartella docs/ di ogni strumento
+mkdocs build --strict -f build/mkdocs.yml      # il risultato si trova in build/docs/
 ```
 
 Quando fai push su `main`, la homepage e la documentazione vengono pubblicate
