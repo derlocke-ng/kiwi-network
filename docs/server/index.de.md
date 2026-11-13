@@ -21,11 +21,11 @@ keine Root-Rechte.
 - Repository:
   [derlocke-ng/kiwi-server](https://github.com/derlocke-ng/kiwi-server),
   GPL-3.0-or-later
-- Aktuelles Release: **v2.42.0**. Es steht im
+- Aktuelles Release: **v2.71.1**. Es steht im
   [Kiwi-Katalog](../desktop/catalogs.md).
-- kiwi-server baut auf zwei Teilen auf: auf [kiwi-modules](single.md) v0.23.0
+- kiwi-server baut auf zwei Teilen auf: auf [kiwi-modules](single.md) v0.29.1
   mit den Modulen und dem Programm, das aus ihnen die Konfiguration erzeugt, und
-  auf [kiwi-stack](single.md) v0.5.0, dem Teil, der auf jeder Maschine läuft.
+  auf [kiwi-stack](single.md) v0.7.1, dem Teil, der auf jeder Maschine läuft.
   Beide sind vendored: kiwi-server enthält von jedem eine Kopie, festgelegt auf
   ein bestimmtes Tag.
 
@@ -188,9 +188,12 @@ Rolle, prüfen jedes Skript mit shellcheck und validieren jede
 Butane-Konfiguration. Außerdem vergleichen sie vier Referenz-Stacks, die
 sogenannten Golden Stacks, Byte für Byte mit ihrer gespeicherten Ausgabe.
 
-Die Föderation zwischen Netzwerken ist noch nicht getestet. Alles läuft über
-IPv4. Das Debian-ISO gibt es nur für amd64. Eine Control Plane
-(`kiwi-server serve`) ist geplant und entworfen, aber noch nicht umgesetzt.
+Die Föderation zwischen zwei Netzwerken wurde im November 2026 zwischen zwei VPS
+getestet. Alles läuft über IPv4. arm64-Boards laufen als Node: Ein Odroid N2+
+mit Armbian wurde aus einem Image eingerichtet, das kiwi-server erzeugt hat
+(`target: armbian`); andere Boards sind ungetestet. Ein Control Node
+(`kiwi-server serve`, das Modul `control`) lässt kiwi-server auf einem Server zu
+Hause laufen, mit einer Webseite fürs Handy; er wurde mit einer Fleet getestet.
 
 Weiterlesen: [Die Fleet-Datei](fleet.md) · [Rollen](roles.md) ·
 [Module](modules.md) · [Maschinen](machines.md) · [Betrieb](operations.md) ·
