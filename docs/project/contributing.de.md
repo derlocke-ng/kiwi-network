@@ -29,6 +29,28 @@ dem Repository, um das es geht. Eine Liste aller Repositories findest du unter
 - **Diese Website und diese Dokumentation** liegen im Repository
   [kiwi-network](https://github.com/derlocke-ng/kiwi-network).
 
+## Ein Kiwi-Werkzeug dokumentieren { #documenting-a-kiwi-tool }
+
+Jedes Kiwi-Werkzeug wird in seinem eigenen Repository dokumentiert. Seine
+`README.md` ist kurz. Sie sagt, was das Werkzeug ist, wie du es installierst
+und wo der Rest steht. Die vollständige Dokumentation liegt im Verzeichnis
+`docs/`. Diese Website zeigt für jedes Werkzeug eine übersetzte Überblicksseite
+und darunter die Seiten aus seinem Verzeichnis `docs/`, so wie sie in seinem
+neuesten Release stehen. Wenn du die Dokumentation eines
+Werkzeugs korrigierst, erscheint die Korrektur hier also mit dem nächsten
+Release dieses Werkzeugs.
+
+Wie du eine README und ein `docs/`-Verzeichnis schreibst, steht im Leitfaden
+**kiwi-docs**. Er beschreibt den Ton und den Aufbau, erklärt, wie du jede
+Aussage am Code überprüfst, und bringt ein Skript mit, das Links und Struktur
+prüft. Sein Quelltext liegt in diesem Repository unter
+[plugins/kiwi-docs](https://github.com/derlocke-ng/kiwi-network/tree/main/plugins/kiwi-docs/skills/kiwi-docs).
+Die Repositories der Werkzeuge enthalten eine Kopie davon in
+`.claude/skills/kiwi-docs/`, sodass Claude-Code-Sitzungen in diesen
+Repositories ihn von selbst verwenden. Welche Repositories diese Website
+einbindet und unter welcher Seite sie erscheinen, steht in
+[docs-sources.yml](https://github.com/derlocke-ng/kiwi-network/blob/main/docs-sources.yml).
+
 ## Dieses Repository { #this-repository }
 
 Das Repository kiwi-network enthält die Homepage und diese Dokumentation:
@@ -46,8 +68,16 @@ führe Folgendes aus:
 ```bash
 python -m pip install mkdocs-material mkdocs-static-i18n
 mkdocs serve             # Live-Vorschau unter http://127.0.0.1:8000
-mkdocs build --strict    # das baut auch die CI: schlägt bei kaputten Links und Ankern fehl
+mkdocs build --strict    # schlägt bei kaputten Links und Ankern fehl
 python -m http.server -d site 8080   # die Homepage
+```
+
+Die Version, die die CI baut, enthält außerdem die Seiten der Werkzeuge. Um
+diese Version zu bauen, führe Folgendes aus:
+
+```bash
+python tools/pull-docs.py                      # diese Dokumentation plus docs/ aus jedem Werkzeug
+mkdocs build --strict -f build/mkdocs.yml      # das Ergebnis liegt in build/docs/
 ```
 
 Wenn du nach `main` pushst, werden Homepage und Dokumentation über GitHub Pages

@@ -28,6 +28,27 @@ repositorio al que se refieren. Los repositorios están enumerados en
 - **Este sitio web y esta documentación** están en el repositorio
   [kiwi-network](https://github.com/derlocke-ng/kiwi-network).
 
+## Documentar una herramienta de Kiwi { #documenting-a-kiwi-tool }
+
+Cada herramienta de Kiwi se documenta en su propio repositorio. Su `README.md`
+es breve: dice qué es la herramienta, cómo se instala y dónde está el resto. La
+documentación completa está en su carpeta `docs/`. Este sitio muestra para cada
+herramienta una página de visión general traducida y, debajo, las páginas de la
+carpeta `docs/` de la herramienta, tal como están en su última versión. Así,
+una corrección en la documentación de una herramienta llega a este sitio con la
+siguiente versión de esa herramienta.
+
+Cómo se escriben un README y una carpeta `docs/` lo explica la guía
+**kiwi-docs**: el tono, cómo se organizan los archivos, cómo comprobar cada
+afirmación con el código y un script que revisa los enlaces y la estructura. Su
+código fuente está en este repositorio, en
+[plugins/kiwi-docs](https://github.com/derlocke-ng/kiwi-network/tree/main/plugins/kiwi-docs/skills/kiwi-docs).
+Los repositorios de las herramientas llevan una copia en
+`.claude/skills/kiwi-docs/`, de modo que las sesiones de Claude Code en esos
+repositorios la usan por su cuenta. Qué repositorios incorpora este sitio, y
+debajo de qué página aparece cada uno, está en
+[docs-sources.yml](https://github.com/derlocke-ng/kiwi-network/blob/main/docs-sources.yml).
+
 ## Este repositorio { #this-repository }
 
 El repositorio kiwi-network contiene la página principal y esta documentación:
@@ -44,8 +65,16 @@ Para ver la documentación y la página principal en tu propio ordenador, ejecut
 ```bash
 python -m pip install mkdocs-material mkdocs-static-i18n
 mkdocs serve             # vista previa en directo en http://127.0.0.1:8000
-mkdocs build --strict    # lo que construye la CI: falla si hay enlaces o anclas rotos
+mkdocs build --strict    # falla si hay enlaces o anclas rotos
 python -m http.server -d site 8080   # la página principal
+```
+
+Lo que construye la CI incluye además las páginas de las herramientas. Para
+construir esa versión, ejecuta:
+
+```bash
+python tools/pull-docs.py                      # la documentación de este repositorio más la carpeta docs/ de cada herramienta
+mkdocs build --strict -f build/mkdocs.yml      # el resultado queda en build/docs/
 ```
 
 Cuando haces push a `main`, la página principal y la documentación se publican

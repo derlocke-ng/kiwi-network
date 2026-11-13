@@ -28,6 +28,25 @@ w repozytorium, którego dotyczą. Lista repozytoriów jest na stronie
 - **Strona internetowa projektu i ta dokumentacja** są w repozytorium
   [kiwi-network](https://github.com/derlocke-ng/kiwi-network).
 
+## Dokumentowanie narzędzia Kiwi { #documenting-a-kiwi-tool }
+
+Każde narzędzie Kiwi ma dokumentację we własnym repozytorium. Jego `README.md`
+jest krótki i mówi, czym jest narzędzie, jak je zainstalować i gdzie szukać
+reszty. Pełna dokumentacja jest w folderze `docs/`. Ta witryna pokazuje dla
+każdego narzędzia przetłumaczoną stronę z przeglądem, a pod nią strony z
+folderu `docs/` tego narzędzia, w wersji z jego najnowszego wydania. Poprawka w
+dokumentacji narzędzia trafia więc tutaj razem z jego następnym wydaniem.
+
+Jak pisać README i folder `docs/`, opisuje przewodnik **kiwi-docs**: styl,
+układ plików, sposób sprawdzania każdego stwierdzenia w kodzie, a do tego
+skrypt, który kontroluje linki i strukturę. Jego źródło jest w tym
+repozytorium, w
+[plugins/kiwi-docs](https://github.com/derlocke-ng/kiwi-network/tree/main/plugins/kiwi-docs/skills/kiwi-docs).
+Repozytoria narzędzi mają jego kopię w `.claude/skills/kiwi-docs/`, więc sesje
+Claude Code w tych repozytoriach korzystają z niego same. Które repozytoria ta
+witryna pobiera i pod którą stroną je pokazuje, zapisano w
+[docs-sources.yml](https://github.com/derlocke-ng/kiwi-network/blob/main/docs-sources.yml).
+
 ## To repozytorium { #this-repository }
 
 Repozytorium kiwi-network zawiera stronę główną i tę dokumentację:
@@ -44,8 +63,16 @@ mkdocs.yml     docs configuration
 ```bash
 python -m pip install mkdocs-material mkdocs-static-i18n
 mkdocs serve             # podgląd na żywo pod http://127.0.0.1:8000
-mkdocs build --strict    # to buduje CI: kończy się błędem przy zepsutych linkach i kotwicach
+mkdocs build --strict    # kończy się błędem przy zepsutych linkach i kotwicach
 python -m http.server -d site 8080   # strona główna
+```
+
+Wersja, którą buduje CI, zawiera też strony narzędzi. Żeby ją zbudować,
+uruchom:
+
+```bash
+python tools/pull-docs.py                      # dokumentacja tego repozytorium plus folder docs/ każdego narzędzia
+mkdocs build --strict -f build/mkdocs.yml      # wynik trafia do build/docs/
 ```
 
 Po wypchnięciu zmian do `main` strona główna i dokumentacja są publikowane
