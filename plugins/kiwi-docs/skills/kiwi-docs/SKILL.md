@@ -82,5 +82,9 @@ tmp=$(mktemp -d) && git clone -q --depth 1 https://github.com/derlocke-ng/kiwi-n
   && cp -r "$tmp/plugins/kiwi-docs/skills/kiwi-docs" .claude/skills/ && rm -rf "$tmp"
 ```
 
+If the repository's `.gitignore` excludes `.claude/`, the copy is never
+committed. Replace that line with `.claude/*` and `!.claude/skills/`; the
+checker reports this case as an error.
+
 Do not edit the copy by hand. Change the source in kiwi-network and bump its
 `VERSION`.

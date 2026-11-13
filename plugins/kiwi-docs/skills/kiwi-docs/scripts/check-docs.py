@@ -222,7 +222,7 @@ def parse_nav(path):
         s = line.split("#", 1)[0].rstrip() if not line.lstrip().startswith("- ") else line.rstrip()
         if not s.strip() or s.strip() == "pages:":
             continue
-        m = re.match(r"^\s+-\s+([A-Za-z0-9._/-]+\.md)\s*:\s*(.+?)\s*$", s)
+        m = re.match(r"^\s*-\s+([A-Za-z0-9._/-]+\.md)\s*:\s*(.+?)\s*$", s)
         if not m:
             err(f"docs/kiwi-docs.yml:{n}", f"expected '  - page.md: Menu title', got: {line.strip()}")
             ok = False
@@ -287,6 +287,22 @@ def check_docs(repo):
                 err(f"docs/{t}", "headings differ from the English page (levels or count)")
 
 
+def check_ignored(repo):
+    """The guide copy and docs/ must be committed; a .gitignore rule can silently hide them."""
+    import subprocess
+    for rel in (".claude/skills/kiwi-docs/SKILL.md", "docs/kiwi-docs.yml", "docs/README.md"):
+        if not os.path.exists(os.path.join(repo, rel)):
+            continue
+        try:
+            r = subprocess.run(["git", "-C", repo, "check-ignore", "-v", rel], capture_output=True, text=True)
+        except OSError:
+            return
+        if r.returncode == 0:
+            rule = r.stdout.split("\t")[0]
+            err(rel, f"is ignored by git ({rule}), so it will not be committed. For .claude/ use "
+                     f"'.claude/*' plus '!.claude/skills/' in .gitignore")
+
+
 def check_upstream():
     try:
         mine = read(os.path.join(HERE, "..", "VERSION")).strip()
@@ -311,6 +327,8 @@ def main(argv):
     if "--docs-only" not in argv:
         check_readme(repo)
     check_docs(repo)
+    if "--docs-only" not in argv:
+        check_ignored(repo)
     if "--no-upstream" not in argv:
         check_upstream()
     os.chdir(cwd)

@@ -52,7 +52,7 @@ def read_nav(path):
     pages = []
     with open(path, encoding="utf-8") as f:
         for line in f:
-            m = re.match(r"^\s+-\s+([A-Za-z0-9._/-]+\.md)\s*:\s*(.+?)\s*$", line)
+            m = re.match(r"^\s*-\s+([A-Za-z0-9._/-]+\.md)\s*:\s*(.+?)\s*$", line)
             if m:
                 pages.append((m.group(1), m.group(2).strip("'\"")))
     return pages
