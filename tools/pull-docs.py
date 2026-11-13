@@ -109,12 +109,17 @@ def pull_source(src, local, nav):
         errors = [l for l in check.stdout.splitlines() if l.startswith("ERROR")]
         log(f"{repo} {ref}: docs/ has errors, skipped: " + " | ".join(errors[:5]), "warning")
         return
-    target_rel = overview[:-3]                       # desktop/kiwi-updater.md -> desktop/kiwi-updater
+    # desktop/kiwi-updater.md -> desktop/kiwi-updater/; an index.md overview (server/index.md)
+    # gets a folder named after the repository instead (server/kiwi-server/).
+    if os.path.basename(overview) == "index.md":
+        target_rel = os.path.join(os.path.dirname(overview), name)
+    else:
+        target_rel = overview[:-3]
     target = os.path.join(SRC, target_rel)
     if os.path.exists(target):
         log(f"{repo}: {target_rel}/ already exists in docs/; skipped", "warning")
         return
-    back = "../" + os.path.basename(overview)
+    back = os.path.relpath(os.path.join(SRC, overview), os.path.join(SRC, target_rel))
     tree = f"https://github.com/{repo}/tree/{ref}/docs" if ref != "local" else f"https://github.com/{repo}"
     for d, _, files in os.walk(docs):
         for f in files:
