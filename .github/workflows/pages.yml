@@ -5,6 +5,10 @@ on:
     branches:
       - main
   workflow_dispatch:
+  # Daily, to pick up new releases of the tools whose docs/ the site shows
+  # (docs-sources.yml).
+  schedule:
+    - cron: '23 3 * * *'
 
 permissions:
   contents: read
@@ -32,9 +36,14 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install mkdocs-material mkdocs-static-i18n
 
+      - name: Pull the tools' docs
+        run: |
+          # kiwi-network's docs/ plus each tool's docs/ at its latest release
+          python tools/pull-docs.py
+
       - name: Build docs
         run: |
-          mkdocs build --strict
+          mkdocs build --strict -f build/mkdocs.yml
 
       - name: Assemble Pages output
         run: |
